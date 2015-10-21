@@ -1,0 +1,127 @@
+#' simuDP
+#'
+#' Simulation for Differential Proportion Case
+#'
+#' @inheritParams singleCellSimu
+#' @inheritParams simuDE
+#'
+#'
+#' @return Simulated_Data Simulated dataset for DP
+
+
+simuDP <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC, coeff, RP, modeFC, DP,
+                   generateZero, constantZero){
+ 
+  numGenes <- nrow(Simulated_Data)
+  numSamples <- ncol(Simulated_Data)/2
+  numDE <- length(DEIndex)
+
+  # calculate means and variances with fold changes
+  MVC2 <- matrix(data=0,nrow=numGenes,ncol=2)
+  if(generateZero %in% c("empirical", "constant")){
+    MVC2[,1:2] <- t(sapply(1:length(samplename), function(x) calcMV(Dataset1[samplename[x],], FC=FC[x], FC.thresh=FC[x]^(1/2), 
+                                                                    threshold = 3, include.zeroes=FALSE)))
+  }else{
+    MVC2[,1:2] <- t(sapply(1:length(samplename), function(x) calcMV(Dataset1[samplename[x],], FC=FC[x], FC.thresh=FC[x]^(1/2), 
+                                                                    threshold = 3, include.zeroes=TRUE)))
+  }
+  
+  # calculate r and p parameters of NB
+  RPC2 <- t(apply(MVC2[,1:2], 1, function(x) calcRP(x[1], x[2])))
+  
+  ### Simulate data in condition1
+  for(i in 1:numGenes){
+    dp <- DP
+    flip <- as.logical(rbinom(1,1, 0.5))
+    if(flip){
+      dp <- rev(dp)
+    }
+    if(generateZero=="empirical"){
+      p <- round(numSamples*(1-Zeropercent_Base[i,1]))
+    } else if (generateZero=="constant"){
+      p <- round((1-constantZero)*numSamples)
+    }
+    
+    if(generateZero %in% c("empirical", "constant")){
+      temp <- matrix(data=0,nrow=p,ncol=2)
+      for(j in 1:p){
+        while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,1],1-RP[i,2])}
+        while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
+      }
+      
+      # place nonzeroes randomly
+      n1 <- round(p*dp[1],digits=0)
+      randp <- sample(1:numSamples, p, replace=FALSE)
+      Simulated_Data[i,randp] <-  c(sample(temp[,1],n1,replace=FALSE), 
+                                    sample(temp[,2],p-n1,replace=FALSE))
+      if(p<numSamples){
+        Simulated_Data[i,(1:numSamples)[-randp]] <-0
+      }
+    }else{
+      temp <- matrix(data=0,nrow=numSamples,ncol=2)
+      temp[,1] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+      temp[,2] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
+  
+      # sample from each mode
+      n1 <- round(numSamples*dp[1],digits=0)
+      Simulated_Data[i,1:numSamples] <-  c(sample(temp[,1],n1,replace=FALSE), 
+                                           sample(temp[,2],numSamples-n1,replace=FALSE))
+    }
+  
+  ### Simulate for condition2
+    if(generateZero=="empirical"){
+      p <- round(numSamples*(1-Zeropercent_Base[i,1]))
+    } else if (generateZero=="constant"){
+      p <- round((1-constantZero)*numSamples)
+    }
+    
+    if(generateZero %in% c("empirical", "constant")){  
+      if(i%in%DEIndex){
+       temp <- matrix(data=0,nrow=p,ncol=2)
+        for(j in 1:p){
+          while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,1],1-RP[i,2])}
+          while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
+        }
+        n1 <- round(p*dp[2],digits=0)
+        randp <- sample(1:numSamples, p, replace=FALSE)
+        Simulated_Data[i,numSamples+randp] <-  c(sample(temp[,1],n1,replace=FALSE), 
+                                          sample(temp[,2],p-n1,replace=FALSE))
+        if(p<numSamples){
+         Simulated_Data[i,((numSamples+1):(2*numSamples))[-randp]] <-0
+        }
+      }else{
+        temp <- matrix(data=0,nrow=p,ncol=2)
+        for(j in 1:p){
+          while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,1],1-RP[i,2])}
+          while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
+        }
+        n1 <- round(p*dp[1],digits=0)
+        randp <- sample(1:numSamples, p, replace=FALSE)
+        Simulated_Data[i,numSamples+randp] <-  c(sample(temp[,1],n1,replace=FALSE), 
+                                              sample(temp[,2],p-n1,replace=FALSE))
+        if(p<numSamples){
+          Simulated_Data[i,((numSamples+1):(2*numSamples))[-randp]] <-0
+        }
+      }
+    }else{
+      if(i%in%DEIndex){
+        temp <- matrix(data=0,nrow=numSamples,ncol=2)
+        temp[,1] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+        temp[,2] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
+  
+        n1 <- round(numSamples*dp[2],digits=0)
+        Simulated_Data[i,((numSamples+1):(2*numSamples))] <-  c(sample(temp[,1],n1,replace=FALSE), 
+                                                                sample(temp[,2],numSamples-n1,replace=FALSE))
+      }else{
+        temp <- matrix(data=0,nrow=numSamples,ncol=2)
+        temp[,1] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+        temp[,2] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
+        
+        n1 <- round(numSamples*dp[1],digits=0)
+        Simulated_Data[i,((numSamples+1):(2*numSamples))] <-  c(sample(temp[,1],n1,replace=FALSE), 
+                                                                sample(temp[,2],numSamples-n1,replace=FALSE))
+      }
+    }
+  }
+  return(list(Simulated_Data, f=f))
+}

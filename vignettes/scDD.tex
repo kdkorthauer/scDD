@@ -1,0 +1,383 @@
+ 	
+%\VignetteIndexEntry{Using scDD}
+
+\documentclass{article}
+\usepackage{underscore}
+
+\RequirePackage{/Library/Frameworks/R.framework/Versions/3.2/Resources/library/BiocStyle/resources/latex/Bioconductor}
+
+\AtBeginDocument{\bibliographystyle{/Library/Frameworks/R.framework/Versions/3.2/Resources/library/BiocStyle/resources/latex/unsrturl}}  
+  \bioctitle[scDD]{scDD: Bayesian Nonparametric Mixture Modeling of Single-Cell RNA-seq Experiments}
+    \author{Keegan Korthauer\footnote{\email{keegan@jimmy.harvard.edu}}}
+
+  
+\usepackage{Sweave}
+\begin{document}
+\input{scDD-concordance}
+
+\maketitle
+\tableofcontents
+
+
+
+\section{Introduction}
+
+The \Rpackage{scDD} package models single-cell gene expression data (from single-cell RNA-seq) using flexible nonparamentric Bayesian mixture models in order to explicitly handle heterogeneity within cell populations.  In bulk RNA-seq data, where each measurement is an average over thousands of cells, distributions of expression over samples are most often unimodal.  In single-cell RNA-seq data, however, even when cells represent genetically homogeneous populations, multimodal distributions of gene expression values over samples are common \cite{korthauer2015}.  This type of heterogeneity is often treated as a nuisance factor in studies of differential expression in single-cell RNA-seq experiments.  Here, we explicitly accommodate it in order to improve power to detect differences in expression distributions that are more complicated than a mean shift.
+
+\section{Background}
+
+Our aim is two-fold: (1) to detect which genes have different expression distributions across two biological conditions and (2) to classify those differences into informative patterns.  Note that in (1) we explicitly say differences in 'distributions' rather than differences in 'average', which would correspond to traditional DE (differential expression) analysis in bulk RNA-seq.  By examining the entire distribution, we are able to detect more subtle differences as well as describe complex patterns, such as the existence of subgroups of cells within and across condition that express a given gene at a different level.
+
+We start by assuming that the log-transformed nonzero expression values arise out of a Dirichlet Process Mixture of normals model.  This allows us to characterize expression distributions in terms of the number of modes (or clusters).  To detect differences in these distributions across conditions, an approximate Bayes Factor score is used which compares the conditional likelihood under the hypothesis of Equivalent distributions (ED) where one clustering process governs both conditions jointly, with the hypothesis of Differential distributions (DD) where each condition is generated from its own clustering process.  Significance of the scores for each gene are evaluated via empirical p-values after permutation.  Zero values are considered by also implementing a $\chi^2$ test of whether the proportion of zero values differs by condition (adjusted for overall sample detection rate).  More details are provided in \cite{korthauer2015}.
+
+After the detection step is carried out, the significantly DD genes are classified into four informative patterns based on the number of clusters detected and whether they overlap.  These patterns, depicted in Figure~\ref{DD}, include DE (differential expression of unimodal genes), DP (differential proportion for multimodal genes), DM (differential modality), and DB (both differential modality and mean expression levels).  Genes where a differential proportion of zeroes were identified are classified as DZ (differential zero).
+
+\incfig{DD}{0.4\textwidth}{Illustration of informative DD patterns}{} 
+
+The rest of this vignette outlines the main functionality of the \Rpackage{scDD} package.  This includes:
+
+\begin{itemize}
+  \item Identifying genes that are expressed differently between two biological conditions and classifying them into informative patterns.
+  \item Simulating single-cell RNA-seq data with differential expression that exhibits multimodal patterns.
+  \item Preprocessing and formatting of single-cell RNA-seq data to facilitate analysis
+  \item Visualizing the expression patterns using a violin plotting scheme
+\end{itemize}
+
+\section{Identify and Classify DD genes}
+In this section, we demonstrate how to use the main function \Rfunction{scDD} to find genes with differential distributions and classify them into the patterns of interest described in the previous section. 
+
+First, we need to load the \Rpackage{scDD} package.  For each of the following sections in this vignette, we assume this step has been carried out.
+\begin{Schunk}
+\begin{Sinput}
+> library(scDD)
+\end{Sinput}
+\end{Schunk}
+
+Next, we load the toy simulated example \Rclass{ExpressionSet} object that we will use for identifying and classifying DD genes.
+\begin{Schunk}
+\begin{Sinput}
+> data(scDatExSim)
+\end{Sinput}
+\end{Schunk}
+
+Verify that this object is a member of the \Rclass{ExpressionSet} class and that it contains 200 samples and 30 genes
+\begin{Schunk}
+\begin{Sinput}
+> class(scDatExSim)
+\end{Sinput}
+\begin{Soutput}
+[1] "ExpressionSet"
+attr(,"package")
+[1] "Biobase"
+\end{Soutput}
+\begin{Sinput}
+> show(scDatExSim)
+\end{Sinput}
+\begin{Soutput}
+ExpressionSet (storageMode: lockedEnvironment)
+assayData: 30 features, 200 samples 
+  element names: exprs 
+protocolData: none
+phenoData
+  sampleNames: Sample1 Sample2 ... Sample200 (200 total)
+  varLabels: condition
+  varMetadata: labelDescription
+featureData: none
+experimentData: use 'experimentData(object)'
+Annotation:  
+NULL
+\end{Soutput}
+\end{Schunk}
+
+Specify the arguments that we'll pass to the \Rfunction{scDD} function.  We will perform 100 permutations on each of the 30 genes.
+\begin{Schunk}
+\begin{Sinput}
+> prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+> nperms <- 100
+\end{Sinput}
+\end{Schunk}
+ 
+Finally, call the \Rfunction{scDD} function to perform permutations, classify DD genes, and return the results.  We won't perform the test for a difference in the proportion of zeroes since none exists in this simulated toy example data.  We also won't perform adjusted permutations to offset the effects of detection rate on mean expression level, since these are also absent in our toy simulated example.  Note that this step will take significantly longer with more genes and/or more permutations, but multiple cores will automatically be utilized (if available) via the \Rpackage{BiocParallel} package.  In practice, it is recommended that at least 1000 permutations are carried out.
+
+\begin{Schunk}
+\begin{Sinput}
+> RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE,
++             adjust.perms=FALSE)
+\end{Sinput}
+\end{Schunk}
+
+The \Robject{RES} object is a list with four items: the first is a data frame with seven columns: 
+\begin{enumerate}
+  \item \Rcode{gene}: gene name (matches rownames of SCdat)
+  \item \Rcode{nonzero.pvalue}: permutation p-value for testing of independence of condition membership with clustering
+  \item \Rcode{zero.pvalue}: p-value for test of difference in dropout rate (only for non-DD genes and if \Rcode{testZeroes==TRUE})
+  \item \Rcode{DDcategory}: name of the DD pattern (DE, DP, DM, DB, DZ), or NC (no call), or NS (not significant).  
+  \item \Rcode{Clusters.combined}: the number of clusters identified when pooling condition 1 and 2 together
+  \item \Rcode{Clusters.c1}: the number of clusters identified in condition 1 alone
+  \item \Rcode{Clusters.c2}: the number of clusters identified in condition 2 alone
+\end{enumerate}
+  The remaining three elements are data frames (first for condition 1 and 2 combined, then condition 1 alone, then condition 2 alone) that contains the cluster memberships for each sample (cluster 1,2,3,...) in columns and genes in rows.  Zeroes, which are not involved in the clustering, are labeled as zero.  
+
+\section{Simulation}
+
+Here we show how to generate a simulated single-cell RNA-seq dataset which contains multi-modal genes.  The \Rfunction{simulateSet} function simulates data from a two-condition experiment with a specified number of genes that fall into each of the patterns of interest.  For DD genes, these include DE (differential expression of unimodal genes), DP (differential proportion for multimodal genes), DM (differential modality), and DB (both differential modality and mean expression levels), and for ED genes these include EE (equivalent expression for unimodal genes) and EP (equivalent proportion for multimodal genes).  The simulation parameters are based on observed data from two conditions, so the function requires an \Rclass{ExpressionSet} formatted dataset as input.
+
+First, we load the toy example \Rclass{ExpressionSet} to simulate from
+\begin{Schunk}
+\begin{Sinput}
+> data(scDatEx)
+\end{Sinput}
+\end{Schunk}
+
+We'll verify that this object is a member of the \Rclass{ExpressionSet} class and that it contains 142 samples and 500 genes
+\begin{Schunk}
+\begin{Sinput}
+> class(scDatEx)
+\end{Sinput}
+\begin{Soutput}
+[1] "ExpressionSet"
+attr(,"package")
+[1] "Biobase"
+\end{Soutput}
+\begin{Sinput}
+> show(scDatEx)
+\end{Sinput}
+\begin{Soutput}
+ExpressionSet (storageMode: lockedEnvironment)
+assayData: 500 features, 142 samples 
+  element names: exprs 
+protocolData: none
+phenoData
+  sampleNames: C1.073 C1.074 ... C2.070 (142 total)
+  varLabels: condition
+  varMetadata: labelDescription
+featureData: none
+experimentData: use 'experimentData(object)'
+Annotation:  
+NULL
+\end{Soutput}
+\end{Schunk}
+
+Next we need to set the arguments that will be passed to the \Rfunction{simulateSet} function.  In this example we will simulate 30 genes total, with 5 genes of each type and 100 samples in each of two conditions.  We also set a random seed for reproducibility.
+
+\begin{Schunk}
+\begin{Sinput}
+> nDE <- 5
+> nDP <- 5
+> nDM <- 5
+> nDB <- 5
+> nEE <- 5
+> nEP <- 5
+> numSamples <- 100
+> seed <- 816
+\end{Sinput}
+\end{Schunk}
+
+Finally, we'll create the simulated set with specified numbers of DE, DP, DM, DM, EE, and EP genes and specified number of samples, where DE gene fold changes represent 2 standard deviations of the observed fold change distribution, and multimodal genes have cluster mean distance of 4 standard deviations.
+\begin{Schunk}
+\begin{Sinput}
+> SD <- simulateSet(scDatEx, numSamples=numSamples, nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB, 
++                   nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE, 
++                   random.seed=seed)
+\end{Sinput}
+\end{Schunk}
+
+The matrix in the first list element of the \Robject{SD} object contains simulated expression values.  The second element stores the fold change/modal distance values which can be useful in assessing performance of a differential expression method.
+
+\section{Formatting and Preprocessing}
+\subsection{Constructing an ExpressionSet object}
+
+In this subsection, we provide a quick example of how to construct an object of the \Rclass{ExpressionSet} class.  For more detailed instructions, refer to the \Rpackage{Biobase} package documentation.
+
+Here we will convert the simulated data object \Robject{SD} returned by \Rfunction{simulateSet} (from the previous section) into an \Rclass{ExpressionSet} object. First, load the \Rpackage{Biobase} package:
+
+\begin{Schunk}
+\begin{Sinput}
+> library(Biobase)   
+\end{Sinput}
+\end{Schunk}
+
+Next, create a vector of condition membership labels (these should be 1 or 2).  In our simulated dataset, we generated \Robject{numSamples} samples in each of two conditions.
+
+\begin{Schunk}
+\begin{Sinput}
+> condition <- c(rep(1, numSamples), rep(2, numSamples))
+\end{Sinput}
+\end{Schunk}
+
+The rows and columns of the expression matrix should have unique names, and the names of the columns should to correspond to the names of the condition membership labels in \Robject{condition}.
+
+\begin{Schunk}
+\begin{Sinput}
+> rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
+> colnames(SD[[1]]) <- names(condition) <- paste0("Sample", 1:ncol(SD[[1]]), sep="")
+\end{Sinput}
+\end{Schunk}
+
+Once our labeling is intact, we can call the \Rfunction{ExpressionSet} function and specify the two relevant pieces of information.  Optionally, additional experiment information can be stored in additional slots; see \Rpackage{Biobase} package.
+\begin{Schunk}
+\begin{Sinput}
+> SDExpressionSet <- ExpressionSet(assayData=SD[[1]], 
++                     phenoData=as(data.frame(condition), "AnnotatedDataFrame"))
+\end{Sinput}
+\end{Schunk}
+
+\subsection{Filtering and Normalization}
+
+In this subsection, we demonstrate the utility of the \Rfunction{preprocess} function, which can be helpful if working with raw data, or data which contains genes that are predominantly zero (common in single-cell RNA-seq experiments).  This function takes as input a list of data matrices, one for each condition.
+
+First, load the toy example data list:
+\begin{Schunk}
+\begin{Sinput}
+> data(scDatExList)
+\end{Sinput}
+\end{Schunk}
+
+Verify that the data is formatted as a list of 2 matrices (one for each of 2 conditions), that each matrix has 100 rows (one for each gene), and that the number of columns in each matrix corresponds to the number of samples in each condition (78 and 64, respectively):
+\begin{Schunk}
+\begin{Sinput}
+> str(scDatExList)
+\end{Sinput}
+\begin{Soutput}
+List of 2
+ $ C1: num [1:100, 1:78] 0 53.3 0 2 0 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : chr [1:100] "MKL2" "CD109" "ABTB1" "MAST2" ...
+  .. ..$ : chr [1:78] "C1.073" "C1.074" "C1.075" "C1.076" ...
+ $ C2: num [1:100, 1:64] 6 17 0 0 0 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : chr [1:100] "MKL2" "CD109" "ABTB1" "MAST2" ...
+  .. ..$ : chr [1:64] "C2.001" "C2.002" "C2.003" "C2.004" ...
+NULL
+\end{Soutput}
+\end{Schunk}
+
+Obtain the names of the conditions to pass to the preprocess function:
+\begin{Schunk}
+\begin{Sinput}
+> condition.names <- names(scDatExList)
+\end{Sinput}
+\end{Schunk}
+
+Finally, apply the \Rfunction{preprocess} function to reformat the data into one data matrix with 100 rows and $78+64=142$ columns.  In this example, we set the \Robject{zero.thresh} argument to 1 so that genes are filtered out if they are all zero, and we set the \Robject{median_norm} argument to \Rcode{FALSE} to return raw data (no normalization is carried out).
+
+\begin{Schunk}
+\begin{Sinput}
+> scDatExMat <- preprocess(scDatExList, ConditionNames=condition.names, 
++                         zero.thresh=1, median_norm=FALSE)
+\end{Sinput}
+\end{Schunk}
+
+Now, apply the preprocess function again, but this time use a more stringent threshold on the proportion of zeroes and apply median normalization.  In this example, we set the \Robject{zero.thresh} argument to 0.75 so that genes with more than 75 percent zeroes are filtered out and we set the \Robject{median_norm} argument to \Rcode{TRUE} to return median normalized counts.
+
+\begin{Schunk}
+\begin{Sinput}
+> scDatExMatNormThresh <- preprocess(scDatExList, ConditionNames=condition.names, 
++                                    zero.thresh=0.75, median_norm=TRUE)
+\end{Sinput}
+\end{Schunk}
+
+\section{Plotting}
+
+Next we demonstrate the plotting routine that is implemented in the \Rfunction{sideViolin} function.  This function produces side-by-side violin plots (where the curves represent a smoothed kernel density estimate)
+of the log-transformed data.  A count of 1 is added before log-transformation so that zeroes can be displayed, but they are not included in the density estimation.  Each condition is represented by one violin plot.  Individual data points are plotted (with jitter) on top. 
+
+We illustrate this function by displaying the six types of simulated genes using the toy example simulated dataset.  First, load the toy simulated dataset:
+
+\begin{Schunk}
+\begin{Sinput}
+> data(scDatExSim)
+\end{Sinput}
+\end{Schunk}
+
+Next, load the Biobase package to facilitate subset operations on ExpressionSet class objects:
+\begin{Schunk}
+\begin{Sinput}
+> library(Biobase)
+\end{Sinput}
+\end{Schunk}
+
+The following lines will produce the figures in Figure~\ref{scDD-DDplots}.
+
+Plot side by side violin plots for Gene 1 (DE):
+\begin{Schunk}
+\begin{Sinput}
+> sideViolin(exprs(scDatExSim)[1,], scDatExSim$condition, 
++            title.gene=featureNames(scDatExSim)[1])
+\end{Sinput}
+\end{Schunk}
+
+Plot side by side violin plots for Gene 6 (DP):
+\begin{Schunk}
+\begin{Sinput}
+> sideViolin(exprs(scDatExSim)[6,], scDatExSim$condition, 
++            title.gene=featureNames(scDatExSim)[6])
+\end{Sinput}
+\end{Schunk}
+
+Plot side by side violin plots for Gene 11 (DM):
+\begin{Schunk}
+\begin{Sinput}
+> sideViolin(exprs(scDatExSim)[11,], scDatExSim$condition, 
++            title.gene=featureNames(scDatExSim)[11])
+\end{Sinput}
+\end{Schunk}
+
+Plot side by side violin plots for Gene 16 (DB):
+\begin{Schunk}
+\begin{Sinput}
+> sideViolin(exprs(scDatExSim)[16,], scDatExSim$condition, 
++            title.gene=featureNames(scDatExSim)[16])
+\end{Sinput}
+\end{Schunk}
+
+Plot side by side violin plots for Gene 21 (EP):
+\begin{Schunk}
+\begin{Sinput}
+> sideViolin(exprs(scDatExSim)[21,], scDatExSim$condition, 
++            title.gene=featureNames(scDatExSim)[21])
+\end{Sinput}
+\end{Schunk}
+
+Plot side by side violin plots for Gene 26 (EE):
+\begin{Schunk}
+\begin{Sinput}
+> sideViolin(exprs(scDatExSim)[26,], scDatExSim$condition, 
++            title.gene=featureNames(scDatExSim)[26])
+\end{Sinput}
+\end{Schunk}
+
+
+The plot objects returned by \Rfunction{sideViolin} are standard \Rpackage{ggplot2} objects, and thus can be manipulated into multipanel figures with the help of the \Rpackage{gridExtra} or \Rpackage{cowplot} packages.
+
+
+\incfig{scDD-DDplots}{0.92\textwidth}{Example Simulated DD genes}{} 
+
+  
+\section{Session Info}
+Here is the output of \Rfunction{sessionInfo} on the system where this document was compiled:
+
+\begin{Schunk}
+\begin{Sinput}
+> toLatex(sessionInfo())
+\end{Sinput}
+\begin{itemize}\raggedright
+  \item R version 3.2.1 (2015-06-18), \verb|x86_64-apple-darwin13.4.0|
+  \item Locale: \verb|en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8|
+  \item Base packages: base, datasets, graphics, grDevices, methods, parallel,
+    stats, utils
+  \item Other packages: Biobase~2.28.0, BiocGenerics~0.14.0, gridExtra~2.0.0,
+    scDD~0.1.8
+  \item Loaded via a namespace (and not attached): abind~1.4-3, arm~1.8-6,
+    BiocParallel~1.2.20, BiocStyle~1.6.0, coda~0.17-1, colorspace~1.2-6,
+    digest~0.6.8, EBSeq~1.8.0, fields~8.2-1, futile.logger~1.4.1,
+    futile.options~1.0.0, ggplot2~1.0.1, grid~3.2.1, gtable~0.1.2, labeling~0.3,
+    lambda.r~1.1.7, lattice~0.20-33, lme4~1.1-9, magrittr~1.5, maps~2.3-11,
+    MASS~7.3-43, Matrix~1.2-2, mclust~5.0.2, minqa~1.2.4, munsell~0.4.2,
+    nlme~3.1-121, nloptr~1.0.4, outliers~0.14, plyr~1.8.3, proto~0.3-10,
+    Rcpp~0.12.0, reshape2~1.4.1, scales~0.3.0, spam~1.0-1, splines~3.2.1,
+    stringi~0.5-5, stringr~1.0.0, tools~3.2.1
+\end{itemize}\end{Schunk}
+
+\bibliography{vignette}
+\end{document}
