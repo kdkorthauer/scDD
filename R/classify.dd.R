@@ -152,15 +152,11 @@ classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, 
       
       if (c.c1[s]==c.c2[s]){ # same number of clusters in each condition
         if (c.c1[s]==1){ # one cluster in each condition
-          if (c.oa[s]>=2){ # at least two clusters overall
-            cat[s] <- "DE"
-          }else{ # one cluster overall
             if (sum(comparisons)>0){
               cat[s] <- "DE"
             }else{
               cat[s] <- "NC"
             }
-          }		
         }else{
           if (c.oa[s]==c.c1[s]){ # at least two clusters overall, same number within each condition as overall
             if (sum(comparisons)<=c.c1[s]){
