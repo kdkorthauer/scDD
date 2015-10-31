@@ -78,6 +78,15 @@ mclustRestricted <- function(y, restrict=TRUE){
           bicdiff <- -Inf
           nmin <- 100
         }
+        if (length(vardiff)==0){
+          vardiff <- 1
+        }
+        if (length(nmin)==0){
+          nmin <- Inf
+        }
+        if (length(meandiff)==0){
+          meandiff <- Inf
+        }
       }
     }
   }
