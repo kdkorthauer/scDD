@@ -135,17 +135,12 @@ classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, 
       t <- 1
       for (a in c.c1.no){
         for (b in c.c2.no){
-          if (num.comparisons==1){
-            samp.diff <- quantile(rt(10000, df=round(params.c1$ak[a]))*sqrt(params.c1$bk[a]/(params.c1$ak[a]*params.c1$sk[a])) + params.c1$mk[a] - 
-                                    rt(10000, df=round(params.c2$ak[b]))*sqrt(params.c2$bk[b]/(params.c2$ak[b]*params.c2$sk[b])) - params.c2$mk[b],
-                                  c(0.025, 0.975))
-            comparisons[t] <- 1*(  (0 < min(samp.diff) & 0 < max(samp.diff)) | (0 > min(samp.diff) & 0 > max(samp.diff)) )
-          }else{
+          
             samp.diff <- quantile(rt(10000, df=round(params.c1$ak[a]))*sqrt(params.c1$bk[a]/(params.c1$ak[a]*params.c1$sk[a])) + params.c1$mk[a] - 
                                     rt(10000, df=round(params.c2$ak[b]))*sqrt(params.c2$bk[b]/(params.c2$ak[b]*params.c2$sk[b])) - params.c2$mk[b],
                                   c(0, 1))
             comparisons[t] <- 1*(  (0 < min(samp.diff) & 0 < max(samp.diff)) | (-0 > min(samp.diff) & -0 > max(samp.diff)) )
-          }
+          
           t <- t+1
         }
       }
