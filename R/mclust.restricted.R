@@ -75,7 +75,7 @@ mclustRestricted <- function(y, restrict=TRUE){
           nmin <- table(cl)[min.cl]
         }else{
           meandiff <- 10
-          bicdiff <- -Inf
+          vardiff <- -Inf
           nmin <- 100
         }
         if (length(vardiff)==0){
