@@ -65,7 +65,7 @@ mclustRestricted <- function(y, restrict=TRUE){
         comps <- mc$G
         
         tries <- tries + 1
-        if (comps > 1 & comps-comps_old==1){
+        if (comps > 1 & comps_old-comps==1){
           compmeans <- as.numeric(by(y, cl, mean))
           meandiff <- diff(compmeans)/max(sqrt(mc$parameters$variance$sigmasq))
          
