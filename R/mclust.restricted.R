@@ -49,7 +49,7 @@ mclustRestricted <- function(y, restrict=TRUE){
       
       if (length(vardiff)==0){
         vardiff <- 1
-      }else if(is.na(vardiff)){
+      }else if(sum(is.na(vardiff))>0){
         vardiff <- 1
       }
       if (length(nmin)==0){
@@ -59,7 +59,7 @@ mclustRestricted <- function(y, restrict=TRUE){
       }
       if (length(meandiff)==0){
         meandiff <- Inf
-      }else if(is.na(meandiff)){
+      }else if(sum(is.na(meandiff))>0){
         meandiff <- Inf
       }
       if (length(mincat)==0){
@@ -98,7 +98,7 @@ mclustRestricted <- function(y, restrict=TRUE){
         if (length(vardiff)==0){
           vardiff <- 1
           err <- 1
-        }else if(is.na(vardiff)){
+        }else if(sum(is.na(vardiff))>0){
           vardiff <- 1
           err <- 1
         }
@@ -112,7 +112,7 @@ mclustRestricted <- function(y, restrict=TRUE){
         if (length(meandiff)==0){
           meandiff <- Inf
           err <- 1
-        }else if(is.na(mean.diff)){
+        }else if(sum(is.na(mean.diff))>0){
           meandiff <- Inf
           err <- 1
         }
