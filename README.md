@@ -7,4 +7,4 @@ install.packages("devtools")
 
 devtools::install_github("kdkorthauer/scDD")
 
-Note: The package was built on R version 3.1.1
+Note: The package was built using R version 3.2.2
