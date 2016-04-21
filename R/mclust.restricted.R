@@ -32,13 +32,19 @@ mclustRestricted <- function(y, restrict=TRUE){
     comps <- mc$G
   }
   
+  # Bimodal index threshold for removing a component (minimum of 1.6, 
+  # increases with sample size and levels off at 2.2)
+  remThresh <- 1/(1+exp(-length(y)/60+0.4)) + 1.2
+  
+  # Bimodal index threshold for keeping an added component (maximum of 4.0,
+  # but is 3.6 at sample size 50
+  # increases with sample size and levels off at 3.4
+  addThresh <- 1/(1+exp(length(y)/9-4.5)) + 3.4
+  
   if (restrict) { 
     if (comps > 1){
-      compmeans <- as.numeric(by(y, cl, mean))
+      compmeans <- mc$parameters$mean
       meandiff <- diff(compmeans)/max(sqrt(mc$parameters$variance$sigmasq))
-      if( min(diff(compmeans)) < 1 ) {
-        meandiff <- diff(compmeans)/sd(y)
-      }
       
       max.cl <- which.max(mc$parameters$variance$sigmasq)
       min.cl <- which.min(mc$parameters$variance$sigmasq)
@@ -46,7 +52,11 @@ mclustRestricted <- function(y, restrict=TRUE){
       nmin <- table(cl)[min.cl]
       mincat <- min(table(cl))
       tries <- 0	
+      nmax <- table(cl)[max.cl]
+      balance <- 2*sqrt(nmin*nmax/(nmin+nmax)^2)
+      meandiff <- meandiff*balance
       
+      # Error handling checks
       if (length(vardiff)==0){
         vardiff <- 1
       }else if(sum(is.na(vardiff))>0){
@@ -132,6 +142,37 @@ mclustRestricted <- function(y, restrict=TRUE){
           comps <- mc$G
         }
         
+      }
+    }else{  # check whether to add a component if only identified one
+      comps_old <- comps
+      comps <- comps+1 
+      mc <- Mclust(y, warn=FALSE, modelNames=c("V"), G=comps)
+      cl <- mc$classification
+      
+      if(!is.null(mc) & length(unique(cl))==comps){ 
+        mincat <- min(table(cl)) 
+        compmeans <- mc$parameters$mean
+        meandiff <- diff(compmeans)/max(sqrt(mc$parameters$variance$sigmasq))
+        
+        max.cl <- which.max(mc$parameters$variance$sigmasq)
+        min.cl <- which.min(mc$parameters$variance$sigmasq)
+        vardiff <- mc$parameters$variance$sigmasq[max.cl] / mc$parameters$variance$sigmasq[min.cl]
+        nmin <- table(cl)[min.cl]
+        mincat <- min(table(cl))
+        tries <- 0	
+        nmax <- table(cl)[max.cl]
+        balance <- 2*sqrt(nmin*nmax/(nmin+nmax)^2)
+        meandiff <- meandiff*balance
+        
+        if(!((min(meandiff) > addThresh & (vardiff < 10)) & mincat>2)){
+          mc <- Mclust(y, warn=FALSE, modelNames=c("V"), G=comps_old)
+          cl <- mc$classification
+          comps <- mc$G
+        }
+      }else{ # couldn't fit requested model; revert to previous fit
+        mc <- Mclust(y, warn=FALSE, modelNames=c("V"), G=comps_old)
+        cl <- mc$classification
+        comps <- mc$G
       }
     }
   }
