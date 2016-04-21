@@ -136,7 +136,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
       }
     }
     
-    pvals <- p.adjust(sapply(1:nrow(exprs(SCdat)), function(x) sum( bf.perm[[x]] > bf[x] - den[x] ) )/(permutations), method="BH")
+    pvals <- sapply(1:nrow(exprs(SCdat)), function(x) sum( bf.perm[[x]] > bf[x] - den[x] ) )/(permutations)
     if (testZeroes){
       sig <- which(pvals < 0.025)
     }else{
@@ -156,7 +156,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
       }
     }
     
-    pvals <- p.adjust(sapply(1:nrow(exprs(SCdat)), function(x) sum( bf.perm[[x]] > bf[x]) )/(permutations), method="BH")
+    pvals <- sapply(1:nrow(exprs(SCdat)), function(x) sum( bf.perm[[x]] > bf[x]) ) / (permutations)
     if (testZeroes){
       sig <- which(pvals < 0.025)
     }else{
@@ -181,7 +181,6 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     pvals.z[ns] <- ztest
     cats[pvals.z < 0.025] <- "DZ"
   }
-  #cats[cats=="NC"] <- "NS"
   
   # build MAP objects
   MAP1 <- matrix(NA, nrow=nrow(exprs(SCdat)), ncol=sum(SCdat$condition==1))

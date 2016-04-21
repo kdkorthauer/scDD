@@ -211,7 +211,7 @@ testZeroes <- function(dat, cond, these=1:nrow(dat)){
       pval[j] <- anova(M1, M0, test="Chisq")[2,5]
     }
   }
-  return(p.adjust(pval, method="BH"))
+  return(pval)
 }
 
 #' feDP
