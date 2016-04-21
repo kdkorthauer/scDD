@@ -276,8 +276,8 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE){
   cat[pval.ns < 0.05 & cat != "DP"] <- "NC"
   cat[pval.ns < 0.05 & c.c1 == c.c2 & c.c1 == c.oa & c.c1 > 1] <- "DP"			
 
-  names(ns_genes) <- cat
-  return(ns_genes)
+  names(pval.ns) <- cat
+  return(pval.ns)
 }
 
 
