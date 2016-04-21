@@ -75,11 +75,13 @@ RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes
             adjust.perms=FALSE)
 @
 
-The \Robject{RES} object is a list with four items: the first is a data frame with seven columns: 
+The \Robject{RES} object is a list with four items: the first is a data frame with nine columns: 
 \begin{enumerate}
   \item \Rcode{gene}: gene name (matches rownames of SCdat)
   \item \Rcode{nonzero.pvalue}: permutation p-value for testing of independence of condition membership with clustering
+  \item \Rcode{nonzero.pvalue.adj}: Benjamini-Hochberg adjusted permutation p-value for testing of independence of condition membership with clustering
   \item \Rcode{zero.pvalue}: p-value for test of difference in dropout rate (only for non-DD genes and if \Rcode{testZeroes==TRUE})
+  \item \Rcode{zero.pvalue.adj}: Benjamini-Hochberg adjusted p-value for test of difference in dropout rate (only for non-DD genes and if \Rcode{testZeroes==TRUE})
   \item \Rcode{DDcategory}: name of the DD pattern (DE, DP, DM, DB, DZ), or NC (no call), or NS (not significant).  
   \item \Rcode{Clusters.combined}: the number of clusters identified when pooling condition 1 and 2 together
   \item \Rcode{Clusters.c1}: the number of clusters identified in condition 1 alone

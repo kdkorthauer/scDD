@@ -26,8 +26,9 @@ detection rate (proportion of nonzero values).  If true, the residuals of a line
 detection rate are permuted, and new fitted values are obtained using these residuals.}
 }
 \value{
-List with four items: the first is a data frame with seven columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 
- condition membership with clustering, p-value for test of difference in dropout rate (only for non-DD genes), and name of the 
+List with four items: the first is a data frame with nine columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 
+ condition membership with clustering, Benjamini-Hochberg adjusted version of the previous column, p-value for test of difference in dropout rate (only for non-DD genes), 
+ Benjamini-Hochberg adjusted version of the previous column, name of the 
  DD (DE, DP, DM, DB) pattern or DZ (otherwise NS = not significant), the number of clusters identified overall, the number of clusters identified in 
  condition 1 alone, and the number of clusters identified in condition 2 alone. The remaining three elements are data frames (first for condition 1 and 2 combined, 
  then condition 1 alone, then condition 2 alone) that contains the cluster memberships for each sample (cluster 1,2,3,...) in columns and
