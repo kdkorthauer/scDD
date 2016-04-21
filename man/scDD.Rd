@@ -29,17 +29,24 @@ detection rate are permuted, and new fitted values are obtained using these resi
 List with four items: the first is a data frame with seven columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 
  condition membership with clustering, p-value for test of difference in dropout rate (only for non-DD genes), and name of the 
  DD (DE, DP, DM, DB) pattern or DZ (otherwise NS = not significant), the number of clusters identified overall, the number of clusters identified in 
- condition 1 alone, and the number of clusters identified in condition 2 alone.    The remaining three elements are data frames (first for condition 1 and 2 combined, 
+ condition 1 alone, and the number of clusters identified in condition 2 alone. The remaining three elements are data frames (first for condition 1 and 2 combined, 
  then condition 1 alone, then condition 2 alone) that contains the cluster memberships for each sample (cluster 1,2,3,...) in columns and
- genes in rows.  Zeroes, which are not involved in the clustering, are labeled as zero.  
+ genes in rows.  Zeroes, which are not involved in the clustering, are labeled as zero.
+}
+\description{
+Find genes with differential distributions (DD) across two conditions
+}
+\details{
+Find genes with differential distributions (DD) across two conditions.  Models each log-transformed gene as a Dirichlet 
+  Process Mixture of normals and uses a permutation test to determine whether condition membership is independent of sample clustering.
+  The FDR adjusted (Benjamini-Hochberg) permutation p-value is returned along with the classification of each significant gene 
+  (with p-value less than 0.05 (or 0.025 if also testing for a difference in the proportion of zeroes)) into one of four categories 
+  (DE, DP, DM, DB).  For genes that do not show significant influence, of condition on clustering, an optional test of whether the 
+  proportion of zeroes (dropout rate) is different across conditions is performed (DZ).
+}
+\examples{
  
- @import Biobase 
- 
- @export
- 
- @examples 
- 
- # load toy simulated example ExpressionSet to find DD genes
+# load toy simulated example ExpressionSet to find DD genes
 
 data(scDatExSim)
 
@@ -64,16 +71,5 @@ nperms <- 100
 # this step will take significantly longer with more genes and/or more permutations
 
 RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
-}
-\description{
-Find genes with differential distributions (DD) across two conditions
-}
-\details{
-Find genes with differential distributions (DD) across two conditions.  Models each log-transformed gene as a Dirichlet 
-  Process Mixture of normals and uses a permutation test to determine whether condition membership is independent of sample clustering.
-  The FDR adjusted (Benjamini-Hochberg) permutation p-value is returned along with the classification of each significant gene 
-  (with p-value less than 0.05 (or 0.025 if also testing for a difference in the proportion of zeroes)) into one of four categories 
-  (DE, DP, DM, DB).  For genes that do not show significant influence, of condition on clustering, an optional test of whether the 
-  proportion of zeroes (dropout rate) is different across conditions is performed (DZ).
 }
 

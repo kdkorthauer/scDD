@@ -16,11 +16,11 @@
 #'  
 #' @param median_norm Logical indicating whether or not to normalize the data using Median Normalization from \code{EBSeq}
 #' 
+#' @export
+#' 
 #' @importFrom EBSeq MedianNorm
 #' 
 #' @importFrom EBSeq GetNormalizedMat
-#'
-#' @export 
 #'
 #' @return pe_mat Processed matrix with genes in rows and samples in columns.  Column names 
 #'  indicate condition.

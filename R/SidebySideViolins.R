@@ -18,10 +18,10 @@
 #' 
 #' @param axes.titles Logical indicating whether or not to include axes labels on plots.  
 #' 
+#' @export
+#' 
 #' @import ggplot2
 #'
-#' @export 
-#' 
 #' @examples 
 #' 
 #' # load toy simulated example ExpressionSet to find DD genes
