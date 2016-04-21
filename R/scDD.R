@@ -26,8 +26,9 @@
 #'   detection rate (proportion of nonzero values).  If true, the residuals of a linear model adjusted for 
 #'   detection rate are permuted, and new fitted values are obtained using these residuals.
 #' 
-#' @return List with four items: the first is a data frame with seven columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 
-#'  condition membership with clustering, p-value for test of difference in dropout rate (only for non-DD genes), and name of the 
+#' @return List with four items: the first is a data frame with nine columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 
+#'  condition membership with clustering, Benjamini-Hochberg adjusted version of the previous column, p-value for test of difference in dropout rate (only for non-DD genes), 
+#'  Benjamini-Hochberg adjusted version of the previous column, name of the 
 #'  DD (DE, DP, DM, DB) pattern or DZ (otherwise NS = not significant), the number of clusters identified overall, the number of clusters identified in 
 #'  condition 1 alone, and the number of clusters identified in condition 2 alone. The remaining three elements are data frames (first for condition 1 and 2 combined, 
 #'  then condition 1 alone, then condition 2 alone) that contains the cluster memberships for each sample (cluster 1,2,3,...) in columns and
@@ -133,9 +134,9 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     
     pvals <- sapply(1:nrow(exprs(SCdat)), function(x) sum( bf.perm[[x]] > bf[x] - den[x] ) )/(permutations)
     if (testZeroes){
-      sig <- which(pvals < 0.025)
+      sig <- which(p.adjust(pvals, method="BH") < 0.025)
     }else{
-      sig <- which(pvals < 0.05)
+      sig <- which(p.adjust(pvals, method="BH") < 0.05)
     }
     
   }else{
@@ -153,9 +154,9 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     
     pvals <- sapply(1:nrow(exprs(SCdat)), function(x) sum( bf.perm[[x]] > bf[x]) ) / (permutations)
     if (testZeroes){
-      sig <- which(pvals < 0.025)
+      sig <- which(p.adjust(pvals, method="BH") < 0.025)
     }else{
-      sig <- which(pvals < 0.05)
+      sig <- which(p.adjust(pvals, method="BH") < 0.05)
     }
   }
   
@@ -174,7 +175,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
   if (testZeroes){
     ztest <- testZeroes(exprs(SCdat), SCdat$condition, ns)
     pvals.z[ns] <- ztest
-    cats[pvals.z < 0.025] <- "DZ"
+    cats[p.adjust(pvals.z, method="BH") < 0.025] <- "DZ"
   }
   
   # build MAP objects
@@ -197,7 +198,8 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
   
   
   # return...
-  return(list(Genes=data.frame(gene=rownames(SCdat), nonzero.pvalue=pvals, zero.pvalue=pvals.z, DDcategory=cats, 
+  return(list(Genes=data.frame(gene=rownames(SCdat), nonzero.pvalue=pvals, nonzero.pvalue.adj=p.adjust(pvals, method="BH"), 
+                    zero.pvalue=pvals.z, zero.pvalue.adj=p.adjust(pvals.z, method="BH"), DDcategory=cats, 
                     Clusters.combined=comps.all, Clusters.c1=comps.c1, Clusters.c2=comps.c2), 
           Zhat.combined=MAP, Zhat.c1=MAP1, Zhat.c2=MAP2))
 }
