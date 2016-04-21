@@ -18,7 +18,7 @@
 #' 
 #' @param axes.titles Logical indicating whether or not to include axes labels on plots.  
 #' 
-#' @import ggplot2 gridExtra
+#' @import ggplot2
 #'
 #' @export 
 #' 

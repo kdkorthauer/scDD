@@ -30,14 +30,8 @@
 #' 
 #' @inheritParams findIndex
 #' 
-#' @importClassesFrom Biobase ExpressionSet
-#'  
-#'  @importMethodsFrom Biobase exprs
-#'  
-#'  @importMethodsFrom Biobase featureNames
-#'  
-#'  @importMethodsFrom Biobase sampleNames
-#'
+#' @import Biobase 
+#' 
 #' @export 
 #'
 #' @return A named list of two items: the first (labeled 'Simulated_Data') is a matrix of simulated 

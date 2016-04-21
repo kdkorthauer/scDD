@@ -1,10 +1,10 @@
 \begin{thebibliography}{1}
 
 \bibitem{korthauer2015}
-Keegan~D Korthauer, Li-Fang Chu, Yuan Li, Ron Stewart, James Thomson, and
-  Christina Kendziorski.
-\newblock sc{M}ixture: Bayesian nonparametric mixture modeling of single-cell
-  {RNA}-seq experiments.
-\newblock {\em In Preparation}, 2015.
+Keegan~D Korthauer, Li-Fang Chu, Michael~A. Newton, Yuan Li, James Thomson, Ron
+  Stewart, and Christina Kendziorski.
+\newblock sc{DD}: A statistical approach for identifying differential
+  distributions in single-cell rna-seq experiments.
+\newblock {\em BioRxiv}, 2015.
 
 \end{thebibliography}
