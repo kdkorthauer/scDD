@@ -24,12 +24,12 @@
 
 
 mclustRestricted <- function(y, restrict=TRUE){
-  mc <- Mclust(y, warn=FALSE, modelNames=c("V"), G=1:5)	
+  mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=1:5))	
   cl <- mc$classification
   comps <- mc$G
   
   if(comps > length(unique(cl))){
-    mc <- Mclust(y, warn=FALSE, modelNames=c("V"), G=1:(comps-1))	
+    mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=1:(comps-1)))
     cl <- mc$classification
     comps <- mc$G
   }
@@ -86,7 +86,7 @@ mclustRestricted <- function(y, restrict=TRUE){
         err <- 0
         comps_old <- comps
         comps <- comps-1 
-        mc <- Mclust(y, warn=FALSE, modelNames=c("V"), G=1:comps)
+        mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=1:comps))
         cl <- mc$classification
         comps <- mc$G
         mincat <- min(table(cl))
@@ -139,7 +139,7 @@ mclustRestricted <- function(y, restrict=TRUE){
         # if fit resulted in any errors, revert to previous fit
         if (err == 1){
           comps <- comps+1 
-          mc <- Mclust(y, warn=FALSE, modelNames=c("V"), G=1:comps)
+          mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=1:comps))
           cl <- mc$classification
           comps <- mc$G
         }
@@ -148,7 +148,7 @@ mclustRestricted <- function(y, restrict=TRUE){
     }else{  # check whether to add a component if only identified one
       comps_old <- comps
       comps <- comps+1 
-      mc <- Mclust(y, warn=FALSE, modelNames=c("V"), G=comps)
+      mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=comps))
       cl <- mc$classification
       
       if(!is.null(mc) & length(unique(cl))==comps){ 
@@ -167,12 +167,12 @@ mclustRestricted <- function(y, restrict=TRUE){
         meandiff <- meandiff*balance
         
         if(!((min(meandiff) > addThresh & (vardiff < 10)) & mincat>2)){
-          mc <- Mclust(y, warn=FALSE, modelNames=c("V"), G=comps_old)
+          mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=comps_old))
           cl <- mc$classification
           comps <- mc$G
         }
       }else{ # couldn't fit requested model; revert to previous fit
-        mc <- Mclust(y, warn=FALSE, modelNames=c("V"), G=comps_old)
+        mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=comps_old))
         cl <- mc$classification
         comps <- mc$G
       }
