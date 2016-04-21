@@ -217,10 +217,14 @@ testZeroes <- function(dat, cond, these=1:nrow(dat)){
 #' feDP
 #'
 #' Function to identify additional DP genes, since clustering process can be consistent within each condition 
-#'   and still have differential proportion within each mode.  
+#'   and still have differential proportion within each mode.  The Bayes factor score also tends to be small when
+#'   the correct number of clusters is not correctly detected; in that case differential proportion will manifest
+#'   as a mean shift.
 #'   
 #' @details The Fisher's Exact test is used to test for independence of condition membership and clustering when 
-#'   the clustering is the same within condition as it is overall (and is multimodal) 
+#'   the clustering is the same across conditions as it is overall (and is multimodal). When clustering within 
+#'   condition is not multimodal or is different across conditions (most often the case), an FDR-adjusted t-test
+#'   is performed to detect overall mean shifts.
 #'
 #' @inheritParams classifyDD
 #' 
@@ -239,12 +243,18 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE){
   c.c2 <- sapply(ns_genes, function(x) luOutlier(c2[[x]]))
   
   cat <- rep(NA, length(ns_genes))
+  pval.ns <- rep(NA, length(ns_genes))
   s <- 1
   
   for (g in ns_genes){
+    y <- pe_mat[g,]
+    cond <- condition[y>0]
+    y <- log(y[y>0])
+    # detect shifts in mean (to catch DP genes with an incorrect # components)
+    pval.ns[s] <- t.test(y~cond)$p.value	
+  
+    # check whether clustering process is consistent within each condition as overall
     if (c.c1[s]==c.c2[s] & c.c1[s]==c.oa[s] & c.oa[s]>1){
-      cond <- condition[pe_mat[g,]>0]
-      
       # non-outlying cluster names
       c.oa.no <- findOutliers(oa[[g]])
       c.c1.no <- findOutliers(c1[[g]])
@@ -261,6 +271,11 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE){
     }
   s <- s+1
   }
+  
+  pval.ns <- p.adjust(pval.ns, method="BH")
+  cat[pval.ns < 0.05 & cat != "DP"] <- "NC"
+  cat[pval.ns < 0.05 & c.c1 == c.c2 & c.c1 == c.oa & c.c1 > 1] <- "DP"			
+
   names(ns_genes) <- cat
   return(ns_genes)
 }
