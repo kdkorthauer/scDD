@@ -226,13 +226,20 @@ testZeroes <- function(dat, cond, these=1:nrow(dat)){
 #'   condition is not multimodal or is different across conditions (most often the case), an FDR-adjusted t-test
 #'   is performed to detect overall mean shifts.
 #'
+#' @param testZeroes Logical indicating whether or not to test for a difference in the proportion of zeroes
+#'
 #' @inheritParams classifyDD
-#' 
 #'
 #' @return cat Character vector of the same length as \code{sig_genes} that indicates which nonsignificant genes by
 #'  the permutation test belong to the DP category
 #' 
-feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE){
+feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE, testZeroes=FALSE){
+  if(testZeroes){
+    pval.thresh <- 0.025
+  }else{
+    pval.thresh <- 0.05
+  }
+  
   oa <- lapply(oa, function(x) x[[1]])
   c1 <- lapply(c1, function(x) x[[1]])
   c2 <- lapply(c2, function(x) x[[1]])
@@ -273,8 +280,8 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE){
   }
   
   pval.ns <- p.adjust(pval.ns, method="BH")
-  cat[pval.ns < 0.05 & cat != "DP"] <- "NC"
-  cat[pval.ns < 0.05 & c.c1 == c.c2 & c.c1 == c.oa & c.c1 > 1] <- "DP"			
+  cat[pval.ns < pval.thresh & cat != "DP"] <- "NC"
+  cat[pval.ns < pval.thresh & c.c1 == c.c2 & c.c1 == c.oa & c.c1 > 1] <- "DP"			
 
   names(pval.ns) <- cat
   return(pval.ns)
