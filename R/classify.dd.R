@@ -226,14 +226,15 @@ testZeroes <- function(dat, cond, these=1:nrow(dat)){
 #'   condition is not multimodal or is different across conditions (most often the case), an FDR-adjusted t-test
 #'   is performed to detect overall mean shifts.
 #'
-#' @param testZeroes Logical indicating whether or not to test for a difference in the proportion of zeroes
-#'
 #' @inheritParams classifyDD
+#' 
+#' @inheritParams scDD
 #'
 #' @return cat Character vector of the same length as \code{sig_genes} that indicates which nonsignificant genes by
 #'  the permutation test belong to the DP category
 #' 
-feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE, testZeroes=FALSE){
+feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE, 
+                 testZeroes=FALSE, adjust.perms=FALSE){
   if(testZeroes){
     pval.thresh <- 0.025
   }else{
@@ -249,6 +250,7 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE, tes
   c.c1 <- sapply(ns_genes, function(x) luOutlier(c1[[x]]))
   c.c2 <- sapply(ns_genes, function(x) luOutlier(c2[[x]]))
   
+  cdr <- apply(pe_mat, 2, function(x) sum(x>0)/length(x))
   cat <- rep(NA, length(ns_genes))
   pval.ns <- rep(NA, length(ns_genes))
   s <- 1
@@ -257,8 +259,14 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE, tes
     y <- pe_mat[g,]
     cond <- condition[y>0]
     y <- log(y[y>0])
+    
     # detect shifts in mean (to catch DP genes with an incorrect # components)
-    pval.ns[s] <- t.test(y~cond)$p.value	
+    if(adjust.perms){
+      cdr0 <- cdr[y>0]
+      pval.ns[s] <- summary(lm(y ~ cdr0 + cond))$coef[3,4]
+    }else{
+      pval.ns[s] <- t.test(y~cond)$p.value	
+    }
   
     # check whether clustering process is consistent within each condition as overall
     if (c.c1[s]==c.c2[s] & c.c1[s]==c.oa[s] & c.oa[s]>1){

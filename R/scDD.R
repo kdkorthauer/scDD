@@ -167,7 +167,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
   cats[sig] <- dd.cats
   
   extraDP <- feDP(exprs(SCdat), SCdat$condition, sig, oa, c1, c2, log.nonzero=TRUE,
-                  testZeroes=testZeroes)
+                  testZeroes=testZeroes, adjust.perms=adjust.perms)
   cats[-sig] <- names(extraDP)
   
   # zero test
