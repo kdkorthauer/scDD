@@ -4,7 +4,8 @@
 \alias{feDP}
 \title{feDP}
 \usage{
-feDP(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero = TRUE)
+feDP(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero = TRUE,
+  testZeroes = FALSE, adjust.perms = FALSE)
 }
 \arguments{
 \item{pe_mat}{Matrix with genes in rows and samples in columns.  Column names 
@@ -25,6 +26,12 @@ each nonzero sample in condition 1 only fit}
 each nonzero sample in condition 2 only fit}
 
 \item{log.nonzero}{Logical indicating whether to perform log transformation of nonzero values.}
+
+\item{testZeroes}{Logical indicating whether or not to test for a difference in the proportion of zeroes}
+
+\item{adjust.perms}{Logical indicating whether or not to adjust the permutation tests for the sample
+detection rate (proportion of nonzero values).  If true, the residuals of a linear model adjusted for 
+detection rate are permuted, and new fitted values are obtained using these residuals.}
 }
 \value{
 cat Character vector of the same length as \code{sig_genes} that indicates which nonsignificant genes by
