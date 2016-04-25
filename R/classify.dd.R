@@ -258,11 +258,11 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE,
   for (g in ns_genes){
     y <- pe_mat[g,]
     cond <- condition[y>0]
+    cdr0 <- cdr[y>0]
     y <- log(y[y>0])
     
     # detect shifts in mean (to catch DP genes with an incorrect # components)
     if(adjust.perms){
-      cdr0 <- cdr[y>0]
       pval.ns[s] <- summary(lm(y ~ cdr0 + cond))$coef[3,4]
     }else{
       pval.ns[s] <- t.test(y~cond)$p.value	
