@@ -100,6 +100,8 @@ mclustRestricted <- function(y, restrict=TRUE){
           min.cl <- which.min(mc$parameters$variance$sigmasq)
           vardiff <- mc$parameters$variance$sigmasq[max.cl] / mc$parameters$variance$sigmasq[min.cl]
           nmin <- table(cl)[min.cl]
+          balance <- 2*sqrt(nmin*nmax/(nmin+nmax)^2)
+          meandiff <- meandiff*balance
         }else{
           meandiff <- 10
           vardiff <- -Inf
@@ -163,8 +165,7 @@ mclustRestricted <- function(y, restrict=TRUE){
         mincat <- min(table(cl))
         tries <- 0	
         nmax <- table(cl)[max.cl]
-        balance <- 2*sqrt(nmin*nmax/(nmin+nmax)^2)
-        meandiff <- meandiff*balance
+        meandiff <- meandiff
         
         if(!((min(meandiff) > addThresh & (vardiff < 10)) & mincat>2)){
           mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=comps_old))
