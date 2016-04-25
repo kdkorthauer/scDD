@@ -81,7 +81,7 @@ mclustRestricted <- function(y, restrict=TRUE){
       }
       
       err <- 0
-      # enforce that clusters have to be separated by at least 2 sds - if not, decrease possible components by 1 and refit
+      # enforce that clusters have to be have sufficient bimodal index - if not, decrease possible components by 1 and refit
       while( (min(meandiff) < remThresh | (vardiff > 20)) & mincat>2 
              & tries <=4 & sum(is.na(mc$class))==0 & err==0){
          err <- 0
@@ -96,7 +96,9 @@ mclustRestricted <- function(y, restrict=TRUE){
         if (comps > 1 & comps_old-comps==1){
           compmeans <- as.numeric(by(y, cl, mean))
           meandiff <- diff(compmeans)/max(sqrt(mc$parameters$variance$sigmasq))
-         
+          balance <- 2*sqrt(nmin*nmax/(nmin+nmax)^2)
+          meandiff <- meandiff*balance
+          
           max.cl <- which.max(mc$parameters$variance$sigmasq)
           min.cl <- which.min(mc$parameters$variance$sigmasq)
           vardiff <- mc$parameters$variance$sigmasq[max.cl] / mc$parameters$variance$sigmasq[min.cl]
