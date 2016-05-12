@@ -5,7 +5,7 @@ To Install:
 
 install.packages("devtools")
 
-devtools::install_github("kdkorthauer/scDD", ref="devel")
+devtools::install_github("kdkorthauer/scDD")
 
 For examples and tips on using the package, please see the vignette [here](https://github.com/kdkorthauer/scDD/blob/master/vignettes/scDD.pdf).
 
