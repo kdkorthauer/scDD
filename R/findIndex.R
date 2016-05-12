@@ -3,13 +3,13 @@
 #' Find a reasonable set of genes (one mode and at least 25% nonzero values) to use for simulation.
 #' @inheritParams scDD
 #' 
-#'  @importClassesFrom Biobase ExpressionSet
+#' @importClassesFrom Biobase ExpressionSet
 #'  
-#'  @importMethodsFrom Biobase exprs
+#' @importMethodsFrom Biobase exprs
 #'  
-#'  @importMethodsFrom Biobase featureNames
+#' @importMethodsFrom Biobase featureNames
 #'  
-#'  @importMethodsFrom Biobase sampleNames
+#' @importMethodsFrom Biobase sampleNames
 #'
 #' @importFrom mclust Mclust mclustBIC
 #' 

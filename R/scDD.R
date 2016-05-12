@@ -30,19 +30,18 @@
 #'  condition membership with clustering, p-value for test of difference in dropout rate (only for non-DD genes), and name of the 
 #'  DD (DE, DP, DM, DB) pattern or DZ (otherwise NS = not significant), the number of clusters identified overall, the number of clusters identified in 
 #'  condition 1 alone, and the number of clusters identified in condition 2 alone.    The remaining three elements are data frames (first for condition 1 and 2 combined, then condition 1 alone, then condition 2 alone) that contains the cluster memberships for each sample (cluster 1,2,3,...) in columns and genes in rows.  Zeroes, which are not involved in the clustering, are labeled as zero.  
-
 #'  
-#'  @importClassesFrom Biobase ExpressionSet
+#' @importClassesFrom Biobase ExpressionSet
 #'  
-#'  @importMethodsFrom Biobase exprs
+#' @importMethodsFrom Biobase exprs
 #'  
-#'  @importMethodsFrom Biobase featureNames
+#' @importMethodsFrom Biobase featureNames
 #'  
-#'  @importMethodsFrom Biobase sampleNames
+#' @importMethodsFrom Biobase sampleNames
 #'  
-#'  @export
+#' @export
 #'  
-#'  @examples 
+#' @examples 
 #'  
 #'  # load toy simulated example ExpressionSet to find DD genes
 #' 

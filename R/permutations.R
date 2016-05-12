@@ -24,7 +24,6 @@
 #' @param restrict Logical indicating whether to perform restricted Mclust clustering where close-together clusters are joined.
 #' 
 #' @importFrom BiocParallel bplapply
-#' 
 #'
 #' @return Bayes factor numerator for the current permutation
 

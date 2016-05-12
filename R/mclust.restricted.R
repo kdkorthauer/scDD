@@ -12,12 +12,11 @@
 #'   and ratio of largest to smallest variance less than 3 when small clusters are present (containing 10% or less of the sample).
 #'   If False, then Mclust results as is are returned.
 #'   
-#'  
 #' @importFrom mclust Mclust
 #' 
 #' @return List object with (1) vector of cluster membership, (2) cluster means, (3) cluster variances, (4) number of model parameters,
 #'  (5) sample size, (6) BIC of selected model, and (6) loglikelihood of selected model. 
-#'  @export
+#' @export
 
 
 

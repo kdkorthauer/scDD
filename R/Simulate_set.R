@@ -32,11 +32,11 @@
 #' 
 #' @importClassesFrom Biobase ExpressionSet
 #'  
-#'  @importMethodsFrom Biobase exprs
+#' @importMethodsFrom Biobase exprs
 #'  
-#'  @importMethodsFrom Biobase featureNames
+#' @importMethodsFrom Biobase featureNames
 #'  
-#'  @importMethodsFrom Biobase sampleNames
+#' @importMethodsFrom Biobase sampleNames
 #'
 #' @export 
 #'

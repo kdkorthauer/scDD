@@ -43,7 +43,7 @@ calcRP <- function(Emean, Evar){
 #' @param threshold Mean threshold value which dictates which fold change value to use for multiplying mean and standard deviation.
 #'  Default value is Inf (so \code{FC} is always used).
 #'  
-#'  @param include.zeroes Logical value indicating whether the zero values should be included in the calculations of the empirical means 
+#' @param include.zeroes Logical value indicating whether the zero values should be included in the calculations of the empirical means 
 #'    and variances.
 #' 
 #' @return MV Vector of two elements, first contains the empirical mean estimate, second contains the empirical variance estimate (optionally 
