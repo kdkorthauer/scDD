@@ -1,5 +1,5 @@
 # scDD
-Development branch of R Package 'scDD'
+Version 1.1.0 of R Package 'scDD'
 
 To Install:
 
