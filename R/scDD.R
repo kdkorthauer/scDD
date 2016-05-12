@@ -170,6 +170,15 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
                   testZeroes=testZeroes, adjust.perms=adjust.perms)
   cats[-sig] <- names(extraDP)
   
+  # classify additional genes with evidence of DD in the form of a mean shift found by 'extraDP'
+  if(testZeroes){
+    NCs <- which(p.adjust(pvals, method="BH") > 0.025 & cats == "NC")
+  }else{
+    NCs <- which(p.adjust(pvals, method="BH") > 0.05 & cats == "NC")
+  }
+  NC.cats <- classifyDD(exprs(SCdat), SCdat$condition, NCs, oa, c1, c2, alpha=alpha, m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE)
+  cats[NCs] <- NC.cats
+  
   # zero test
   ns <- which(!(cats %in% c("DE", "DP", "DM", "DB")))
   pvals.z <- rep(NA, nrow(exprs(SCdat)))
