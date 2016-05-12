@@ -1,15 +1,13 @@
 #' findIndex
 #'
 #' Find a reasonable set of genes (one mode and at least 25% nonzero values) to use for simulation.
-#' @inheritParams scDD
+#' @param SCdat An object of class \code{ExpressionSet} that contains normalized single-cell expression and metadata, where the \code{assayData} 
+#'   slot contains one row for each gene and one sample for each column.  The \code{PhenoData} slot should contain a vector of numeric values
+#'   (either 1 or 2) that indicates which 
+#'   condition each sample belongs to (in the same order as the columns of \code{assayData}).  Optional additional metadata about the 
+#'   experiment can be contained in the \code{experimentData} slot.
 #' 
-#' @importClassesFrom Biobase ExpressionSet
-#'  
-#' @importMethodsFrom Biobase exprs
-#'  
-#' @importMethodsFrom Biobase featureNames
-#'  
-#' @importMethodsFrom Biobase sampleNames
+#' @import Biobase
 #'
 #' @importFrom mclust Mclust mclustBIC
 #' 

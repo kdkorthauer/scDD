@@ -9,9 +9,14 @@ mclustRestricted(y, restrict = TRUE)
 \arguments{
 \item{y}{Numeric vector of values to fit to a normal mixture model with Mclust.}
 
+<<<<<<< HEAD
 \item{restrict}{Logical indicating whether or not to enforce the restriction on cluster separation by at least 2 standard deviations
 and ratio of largest to smallest variance less than 3 when small clusters are present (containing 10% or less of the sample).
 If False, then Mclust results as is are returned.}
+=======
+\item{restrict}{Logical indicating whether or not to enforce the restriction on cluster separation based on bimodal index
+and ratio of largest to smallest variance (see details).  If False, then Mclust results as is are returned.}
+>>>>>>> devel
 }
 \value{
 List object with (1) vector of cluster membership, (2) cluster means, (3) cluster variances, (4) number of model parameters,
@@ -22,7 +27,9 @@ Function to determine how many normal mixture components are present.
 }
 \details{
 Robust to detecting multiple components that are close together by enforcing that the distance between two clusters 
- of appreciable size (at least 4 samples) be at least 2 standard deviations and not have variances that differ by more than 
- a ratio of 3 for clusters of small size (10% or less of the sample).
+ of appreciable size (at least 4 samples), have sufficiently high bimodal index (cluster mean difference standardized by average
+ standard deviation and multiplied by a balance factor which is one when clusters are perfectly balanced) and not have variances
+ that differ by more than a ratio of 20. Bimodal index threshold is dependent on sample size to ensure consistent performance
+ in power and type I error of detection of multiple components.
 }
 

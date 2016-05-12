@@ -30,15 +30,9 @@
 #' 
 #' @inheritParams findIndex
 #' 
-#' @importClassesFrom Biobase ExpressionSet
-#'  
-#' @importMethodsFrom Biobase exprs
-#'  
-#' @importMethodsFrom Biobase featureNames
-#'  
-#' @importMethodsFrom Biobase sampleNames
-#'
-#' @export 
+#' @export
+#' 
+#' @import Biobase 
 #'
 #' @return A named list of two items: the first (labeled 'Simulated_Data') is a matrix of simulated 
 #'   data with \code{numSamples} columns and \code{nDE + nDP + nDM + nDB + nEE + nEP} rows 

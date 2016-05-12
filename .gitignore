@@ -1,3 +1,11 @@
 .Rproj.user
 .Rhistory
 .RData
+scDD.Rproj
+vignettes/DD.pdf
+.bbl
+.log
+vignettes/scDD.pdf
+.synctex.gz
+.toc
+vignettes/scDD-concordance.tex
