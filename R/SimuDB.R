@@ -11,7 +11,7 @@
 
 
 simuDB <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC, coeff, RP, modeFC, DP,
-                     generateZero, constantZero){
+                     generateZero, constantZero, varInflation){
   
   numGenes <- nrow(Simulated_Data)
   numSamples <- ncol(Simulated_Data)/2
@@ -27,8 +27,14 @@ simuDB <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
     
     if(generateZero %in% c("empirical", "constant")){
       temp <- matrix(data=0,nrow=p,ncol=1)
-      for(j in 1:p){
-        while(temp[j]==0){temp[j] <- rnbinom(1,RP[i,1],1-RP[i,2])}
+      if(is.null(varInflation)){
+        for(j in 1:p){
+          while(temp[j]==0){temp[j] <- rnbinom(1,RP[i,1],1-RP[i,2])}
+        }
+      }else{
+        for(j in 1:p){
+          while(temp[j]==0){temp[j] <- rnbinom(1,RP[i,3],1-RP[i,4])}
+        }
       }
       randp <- sample(1:numSamples, p, replace=FALSE)
       Simulated_Data[i,randp] <- temp
@@ -36,7 +42,11 @@ simuDB <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
         Simulated_Data[i,(1:numSamples)[-randp]] <-0
       }
     }else{
-      Simulated_Data[i,1:numSamples] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+      if(is.null(varInflation)){
+        Simulated_Data[i,1:numSamples] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+      }else{
+        Simulated_Data[i,1:numSamples] <- rnbinom(numSamples,RP[i,3],1-RP[i,4])
+      }
     }
   }
   
@@ -63,7 +73,24 @@ simuDB <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
   RPC2 <- cbind( t(apply(MVC2[,1:2], 1, function(x) calcRP(x[1], x[2]))),
                  t(apply(MVC2[,3:4], 1, function(x) calcRP(x[1], x[2]))))
   
-
+  # calculate r and p parameters of inflated variance NB and add to the RPC2 matrix
+  if(!is.null(varInflation)){
+    MVC2.Infl1 <- MVC2
+    MVC2.Infl1[,1] <- MVC2[,1]*(1 + MVC2[,2]/(MVC2[,1]^2))^((varInflation[1]-1)/2) 
+    MVC2.Infl1[,2] <- MVC2[,2]*( ((1 + MVC2[,2]/(MVC2[,1]^2))^(2*varInflation[1])-(1 + MVC2[,2]/(MVC2[,1]^2))^varInflation[1]) / 
+                                   ((1 + MVC2[,2]/(MVC2[,1]^2))^2-(1 + MVC2[,2]/(MVC2[,1]^2))) )
+    
+    MVC2.Infl2 <- MVC2
+    MVC2.Infl2[,1] <- MVC2[,1]*(1 + MVC2[,2]/(MVC2[,1]^2))^((varInflation[2]-1)/2) 
+    MVC2.Infl2[,2] <- MVC2[,2]*( ((1 + MVC2[,2]/(MVC2[,1]^2))^(2*varInflation[2])-(1 + MVC2[,2]/(MVC2[,1]^2))^varInflation[2]) / 
+                                   ((1 + MVC2[,2]/(MVC2[,1]^2))^2-(1 + MVC2[,2]/(MVC2[,1]^2))) )
+    
+    RPC2 <- cbind(RPC2, cbind( t(apply(MVC2[,1:2], 1, function(x) calcRP(x[1], x[2]))),
+                               t(apply(MVC2[,3:4], 1, function(x) calcRP(x[1], x[2])))))
+    RPC2 <- cbind(RPC2, cbind( t(apply(MVC2[,1:2], 1, function(x) calcRP(x[1], x[2]))),
+                               t(apply(MVC2[,3:4], 1, function(x) calcRP(x[1], x[2])))))
+  }
+  
   ### Simulate data in condition 1
   for(i in 1:numGenes){
     if(generateZero=="empirical"){
@@ -74,9 +101,15 @@ simuDB <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
     
     if(generateZero %in% c("empirical", "constant")){
       temp <- matrix(data=0,nrow=p,ncol=1)
-      if(MVC2[i,5]==0){  # gene is below cutoff 
-        for(j in 1:p){
-          while(temp[j]==0){temp[j] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
+      if(MVC2[i,5]==0){  # gene is below cutoff
+        if(is.null(varInflation)){
+          for(j in 1:p){
+            while(temp[j]==0){temp[j] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
+          }
+        }else{
+          for(j in 1:p){
+            while(temp[j]==0){temp[j] <- rnbinom(1,RPC2[i,5],1-RPC2[i,6])}
+          } 
         }
         randp <- sample(1:numSamples, p, replace=FALSE)
         Simulated_Data[i,randp] <- temp
@@ -84,8 +117,14 @@ simuDB <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
           Simulated_Data[i,(1:numSamples)[-randp]] <-0
         }
       }else{  # gene is above cutoff
-        for(j in 1:p){
-          while(temp[j]==0){temp[j] <- rnbinom(1,RP[i,1],1-RP[i,2])}
+        if(is.null(varInflation)){
+          for(j in 1:p){
+            while(temp[j]==0){temp[j] <- rnbinom(1,RP[i,1],1-RP[i,2])}
+          }
+        }else{
+          for(j in 1:p){
+            while(temp[j]==0){temp[j] <- rnbinom(1,RP[i,3],1-RP[i,4])}
+          }
         }
         randp <- sample(1:numSamples, p, replace=FALSE)
         Simulated_Data[i,randp] <- temp
@@ -95,12 +134,21 @@ simuDB <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
       }
     } else{
       if(MVC2[i,5]==0){  # gene is below cutoff 
-        Simulated_Data[i,1:numSamples] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
+        if(is.null(varInflation)){
+          Simulated_Data[i,1:numSamples] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
+        }else{
+          Simulated_Data[i,1:numSamples] <- rnbinom(numSamples,RPC2[i,5],1-RPC2[i,6])
+        }
       }else{  # gene is above cutoff
-        Simulated_Data[i,1:numSamples] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+        if(is.null(varInflation)){
+          Simulated_Data[i,1:numSamples] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+        }else{
+          Simulated_Data[i,1:numSamples] <- rnbinom(numSamples,RP[i,3],1-RP[i,4])
+        }
       }
     }
   }
+
   
   ### Simulate for condition2
   for(i in 1:numGenes){
@@ -114,14 +162,28 @@ simuDB <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
       if(i%in%DEIndex){ 
         temp <- matrix(data=0,nrow=p,ncol=2)
         if(MVC2[i,5]==0){ # gene is below cutoff
-          for(j in 1:p){
-            while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,1],1-RP[i,2])}
-            while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,3],1-RPC2[i,4])}
+          if(is.null(varInflation)){
+            for(j in 1:p){
+              while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,1],1-RP[i,2])}
+              while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,3],1-RPC2[i,4])}
+            }
+          }else{
+            for(j in 1:p){
+              while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,5],1-RP[i,6])}
+              while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,11],1-RPC2[i,12])}
+            }
           }
         }else{  # gene is above cutoff
-          for(j in 1:p){
-            while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
-            while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,3],1-RPC2[i,4])}
+          if(is.null(varInflation)){
+            for(j in 1:p){
+              while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
+              while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,3],1-RPC2[i,4])}
+            }
+          }else{
+            for(j in 1:p){
+              while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RPC2[i,9],1-RPC2[i,10])}
+              while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,11],1-RPC2[i,12])}
+            }
           }
         }
         
@@ -135,12 +197,24 @@ simuDB <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
       }else{  #EE genes (simulate just like in C1)
         temp <- matrix(data=0,nrow=p,ncol=1)
         if(MVC2[i,5]==0){ # gene is below cutoff
-          for(j in 1:p){
-            while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
+          if(is.null(varInflation)){
+            for(j in 1:p){
+              while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
+            }
+          }else{
+            for(j in 1:p){
+              while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RPC2[i,9],1-RPC2[i,10])}
+            }
           }
         }else{ # gene is above
-          for(j in 1:p){
-            while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,1],1-RP[i,2])}
+          if(is.null(varInflation)){
+            for(j in 1:p){
+              while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,1],1-RP[i,2])}
+            }
+          }else{
+            for(j in 1:p){
+              while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,5],1-RP[i,6])}
+            }
           }
         }
         
@@ -154,11 +228,21 @@ simuDB <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
       if(i%in%DEIndex){ 
         temp <- matrix(data=0,nrow=numSamples,ncol=2)
         if(MVC2[i,5]==0){ # gene is below cutoff
-          temp[,1] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
-          temp[,2] <- rnbinom(numSamples,RPC2[i,3],1-RPC2[i,4])
+          if(is.null(varInflation)){
+            temp[,1] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+            temp[,2] <- rnbinom(numSamples,RPC2[i,3],1-RPC2[i,4])
+          }else{
+            temp[,1] <- rnbinom(numSamples,RP[i,5],1-RP[i,6])
+            temp[,2] <- rnbinom(numSamples,RPC2[i,11],1-RPC2[i,12])
+          }
         }else{  # gene is above cutoff
-          temp[,1] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
-          temp[,2] <- rnbinom(numSamples,RPC2[i,3],1-RPC2[i,4])
+          if(is.null(varInflation)){
+            temp[,1] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
+            temp[,2] <- rnbinom(numSamples,RPC2[i,3],1-RPC2[i,4])
+          }else{
+            temp[,1] <- rnbinom(numSamples,RPC2[i,9],1-RPC2[i,10])
+            temp[,2] <- rnbinom(numSamples,RPC2[i,11],1-RPC2[i,12])
+          }
         }
         
         n1 <- round(numSamples*DP[1],digits=0)
@@ -167,9 +251,17 @@ simuDB <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
         
       }else{  #EE genes (simulate just like in C1)
         if(MVC2[i,5]==0){ # gene is below cutoff
-          temp <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
+          if(is.null(varInflation)){
+            temp <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
+          }else{
+            temp <- rnbinom(numSamples,RPC2[i,9],1-RPC2[i,10])
+          }
         }else{ # gene is above cutoff
-          temp <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+          if(is.null(varInflation)){
+            temp <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+          }else{
+            temp <- rnbinom(numSamples,RP[i,5],1-RP[i,6])
+          }
         }
       }
     }

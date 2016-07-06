@@ -7,7 +7,7 @@
 singleCellSimu(Dataset1, Method, index, FC, modeFC, DP, Validation = FALSE,
   numGenes = 1000, numDE = 100, numSamples = 100,
   generateZero = c("empirical", "simulated", "constant"),
-  constantZero = NULL)
+  constantZero = NULL, varInflation = NULL)
 }
 \arguments{
 \item{Dataset1}{Numeric matrix of expression values with genes in rows and samples in columns.}
@@ -38,6 +38,11 @@ proportion of zeroes equal to \code{constantZero}.}
 
 \item{constantZero}{Numeric value between 0 and 1 that indicates the fixed proportion of zeroes for every gene.
 Ignored if \code{generateZero} method is not equal to "\code{constant}".}
+
+\item{varInflation}{Optional numeric vector with one element for each condition that corresponds to the multiplicative 
+variance inflation factor to use when simulating data.  Useful for sensitivity studies to assess the impact of 
+confounding effects on differential variance across conditions. Currently assumes all samples within a 
+condition are subject to the same variance inflation factor.}
 }
 \value{
 Simulated_Data A list object where the first element contains a matrix of 
