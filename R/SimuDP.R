@@ -10,7 +10,7 @@
 
 
 simuDP <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC, coeff, RP, modeFC, DP,
-                   generateZero, constantZero){
+                   generateZero, constantZero, varInflation){
  
   numGenes <- nrow(Simulated_Data)
   numSamples <- ncol(Simulated_Data)/2
@@ -29,6 +29,23 @@ simuDP <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
   # calculate r and p parameters of NB
   RPC2 <- t(apply(MVC2[,1:2], 1, function(x) calcRP(x[1], x[2])))
   
+  # calculate r and p parameters of inflated variance NB and add to the RPC2 matrix
+  if(!is.null(varInflation)){
+    MVC2.Infl1 <- MVC2
+    MVC2.Infl1[,1] <- MVC2[,1]*(1 + MVC2[,2]/(MVC2[,1]^2))^((varInflation[1]-1)/2) 
+    MVC2.Infl1[,2] <- MVC2[,2]*( ((1 + MVC2[,2]/(MVC2[,1]^2))^(2*varInflation[1])-(1 + MVC2[,2]/(MVC2[,1]^2))^varInflation[1]) / 
+                                   ((1 + MVC2[,2]/(MVC2[,1]^2))^2-(1 + MVC2[,2]/(MVC2[,1]^2))) )
+    
+    MVC2.Infl2 <- MVC2
+    MVC2.Infl2[,1] <- MVC2[,1]*(1 + MVC2[,2]/(MVC2[,1]^2))^((varInflation[2]-1)/2) 
+    MVC2.Infl2[,2] <- MVC2[,2]*( ((1 + MVC2[,2]/(MVC2[,1]^2))^(2*varInflation[2])-(1 + MVC2[,2]/(MVC2[,1]^2))^varInflation[2]) / 
+                                   ((1 + MVC2[,2]/(MVC2[,1]^2))^2-(1 + MVC2[,2]/(MVC2[,1]^2))) )
+    
+    RPC2 <- cbind(RPC2, t(apply(MVC2.Infl1[,1:2], 1, function(x) calcRP(x[1], x[2]))))
+    RPC2 <- cbind(RPC2, t(apply(MVC2.Infl2[,1:2], 1, function(x) calcRP(x[1], x[2]))))
+  }
+  
+  
   ### Simulate data in condition1
   for(i in 1:numGenes){
     dp <- DP
@@ -44,11 +61,17 @@ simuDP <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
     
     if(generateZero %in% c("empirical", "constant")){
       temp <- matrix(data=0,nrow=p,ncol=2)
-      for(j in 1:p){
-        while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,1],1-RP[i,2])}
-        while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
+      if(is.null(varInflation)){
+        for(j in 1:p){
+          while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,1],1-RP[i,2])}
+          while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
+        }
+      }else{
+        for(j in 1:p){
+          while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,3],1-RP[i,4])}
+          while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,3],1-RPC2[i,4])}
+        }
       }
-      
       # place nonzeroes randomly
       n1 <- round(p*dp[1],digits=0)
       randp <- sample(1:numSamples, p, replace=FALSE)
@@ -59,8 +82,13 @@ simuDP <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
       }
     }else{
       temp <- matrix(data=0,nrow=numSamples,ncol=2)
-      temp[,1] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
-      temp[,2] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
+      if(is.null(varInflation)){
+        temp[,1] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+        temp[,2] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
+      }else{
+        temp[,1] <- rnbinom(numSamples,RP[i,3],1-RP[i,4])
+        temp[,2] <- rnbinom(numSamples,RPC2[i,3],1-RPC2[i,4])
+      }
   
       # sample from each mode
       n1 <- round(numSamples*dp[1],digits=0)
@@ -78,10 +106,17 @@ simuDP <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
     if(generateZero %in% c("empirical", "constant")){  
       if(i%in%DEIndex){
        temp <- matrix(data=0,nrow=p,ncol=2)
-        for(j in 1:p){
-          while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,1],1-RP[i,2])}
-          while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
-        }
+       if(is.null(varInflation)){
+          for(j in 1:p){
+            while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,1],1-RP[i,2])}
+            while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
+          }
+       }else{
+         for(j in 1:p){
+           while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,5],1-RP[i,6])}
+           while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,5],1-RPC2[i,6])}
+         }
+       }
         n1 <- round(p*dp[2],digits=0)
         randp <- sample(1:numSamples, p, replace=FALSE)
         Simulated_Data[i,numSamples+randp] <-  c(sample(temp[,1],n1,replace=FALSE), 
@@ -91,9 +126,16 @@ simuDP <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
         }
       }else{
         temp <- matrix(data=0,nrow=p,ncol=2)
-        for(j in 1:p){
-          while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,1],1-RP[i,2])}
-          while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
+        if(is.null(varInflation)){
+          for(j in 1:p){
+            while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,1],1-RP[i,2])}
+            while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,1],1-RPC2[i,2])}
+          }
+        }else{
+          for(j in 1:p){
+            while(temp[j,1]==0){temp[j,1] <- rnbinom(1,RP[i,5],1-RP[i,6])}
+            while(temp[j,2]==0){temp[j,2] <- rnbinom(1,RPC2[i,5],1-RPC2[i,6])}
+          }
         }
         n1 <- round(p*dp[1],digits=0)
         randp <- sample(1:numSamples, p, replace=FALSE)
@@ -106,17 +148,25 @@ simuDP <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
     }else{
       if(i%in%DEIndex){
         temp <- matrix(data=0,nrow=numSamples,ncol=2)
-        temp[,1] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
-        temp[,2] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
-  
+        if(is.null(varInflation)){
+          temp[,1] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+          temp[,2] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
+        }else{
+          temp[,1] <- rnbinom(numSamples,RP[i,5],1-RP[i,5])
+          temp[,2] <- rnbinom(numSamples,RPC2[i,6],1-RPC2[i,6])
+        }
         n1 <- round(numSamples*dp[2],digits=0)
         Simulated_Data[i,((numSamples+1):(2*numSamples))] <-  c(sample(temp[,1],n1,replace=FALSE), 
                                                                 sample(temp[,2],numSamples-n1,replace=FALSE))
       }else{
         temp <- matrix(data=0,nrow=numSamples,ncol=2)
-        temp[,1] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
-        temp[,2] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
-        
+        if(is.null(varInflation)){
+          temp[,1] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+          temp[,2] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
+        }else{
+          temp[,1] <- rnbinom(numSamples,RP[i,5],1-RP[i,6])
+          temp[,2] <- rnbinom(numSamples,RPC2[i,5],1-RPC2[i,6]) 
+        }
         n1 <- round(numSamples*dp[1],digits=0)
         Simulated_Data[i,((numSamples+1):(2*numSamples))] <-  c(sample(temp[,1],n1,replace=FALSE), 
                                                                 sample(temp[,2],numSamples-n1,replace=FALSE))

@@ -5,7 +5,7 @@
 \title{simuDM}
 \usage{
 simuDM(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC,
-  coeff, RP, modeFC, generateZero, constantZero)
+  coeff, RP, modeFC, generateZero, constantZero, varInflation)
 }
 \arguments{
 \item{Dataset1}{Numeric matrix of expression values with genes in rows and samples in columns.}
@@ -37,6 +37,11 @@ proportion of zeroes equal to \code{constantZero}.}
 
 \item{constantZero}{Numeric value between 0 and 1 that indicates the fixed proportion of zeroes for every gene.
 Ignored if \code{generateZero} method is not equal to "\code{constant}".}
+
+\item{varInflation}{Optional numeric vector with one element for each condition that corresponds to the multiplicative 
+variance inflation factor to use when simulating data.  Useful for sensitivity studies to assess the impact of 
+confounding effects on differential variance across conditions. Currently assumes all samples within a 
+condition are subject to the same variance inflation factor.}
 }
 \value{
 Simulated_Data Simulated dataset for DM

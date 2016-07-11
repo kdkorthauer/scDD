@@ -6,7 +6,8 @@
 \usage{
 simulateSet(SCdat, numSamples = 100, nDE = 250, nDP = 250, nDM = 250,
   nDB = 250, nEE = 5000, nEP = 4000, sd.range = c(1, 3), modeFC = c(2,
-  3, 4), plots = TRUE, plot.file = NULL, random.seed = 284)
+  3, 4), plots = TRUE, plot.file = NULL, random.seed = 284,
+  varInflation = NULL)
 }
 \arguments{
 \item{SCdat}{An object of class \code{ExpressionSet} that contains normalized single-cell expression and metadata, where the \code{assayData} 
@@ -39,6 +40,11 @@ of fold changes to randomly select.}
 \item{plot.file}{Character containing the file string if the plots are to be sent to a pdf instead of to the standard output.}
 
 \item{random.seed}{Numeric value for a call to \code{set.seed} for reproducibility.}
+
+\item{varInflation}{Optional numeric vector with one element for each condition that corresponds to the multiplicative 
+variance inflation factor to use when simulating data.  Useful for sensitivity studies to assess the impact of 
+confounding effects on differential variance across conditions. Currently assumes all samples within a 
+condition are subject to the same variance inflation factor.}
 }
 \value{
 A named list of two items: the first (labeled 'Simulated_Data') is a matrix of simulated 
