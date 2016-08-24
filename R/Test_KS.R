@@ -53,8 +53,8 @@ testKS <- function(dat, condition, inclZero=TRUE, numDE=NULL, DEIndex){
     ks.test(x1,x2, exact=FALSE)$p.value
   }
   
-  ks.pval <- apply(dat, 1, function(x) onegene(x) )
-  ks.pval <- p.adjust(ks.pval, method="BH")
+  ks.pval.unadj <- apply(dat, 1, function(x) onegene(x) )
+  ks.pval <- p.adjust(ks.pval.unadj, method="BH")
   sig_genes_ks <- which(ks.pval < 0.05)
   names(sig_genes_ks) <- rownames(dat)[sig_genes_ks]
   names(ks.pval) <- rownames(dat)
@@ -62,7 +62,7 @@ testKS <- function(dat, condition, inclZero=TRUE, numDE=NULL, DEIndex){
   if(!is.null(numDE)){
     power <- sum(sig_genes_ks %in% DEIndex) / numDE
     fdr <- length(sig_genes_ks[!(sig_genes_ks %in% DEIndex)]) / length(sig_genes_ks)
-    return(list(genes=sig_genes_ks, p=ks.pval, power=power, fdr=fdr))
+    return(list(genes=sig_genes_ks, p=ks.pval, p.unadj=ks.pval.unadj, power=power, fdr=fdr))
   }
-  return(list(genes=sig_genes_ks, p=ks.pval))
+  return(list(genes=sig_genes_ks, p=ks.pval, p.unadj=ks.pval.unadj))
 }
