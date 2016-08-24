@@ -18,7 +18,16 @@
 #' @param prior_param A list of prior parameter values to be used when modeling each gene as a mixture of DP normals.  Default 
 #'    values are given that specify a vague prior distribution on the cluster-specific means and variances.
 #'    
-#' @param permutations The number of permutations to be used in calculating empirical p-values.
+#' @param permutations The number of permutations to be used in calculating empirical p-values.  If set to zero,
+#'   the Bayes Factor permutation test will not be performed.  Instead, the genes with significantly different
+#'   expression distributions will be identified using the nonparametric Kolmogorov-Smirnov test, which tests the null hypothesis that 
+#'   the samples are generated from the same continuous distribution.  This test will yield
+#'   slightly lower power than the full permutation testing framework (this effect is more pronounced at smaller sample 
+#'   sizes, and is more pronounced in the DB category), but is orders of magnitude faster.  The overall power 
+#'   to detect DD genes in simulation was still comparable or favorable compared to existing methods, however. This option
+#'   is recommended when compute resources are limited.  The remaining steps of the scDD framework will remain unchanged
+#'   (namely, categorizing the significant DD genes into patterns that represent the major distributional changes, 
+#'   as well as the ability to visualize the results with violin plots using the \code{sideViolin} function).
 #' 
 #' @param testZeroes Logical indicating whether or not to test for a difference in the proportion of zeroes
 #' 
@@ -111,53 +120,67 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     comps.c2[i] <- luOutlier(c2[[i]]$class)
   }
   
-  
-  # obtain Bayes Factor score numerators for each permutation
-  print("Performing permutations to evaluate independence of clustering and condition for each gene")
-  bf.perm <- vector("list", nrow(exprs(SCdat)))
-  names(bf.perm) <- rownames(exprs(SCdat))
-  
-  if(adjust.perms){
-    C <- apply(exprs(SCdat), 2, function(x) sum(x>0)/length(x))
+  if (permutations == 0){
+    message("Notice! Number of permutations is set to zero; using Kolmogorov-Smirnov to test for differences in distributions instead of the Bayes Factor permutation test")
     
-    t1 <- proc.time()
-    for (g in 1:nrow(exprs(SCdat))){
-      bf.perm[[g]] <- permMclustCov(exprs(SCdat)[g,], permutations, C, SCdat$condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
-                                    alpha, m0, s0, a0, b0)
-      
-      if (g%%1000 == 0){
-        t2 <- proc.time()
-        print(paste0(g, " genes completed at ", date(), ", took ", round((t2-t1)[3]/60, 2), " minutes")) 
-        t1 <- t2
-      }
-    }
+    res_ks <- testKS(exprs(SCdat), SCdat$condition, inclZero=FALSE)
     
-    pvals <- sapply(1:nrow(exprs(SCdat)), function(x) sum( bf.perm[[x]] > bf[x] - den[x] ) )/(permutations)
     if (testZeroes){
-      sig <- which(p.adjust(pvals, method="BH") < 0.025)
+      sig <- which(res_ks$p < 0.025)
     }else{
-      sig <- which(p.adjust(pvals, method="BH") < 0.05)
+      sig <- which(res_ks$p < 0.05)
     }
     
-  }else{
-    t1 <- proc.time()
-    for (g in 1:nrow(exprs(SCdat))){
-      bf.perm[[g]] <- permMclust(exprs(SCdat[g,]), permutations, SCdat$condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
-                                  alpha, m0, s0, a0, b0)
+    pvals <- res_ks$p.unadj
+    
+  }else{ 
+      # obtain Bayes Factor score numerators for each permutation
+      print("Performing permutations to evaluate independence of clustering and condition for each gene")
+      bf.perm <- vector("list", nrow(exprs(SCdat)))
+      names(bf.perm) <- rownames(exprs(SCdat))
       
-      if (g%%1000 == 0){
-        t2 <- proc.time()
-        print(paste0(g, " genes completed at ", date(), ", took ", round((t2-t1)[3]/60, 2), " minutes")) 
-        t1 <- t2
+      if(adjust.perms){
+        C <- apply(exprs(SCdat), 2, function(x) sum(x>0)/length(x))
+        
+        t1 <- proc.time()
+        for (g in 1:nrow(exprs(SCdat))){
+          bf.perm[[g]] <- permMclustCov(exprs(SCdat)[g,], permutations, C, SCdat$condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
+                                        alpha, m0, s0, a0, b0)
+          
+          if (g%%1000 == 0){
+            t2 <- proc.time()
+            print(paste0(g, " genes completed at ", date(), ", took ", round((t2-t1)[3]/60, 2), " minutes")) 
+            t1 <- t2
+          }
+        }
+        
+        pvals <- sapply(1:nrow(exprs(SCdat)), function(x) sum( bf.perm[[x]] > bf[x] - den[x] ) )/(permutations)
+        if (testZeroes){
+          sig <- which(p.adjust(pvals, method="BH") < 0.025)
+        }else{
+          sig <- which(p.adjust(pvals, method="BH") < 0.05)
+        }
+        
+      }else{
+        t1 <- proc.time()
+        for (g in 1:nrow(exprs(SCdat))){
+          bf.perm[[g]] <- permMclust(exprs(SCdat[g,]), permutations, SCdat$condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
+                                      alpha, m0, s0, a0, b0)
+          
+          if (g%%1000 == 0){
+            t2 <- proc.time()
+            print(paste0(g, " genes completed at ", date(), ", took ", round((t2-t1)[3]/60, 2), " minutes")) 
+            t1 <- t2
+          }
+        }
+        
+        pvals <- sapply(1:nrow(exprs(SCdat)), function(x) sum( bf.perm[[x]] > bf[x]) ) / (permutations)
+        if (testZeroes){
+          sig <- which(p.adjust(pvals, method="BH") < 0.025)
+        }else{
+          sig <- which(p.adjust(pvals, method="BH") < 0.05)
+        }
       }
-    }
-    
-    pvals <- sapply(1:nrow(exprs(SCdat)), function(x) sum( bf.perm[[x]] > bf[x]) ) / (permutations)
-    if (testZeroes){
-      sig <- which(p.adjust(pvals, method="BH") < 0.025)
-    }else{
-      sig <- which(p.adjust(pvals, method="BH") < 0.05)
-    }
   }
   
   print("Classifying significant genes into patterns")
