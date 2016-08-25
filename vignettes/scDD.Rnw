@@ -88,6 +88,22 @@ The \Robject{RES} object is a list with four items: the first is a data frame wi
   \item \Rcode{Clusters.c2}: the number of clusters identified in condition 2 alone
 \end{enumerate}
   The remaining three elements are data frames (first for condition 1 and 2 combined, then condition 1 alone, then condition 2 alone) that contains the cluster memberships for each sample (cluster 1,2,3,...) in columns and genes in rows.  Zeroes, which are not involved in the clustering, are labeled as zero.  
+  
+
+\section{Alternate test for Differential Distributions}
+
+The first step in the scDD framework that identifies Differential Distributions was designed to have optimal power to detect differences in expression distributions, but the utilization of a permutation test on the Bayes Factor can be computationally demanding.  While this is not an issue when machines with multiple cores are available since the code takes advantage of parallel processing, we also provide an option to use an alternate test to detect distributional differences that avoides the use of a permutation test.  This optional test is the Kolmogorov-Smirnov test, which examines the null hypothesis that two samples are generated from the same continuous distribution.  While the use of this test yielded slighlty lower power in simulations than the full permutation testing framework at lower sample sizes (primarily affecting the DB pattern genes), it does not require permutations and thus is orders of magnitude faster.  The overall power to detect DD genes in simulation was still comparable or favorable to exisiting methods for differential expression analysis of scRNA-seq experiments.  
+
+The remaining steps of the scDD framework remain unchanged if the alternate test is used.  That is, the Dirichlet process mixture model is still fit to the observed expression measurements so that the significant DD genes can be categorized into patterns that represent the major distributional changes, and results can still be visualized with violin plots using the \Rfunction{sideViolin} function described in the Plotting section.  
+
+The option to use the Kolmogorov-Smirnov test instead of the full permutation testing procedure is invoked by setting the number of permutations to zero (the \Rcode{permutations} argument) when calling the main \Rfunction{scDD} function, as follows.  
+
+<<eval=FALSE, print=TRUE, results=hide>>=
+RES_KS <- scDD(scDatExSim, prior_param=prior_param, permutations=0, testZeroes=FALSE,
+            adjust.perms=FALSE)
+@
+
+The results object returned by \Rfunction{scDD} remains exactly as described in the previous section, with the exception that the \Rcode{nonzero.pvalue} and \Rcode{nonzero.pvalue.adj} columns of the \Rfunction{Genes} data frame now contain the p-values and Benjamini-Hochberg adjusted p-values of the Kolmogorov-Smirnov test rather than the permutation test. 
 
 \section{Simulation}
 
