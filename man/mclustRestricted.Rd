@@ -9,14 +9,8 @@ mclustRestricted(y, restrict = TRUE)
 \arguments{
 \item{y}{Numeric vector of values to fit to a normal mixture model with Mclust.}
 
-<<<<<<< HEAD
-\item{restrict}{Logical indicating whether or not to enforce the restriction on cluster separation by at least 2 standard deviations
-and ratio of largest to smallest variance less than 3 when small clusters are present (containing 10% or less of the sample).
-If False, then Mclust results as is are returned.}
-=======
 \item{restrict}{Logical indicating whether or not to enforce the restriction on cluster separation based on bimodal index
 and ratio of largest to smallest variance (see details).  If False, then Mclust results as is are returned.}
->>>>>>> devel
 }
 \value{
 List object with (1) vector of cluster membership, (2) cluster means, (3) cluster variances, (4) number of model parameters,

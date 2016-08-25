@@ -25,7 +25,8 @@ values are given that specify a vague prior distribution on the cluster-specific
 detection rate (proportion of nonzero values).  If true, the residuals of a linear model adjusted for 
 detection rate are permuted, and new fitted values are obtained using these residuals.}
 }
-\value{List with four items: the first is a data frame with nine columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 
+\value{
+List with four items: the first is a data frame with nine columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 
  condition membership with clustering, Benjamini-Hochberg adjusted version of the previous column, p-value for test of difference in dropout rate (only for non-DD genes), 
  Benjamini-Hochberg adjusted version of the previous column, name of the 
  DD (DE, DP, DM, DB) pattern or DZ (otherwise NS = not significant), the number of clusters identified overall, the number of clusters identified in 
@@ -47,7 +48,6 @@ Find genes with differential distributions (DD) across two conditions.  Models e
 \examples{
  
 # load toy simulated example ExpressionSet to find DD genes
-
 
 data(scDatExSim)
 
