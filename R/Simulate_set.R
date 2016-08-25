@@ -89,7 +89,8 @@
 
 
 simulateSet <- function(SCdat, numSamples=100, nDE=250, nDP=250, nDM=250, nDB=250, 
-                         nEE=5000, nEP=4000, sd.range=c(1,3), modeFC=c(2,3,4), plots=TRUE, plot.file=NULL, random.seed=284){
+                         nEE=5000, nEP=4000, sd.range=c(1,3), modeFC=c(2,3,4), plots=TRUE, plot.file=NULL, random.seed=284,
+                         varInflation=NULL){
 if(!is.null(plot.file)){
   pdf(file=paste0(plot.file))
 }
@@ -111,7 +112,7 @@ set.seed(random.seed)
 ### DE
 SD1 <- singleCellSimu(Dataset1, Method = "DE", index, FC, modeFC, Validation = FALSE, numGenes=nDE, numDE=nDE,
                         numSamples=numSamples, generateZero=generateZero,
-                        constantZero=constantZero)
+                        constantZero=constantZero, varInflation)
 Simulated_Data <- SD1[[1]]
 rnms <- rep("EE", nrow(Simulated_Data))
 rnms[SD1[[2]]] <- "DE"
@@ -122,7 +123,7 @@ fcs <- SD1[[3]]
 ### DP
 SD2 <- singleCellSimu(Dataset1, Method = "DP", index, FC, modeFC, DP = c(0.33,0.66), Validation = FALSE,
                         numGenes=nDP, numDE=nDP, numSamples=numSamples,
-                        generateZero=generateZero, constantZero=constantZero)
+                        generateZero=generateZero, constantZero=constantZero, varInflation=varInflation)
 Simulated_Data_DP <- SD2[[1]]
 rnms <- rep("EE", nrow(Simulated_Data_DP))
 rnms[SD2[[2]]] <- "DP"
@@ -133,7 +134,7 @@ fcs <- c(fcs, SD2[[3]])
 ### DM
 SD3 <- singleCellSimu(Dataset1, Method = "DM", index, FC, modeFC, Validation = FALSE,
                         numGenes=nDM, numDE=nDM, numSamples=numSamples, 
-                        generateZero=generateZero, constantZero=constantZero)
+                        generateZero=generateZero, constantZero=constantZero, varInflation)
 Simulated_Data_DM <- SD3[[1]]
 rnms <- rep("EE", nrow(Simulated_Data_DM))
 rnms[SD3[[2]]] <- "DM"
@@ -145,7 +146,7 @@ fcs <- c(fcs, SD3[[3]])
 ### DB
 SD4 <- singleCellSimu(Dataset1, Method = "DB", index, FC, modeFC, DP = c(0.5,0.5), Validation = FALSE,
                         numGenes=nDB, numDE=nDB, numSamples=numSamples, 
-                        generateZero=generateZero, constantZero=constantZero)
+                        generateZero=generateZero, constantZero=constantZero, varInflation)
 Simulated_Data_DB <- SD4[[1]]
 rnms <- rep("EE", nrow(Simulated_Data_DB))
 rnms[SD4[[2]]] <- "DB"
@@ -156,7 +157,7 @@ fcs <- c(fcs, SD4[[3]])
 ### EP
 SD5 <- singleCellSimu(Dataset1, Method = "DP", index, FC, modeFC, DP = c(0.50,0.50), Validation = FALSE,
                         numGenes=nEP, numDE=0, numSamples=numSamples, 
-                        generateZero=generateZero, constantZero=constantZero)
+                        generateZero=generateZero, constantZero=constantZero, varInflation)
 Simulated_Data_EP <- SD5[[1]]
 rnms <- rep("EP", nrow(Simulated_Data_EP))
 rnms[SD5[[2]]] <- "DP"
@@ -167,7 +168,7 @@ fcs <- c(fcs, SD5[[3]])
 ### EE
 SD6<- singleCellSimu(Dataset1, Method = "DE", index, FC, modeFC, Validation = plots, 
                        numGenes=nEE, numDE=0, numSamples=numSamples, 
-                       generateZero=generateZero, constantZero=constantZero)
+                       generateZero=generateZero, constantZero=constantZero, varInflation=varInflation)
 Simulated_Data_EE <- SD6[[1]]
 rnms <- rep("EE", nrow(Simulated_Data_EE))
 rnms[SD6[[2]]] <- "DE"

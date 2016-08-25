@@ -107,6 +107,11 @@ calcMV <- function(a, FC=1, FC.thresh=NA, threshold=Inf, include.zeroes=FALSE){
 #' 
 #' @param numSamples numeric value for the number of samples in each condition to simulate
 #' 
+#' @param varInflation Optional numeric vector with one element for each condition that corresponds to the multiplicative 
+#'  variance inflation factor to use when simulating data.  Useful for sensitivity studies to assess the impact of 
+#'  confounding effects on differential variance across conditions. Currently assumes all samples within a 
+#'  condition are subject to the same variance inflation factor.
+#' 
 #' @importFrom outliers grubbs.test
 #'
 #' @return Simulated_Data A list object where the first element contains a matrix of 
@@ -117,8 +122,13 @@ calcMV <- function(a, FC=1, FC.thresh=NA, threshold=Inf, include.zeroes=FALSE){
 singleCellSimu <- function(Dataset1, Method, index, FC, modeFC, DP, Validation=FALSE, 
                              numGenes=1000, numDE=100, numSamples=100, 
                              generateZero=c("empirical", "simulated", "constant"),
-                             constantZero=NULL){
-  
+                             constantZero=NULL, varInflation=NULL){
+if(!is.null(varInflation)){
+  if(!length(varInflation)==2){
+    stop("Error: varInflation vector needs to contain one factor for each sample or one factor for each condition")
+  }
+}
+    
 if(length(generateZero)>1){
   generateZero <- generateZero[1]
 }
@@ -146,7 +156,6 @@ if(Method %in%  c("DP", "DM")){
   MV[,3:4] <- t(sapply(1:length(samplename), function(x) calcMV(Dataset1[samplename[x],], FC=1, include.zeroes=TRUE)))
 }
 
-
 ### Calculate parameter R and P in NB distribution
 if(generateZero %in% c("empirical", "constant")){
   RP <- t(apply(MV[,1:2], 1, function(x) calcRP(x[1], x[2])))
@@ -154,6 +163,24 @@ if(generateZero %in% c("empirical", "constant")){
   RP <- t(apply(MV[,3:4], 1, function(x) calcRP(x[1], x[2])))
 }else{
   stop("Error: Please specify a valid generateZero method!")
+}
+
+# if inflating the variance factor with varInflation, apply condition 1's factor to this MV matrix
+# and calculate the corresponding RP values
+if(!is.null(varInflation)){
+  MV.Infl1 <- MV
+  MV.Infl1[,c(2,4)] <- MV[,c(2,4)]*varInflation[1] 
+  
+  MV.Infl2 <- MV
+  MV.Infl2[,c(2,4)] <- MV[,c(2,4)]*varInflation[2] 
+  
+  if(generateZero %in% c("empirical", "constant")){
+    RP <- cbind(RP, t(apply(MV.Infl1[,1:2], 1, function(x) calcRP(x[1], x[2]))))
+    RP <- cbind(RP, t(apply(MV.Infl2[,1:2], 1, function(x) calcRP(x[1], x[2]))))
+  }else if (generateZero == "simulated"){
+    RP <- cbind(RP, t(apply(MV.Infl1[,3:4], 1, function(x) calcRP(x[1], x[2]))))
+    RP <- cbind(RP, t(apply(MV.Infl2[,3:4], 1, function(x) calcRP(x[1], x[2]))))
+  }
 }
 
 
@@ -176,24 +203,24 @@ EEIndex <- x[!(x%in%DEIndex)]
 if(Method=="DE")
 {
 	desim <- simuDE(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC, coeff, RP, modeFC,
-	                         generateZero, constantZero)
+	                         generateZero, constantZero, varInflation)
 	Simulated_Data <- desim[[1]]
   DE_FC <- desim[[2]]
 } else if(Method=="DP"){
   dpsim <- simuDP(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC2, coeff, RP, modeFC, DP,
-                  generateZero, constantZero)
+                  generateZero, constantZero, varInflation)
   Simulated_Data <- dpsim[[1]]
   DE_FC <- dpsim[[2]]
 }else if(Method=="DM"){
   
   dmsim <- simuDM(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC2, coeff, RP, modeFC,
-                  generateZero, constantZero)
+                  generateZero, constantZero, varInflation)
   Simulated_Data <- dmsim[[1]]
   DE_FC <- dmsim[[2]]
 }else if(Method=="DB"){
   
   DBsim <- simuDB(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC2, coeff, RP, modeFC, DP,
-                      generateZero, constantZero)
+                      generateZero, constantZero, varInflation)
   Simulated_Data <- DBsim[[1]]
   DE_FC <- DBsim[[2]]
 }

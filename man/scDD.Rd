@@ -17,7 +17,16 @@ experiment can be contained in the \code{experimentData} slot.}
 \item{prior_param}{A list of prior parameter values to be used when modeling each gene as a mixture of DP normals.  Default 
 values are given that specify a vague prior distribution on the cluster-specific means and variances.}
 
-\item{permutations}{The number of permutations to be used in calculating empirical p-values.}
+\item{permutations}{The number of permutations to be used in calculating empirical p-values.  If set to zero,
+the Bayes Factor permutation test will not be performed.  Instead, the genes with significantly different
+expression distributions will be identified using the nonparametric Kolmogorov-Smirnov test, which tests the null hypothesis that 
+the samples are generated from the same continuous distribution.  This test will yield
+slightly lower power than the full permutation testing framework (this effect is more pronounced at smaller sample 
+sizes, and is more pronounced in the DB category), but is orders of magnitude faster.  The overall power 
+to detect DD genes in simulation was still comparable or favorable compared to existing methods, however. This option
+is recommended when compute resources are limited.  The remaining steps of the scDD framework will remain unchanged
+(namely, categorizing the significant DD genes into patterns that represent the major distributional changes, 
+as well as the ability to visualize the results with violin plots using the \code{sideViolin} function).}
 
 \item{testZeroes}{Logical indicating whether or not to test for a difference in the proportion of zeroes}
 
