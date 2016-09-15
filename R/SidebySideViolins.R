@@ -99,8 +99,8 @@ sideViolin <- function(y, cond, MAP=NULL, logT=TRUE, title.gene="", conditionLab
   
   g <- ggplot(daty, aes(factor(cond), y), aes(shape=shps))
   g + geom_jitter(alpha=0.5, color="black", position = position_jitter(width = 0.15),
-                      aes(shape=shps), show_guide=FALSE) +
-    geom_violin(data=daty[daty$y>0, ], alpha=0.5, aes(fill=factor(cond)), show_guide=FALSE, scale="count") + 
+                      aes(shape=shps), show.legend=FALSE) +
+    geom_violin(data=daty[daty$y>0, ], alpha=0.5, aes(fill=factor(cond)), show.legend=FALSE, scale="count") + 
     ggtitle(paste0(title.gene)) +
     theme(plot.title = element_text(size=20, face="bold", vjust=2)) + 
     labs(x="Condition", y="log(EC + 1)") +
