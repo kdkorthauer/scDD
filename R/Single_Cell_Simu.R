@@ -144,7 +144,7 @@ for(i in 1:numGenes){
 }
 
 ### Calculate means and variances for these genes
-Zeropercent_Base <- as.matrix(apply(Dataset1[samplename,], 1, function(a) length(which(a == 0)) / length(a)))           
+Zeropercent_Base <- as.matrix(apply(Dataset1[samplename,,drop=FALSE], 1, function(a) length(which(a == 0)) / length(a)))           
 MV <- matrix(data = 0,nrow = numGenes,ncol = 4)
 if(Method %in%  c("DP", "DM")){
   MV[,1:2] <- t(sapply(1:length(samplename), function(x) calcMV(Dataset1[samplename[x],], FC=1, FC.thresh=FC2[x]^(-1/2), 
@@ -158,9 +158,9 @@ if(Method %in%  c("DP", "DM")){
 
 ### Calculate parameter R and P in NB distribution
 if(generateZero %in% c("empirical", "constant")){
-  RP <- t(apply(MV[,1:2], 1, function(x) calcRP(x[1], x[2])))
+  RP <- t(apply(MV[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2])))
 }else if (generateZero == "simulated"){
-  RP <- t(apply(MV[,3:4], 1, function(x) calcRP(x[1], x[2])))
+  RP <- t(apply(MV[,3:4,drop=FALSE], 1, function(x) calcRP(x[1], x[2])))
 }else{
   stop("Error: Please specify a valid generateZero method!")
 }
@@ -175,11 +175,11 @@ if(!is.null(varInflation)){
   MV.Infl2[,c(2,4)] <- MV[,c(2,4)]*varInflation[2] 
   
   if(generateZero %in% c("empirical", "constant")){
-    RP <- cbind(RP, t(apply(MV.Infl1[,1:2], 1, function(x) calcRP(x[1], x[2]))))
-    RP <- cbind(RP, t(apply(MV.Infl2[,1:2], 1, function(x) calcRP(x[1], x[2]))))
+    RP <- cbind(RP, t(apply(MV.Infl1[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
+    RP <- cbind(RP, t(apply(MV.Infl2[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
   }else if (generateZero == "simulated"){
-    RP <- cbind(RP, t(apply(MV.Infl1[,3:4], 1, function(x) calcRP(x[1], x[2]))))
-    RP <- cbind(RP, t(apply(MV.Infl2[,3:4], 1, function(x) calcRP(x[1], x[2]))))
+    RP <- cbind(RP, t(apply(MV.Infl1[,3:4,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
+    RP <- cbind(RP, t(apply(MV.Infl2[,3:4,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
   }
 }
 

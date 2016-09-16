@@ -193,6 +193,10 @@ if (nEE > 0){
   names(fcs) <- rownames(pe_mat[(1:sum(nDE,nDP,nDM,nDB)),])
 }
 
+if (nDE + nDP + nDM + nDB + nEE + nEP == 0){
+  stop("Error: This function simulates gene expression data, but the number of genes to simulate was set to zero.  Please specify a nonzero number of either DE, DP, DM, DB, EE, or EP genes.")
+}
+
 if (!is.null(plot.file)){
   dev.off()
 }

@@ -66,12 +66,12 @@ simuDB <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
     MVC2[,3:4] <- t(sapply(1:length(samplename), function(x) calcMV(Dataset1[samplename[x],], FC=FC[x], FC.thresh=FC[x]^(1/2), 
                                                                     threshold = cutoff, include.zeroes=TRUE)))
   }
-  MVC2[,5] <- apply(Dataset1[samplename,], 1, function(x) sum(log(mean(x[x>0]))>=cutoff))
+  MVC2[,5] <- apply(Dataset1[samplename,,drop=FALSE], 1, function(x) sum(log(mean(x[x>0]))>=cutoff))
   
   
   # calculate r and p parameters of NB
-  RPC2 <- cbind( t(apply(MVC2[,1:2], 1, function(x) calcRP(x[1], x[2]))),
-                 t(apply(MVC2[,3:4], 1, function(x) calcRP(x[1], x[2]))))
+  RPC2 <- cbind( t(apply(MVC2[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))),
+                 t(apply(MVC2[,3:4,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
   
   # calculate r and p parameters of inflated variance NB and add to the RPC2 matrix
   if(!is.null(varInflation)){
@@ -85,10 +85,10 @@ simuDB <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
     MVC2.Infl2[,2] <- MVC2[,2]*( ((1 + MVC2[,2]/(MVC2[,1]^2))^(2*varInflation[2])-(1 + MVC2[,2]/(MVC2[,1]^2))^varInflation[2]) / 
                                    ((1 + MVC2[,2]/(MVC2[,1]^2))^2-(1 + MVC2[,2]/(MVC2[,1]^2))) )
     
-    RPC2 <- cbind(RPC2, cbind( t(apply(MVC2[,1:2], 1, function(x) calcRP(x[1], x[2]))),
-                               t(apply(MVC2[,3:4], 1, function(x) calcRP(x[1], x[2])))))
-    RPC2 <- cbind(RPC2, cbind( t(apply(MVC2[,1:2], 1, function(x) calcRP(x[1], x[2]))),
-                               t(apply(MVC2[,3:4], 1, function(x) calcRP(x[1], x[2])))))
+    RPC2 <- cbind(RPC2, cbind( t(apply(MVC2[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))),
+                               t(apply(MVC2[,3:4,drop=FALSE], 1, function(x) calcRP(x[1], x[2])))))
+    RPC2 <- cbind(RPC2, cbind( t(apply(MVC2[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))),
+                               t(apply(MVC2[,3:4,drop=FALSE], 1, function(x) calcRP(x[1], x[2])))))
   }
   
   ### Simulate data in condition 1

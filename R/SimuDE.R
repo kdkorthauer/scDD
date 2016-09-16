@@ -87,7 +87,7 @@ if(generateZero %in% c("empirical", "constant")){
 }
 
 # calculate r and p parameters of NB
-RPC2 <- t(apply(MVC2[,1:2], 1, function(x) calcRP(x[1], x[2])))
+RPC2 <- t(apply(MVC2[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2])))
 
 # m.factor = (1 + v/m^2)^((c-1)/2)
 # v.factor = ( (1 + v/m^2)^(2c) - (1 + v/m^2)^c ) /  ( (1 + v/m^2)^2 - (1+m/v^2))
@@ -102,8 +102,8 @@ if(!is.null(varInflation)){
   MVC2.Infl2[,2] <- MVC2[,2]*( ((1 + MVC2[,2]/(MVC2[,1]^2))^(2*varInflation[2])-(1 + MVC2[,2]/(MVC2[,1]^2))^varInflation[2]) / 
                                  ((1 + MVC2[,2]/(MVC2[,1]^2))^2-(1 + MVC2[,2]/(MVC2[,1]^2))) )
   
-  RPC2 <- cbind(RPC2, t(apply(MVC2.Infl1[,1:2], 1, function(x) calcRP(x[1], x[2]))))
-  RPC2 <- cbind(RPC2, t(apply(MVC2.Infl2[,1:2], 1, function(x) calcRP(x[1], x[2]))))
+  RPC2 <- cbind(RPC2, t(apply(MVC2.Infl1[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
+  RPC2 <- cbind(RPC2, t(apply(MVC2.Infl2[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
 }
 
 # now simulate genes in condition 2

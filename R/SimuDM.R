@@ -27,7 +27,7 @@ simuDM <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
   }
   
   # calculate r and p parameters of NB
-  RPC2 <- t(apply(MVC2[,1:2], 1, function(x) calcRP(x[1], x[2])))
+  RPC2 <- t(apply(MVC2[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2])))
   
   # calculate r and p parameters of inflated variance NB and add to the RPC2 matrix
   if(!is.null(varInflation)){
@@ -41,8 +41,8 @@ simuDM <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Ba
     MVC2.Infl2[,2] <- MVC2[,2]*( ((1 + MVC2[,2]/(MVC2[,1]^2))^(2*varInflation[2])-(1 + MVC2[,2]/(MVC2[,1]^2))^varInflation[2]) / 
                                    ((1 + MVC2[,2]/(MVC2[,1]^2))^2-(1 + MVC2[,2]/(MVC2[,1]^2))) )
     
-    RPC2 <- cbind(RPC2, t(apply(MVC2.Infl1[,1:2], 1, function(x) calcRP(x[1], x[2]))))
-    RPC2 <- cbind(RPC2, t(apply(MVC2.Infl2[,1:2], 1, function(x) calcRP(x[1], x[2]))))
+    RPC2 <- cbind(RPC2, t(apply(MVC2.Infl1[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
+    RPC2 <- cbind(RPC2, t(apply(MVC2.Infl2[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
   }
   
   dp <- c(1,0.5)
