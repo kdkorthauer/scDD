@@ -109,73 +109,89 @@ print("Simulating individual genes...")
 Dataset1 <- exprs(SCdat[,SCdat$condition==1])
 
 set.seed(random.seed)
+
+# initialize pe_mat and fcs
+pe_mat <- NULL
+fcs <- NULL
+
 ### DE
-SD1 <- singleCellSimu(Dataset1, Method = "DE", index, FC, modeFC, Validation = FALSE, numGenes=nDE, numDE=nDE,
+if (nDE > 0){
+  SD1 <- singleCellSimu(Dataset1, Method = "DE", index, FC, modeFC, Validation = FALSE, numGenes=nDE, numDE=nDE,
                         numSamples=numSamples, generateZero=generateZero,
                         constantZero=constantZero, varInflation)
-Simulated_Data <- SD1[[1]]
-rnms <- rep("EE", nrow(Simulated_Data))
-rnms[SD1[[2]]] <- "DE"
-rownames(Simulated_Data) <- rnms
-pe_mat <- Simulated_Data
-fcs <- SD1[[3]]
+  Simulated_Data <- SD1[[1]]
+  rnms <- rep("EE", nrow(Simulated_Data))
+  rnms[SD1[[2]]] <- "DE"
+  rownames(Simulated_Data) <- rnms
+  pe_mat <- Simulated_Data
+  fcs <- SD1[[3]]
+}
 
 ### DP
-SD2 <- singleCellSimu(Dataset1, Method = "DP", index, FC, modeFC, DP = c(0.33,0.66), Validation = FALSE,
+if (nDP > 0){
+  SD2 <- singleCellSimu(Dataset1, Method = "DP", index, FC, modeFC, DP = c(0.33,0.66), Validation = FALSE,
                         numGenes=nDP, numDE=nDP, numSamples=numSamples,
                         generateZero=generateZero, constantZero=constantZero, varInflation=varInflation)
-Simulated_Data_DP <- SD2[[1]]
-rnms <- rep("EE", nrow(Simulated_Data_DP))
-rnms[SD2[[2]]] <- "DP"
-rownames(Simulated_Data_DP) <- rnms
-pe_mat <- rbind(pe_mat, Simulated_Data_DP)
-fcs <- c(fcs, SD2[[3]])
+  Simulated_Data_DP <- SD2[[1]]
+  rnms <- rep("EE", nrow(Simulated_Data_DP))
+  rnms[SD2[[2]]] <- "DP"
+  rownames(Simulated_Data_DP) <- rnms
+  pe_mat <- rbind(pe_mat, Simulated_Data_DP)
+  fcs <- c(fcs, SD2[[3]])
+}
 
 ### DM
-SD3 <- singleCellSimu(Dataset1, Method = "DM", index, FC, modeFC, Validation = FALSE,
+if (nDM > 0){
+  SD3 <- singleCellSimu(Dataset1, Method = "DM", index, FC, modeFC, Validation = FALSE,
                         numGenes=nDM, numDE=nDM, numSamples=numSamples, 
                         generateZero=generateZero, constantZero=constantZero, varInflation)
-Simulated_Data_DM <- SD3[[1]]
-rnms <- rep("EE", nrow(Simulated_Data_DM))
-rnms[SD3[[2]]] <- "DM"
-rownames(Simulated_Data_DM) <- rnms
-pe_mat <- rbind(pe_mat, Simulated_Data_DM)
-fcs <- c(fcs, SD3[[3]])
-
+  Simulated_Data_DM <- SD3[[1]]
+  rnms <- rep("EE", nrow(Simulated_Data_DM))
+  rnms[SD3[[2]]] <- "DM"
+  rownames(Simulated_Data_DM) <- rnms
+  pe_mat <- rbind(pe_mat, Simulated_Data_DM)
+  fcs <- c(fcs, SD3[[3]])
+}
 
 ### DB
-SD4 <- singleCellSimu(Dataset1, Method = "DB", index, FC, modeFC, DP = c(0.5,0.5), Validation = FALSE,
+if (nDB > 0){
+  SD4 <- singleCellSimu(Dataset1, Method = "DB", index, FC, modeFC, DP = c(0.5,0.5), Validation = FALSE,
                         numGenes=nDB, numDE=nDB, numSamples=numSamples, 
                         generateZero=generateZero, constantZero=constantZero, varInflation)
-Simulated_Data_DB <- SD4[[1]]
-rnms <- rep("EE", nrow(Simulated_Data_DB))
-rnms[SD4[[2]]] <- "DB"
-rownames(Simulated_Data_DB) <- rnms
-pe_mat <- rbind(pe_mat, Simulated_Data_DB)
-fcs <- c(fcs, SD4[[3]])
+  Simulated_Data_DB <- SD4[[1]]
+  rnms <- rep("EE", nrow(Simulated_Data_DB))
+  rnms[SD4[[2]]] <- "DB"
+  rownames(Simulated_Data_DB) <- rnms
+  pe_mat <- rbind(pe_mat, Simulated_Data_DB)
+  fcs <- c(fcs, SD4[[3]])
+}
 
 ### EP
-SD5 <- singleCellSimu(Dataset1, Method = "DP", index, FC, modeFC, DP = c(0.50,0.50), Validation = FALSE,
+if (nEP > 0){
+  SD5 <- singleCellSimu(Dataset1, Method = "DP", index, FC, modeFC, DP = c(0.50,0.50), Validation = FALSE,
                         numGenes=nEP, numDE=0, numSamples=numSamples, 
                         generateZero=generateZero, constantZero=constantZero, varInflation)
-Simulated_Data_EP <- SD5[[1]]
-rnms <- rep("EP", nrow(Simulated_Data_EP))
-rnms[SD5[[2]]] <- "DP"
-rownames(Simulated_Data_EP) <- rnms
-pe_mat <- rbind(pe_mat, Simulated_Data_EP)
-fcs <- c(fcs, SD5[[3]])
+  Simulated_Data_EP <- SD5[[1]]
+  rnms <- rep("EP", nrow(Simulated_Data_EP))
+  rnms[SD5[[2]]] <- "DP"
+  rownames(Simulated_Data_EP) <- rnms
+  pe_mat <- rbind(pe_mat, Simulated_Data_EP)
+  fcs <- c(fcs, SD5[[3]])
+}
 
 ### EE
-SD6<- singleCellSimu(Dataset1, Method = "DE", index, FC, modeFC, Validation = plots, 
+if (nEE > 0){
+  SD6<- singleCellSimu(Dataset1, Method = "DE", index, FC, modeFC, Validation = plots, 
                        numGenes=nEE, numDE=0, numSamples=numSamples, 
                        generateZero=generateZero, constantZero=constantZero, varInflation=varInflation)
-Simulated_Data_EE <- SD6[[1]]
-rnms <- rep("EE", nrow(Simulated_Data_EE))
-rnms[SD6[[2]]] <- "DE"
-rownames(Simulated_Data_EE) <- rnms
-pe_mat <- rbind(pe_mat, Simulated_Data_EE)
-fcs <- c(fcs, rep(NA, nEE))
-names(fcs) <- rownames(pe_mat[(1:sum(nDE,nDP,nDM,nDB)),])
+  Simulated_Data_EE <- SD6[[1]]
+  rnms <- rep("EE", nrow(Simulated_Data_EE))
+  rnms[SD6[[2]]] <- "DE"
+  rownames(Simulated_Data_EE) <- rnms
+  pe_mat <- rbind(pe_mat, Simulated_Data_EE)
+  fcs <- c(fcs, rep(NA, nEE))
+  names(fcs) <- rownames(pe_mat[(1:sum(nDE,nDP,nDM,nDB)),])
+}
 
 if (!is.null(plot.file)){
   dev.off()
