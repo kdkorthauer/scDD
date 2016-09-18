@@ -44,7 +44,9 @@
 #'  genes in rows.  Zeroes, which are not involved in the clustering, are labeled as zero.  
 #'  
 #' @export
-#'  
+#'
+#' @importFrom BiocParallel bplapply  
+#' 
 #' @import Biobase 
 #'  
 #' @examples 
@@ -100,27 +102,23 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
   
   oa <- c1 <- c2 <- vector("list", nrow(exprs(SCdat)))
   bf <- den <- comps.all <- comps.c1 <- comps.c2 <- rep(NA, nrow(exprs(SCdat)))
-  
-  for (i in 1:nrow(exprs(SCdat))){
-    y <- exprs(SCdat)[i,]
-    cond0 <- SCdat$condition[y>0]
-    y <- log(y[y>0])
-    
-    oa[[i]] <- mclustRestricted(y, restrict=TRUE)
-    c1[[i]] <- mclustRestricted(y[cond0==1], restrict=TRUE)
-    c2[[i]] <- mclustRestricted(y[cond0==2], restrict=TRUE)
-    
-    bf[i] <- jointPosterior(y[cond0==1], c1[[i]], alpha, m0, s0, a0, b0) + 
-      jointPosterior(y[cond0==2], c2[[i]], alpha, m0, s0, a0, b0) 
-    
-    den[i] <- jointPosterior(y, oa[[i]], alpha, m0, s0, a0, b0)
-    
-    comps.all[i] <- luOutlier(oa[[i]]$class)
-    comps.c1[i] <- luOutlier(c1[[i]]$class)
-    comps.c2[i] <- luOutlier(c2[[i]]$class)
-  }
-  
+
   if (permutations == 0){
+    
+    for (i in 1:nrow(exprs(SCdat))){
+      y <- exprs(SCdat)[i,]
+      cond0 <- SCdat$condition[y>0]
+      y <- log(y[y>0])
+      
+      oa[[i]] <- mclustRestricted(y, restrict=TRUE)
+      c1[[i]] <- mclustRestricted(y[cond0==1], restrict=TRUE)
+      c2[[i]] <- mclustRestricted(y[cond0==2], restrict=TRUE)
+    }
+    
+    comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class)))
+    comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class)))
+    comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class)))
+    
     message("Notice! Number of permutations is set to zero; using Kolmogorov-Smirnov to test for differences in distributions instead of the Bayes Factor permutation test")
     
     res_ks <- testKS(exprs(SCdat), SCdat$condition, inclZero=FALSE)
@@ -134,6 +132,25 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     pvals <- res_ks$p.unadj
     
   }else{ 
+    for (i in 1:nrow(exprs(SCdat))){
+      y <- exprs(SCdat)[i,]
+      cond0 <- SCdat$condition[y>0]
+      y <- log(y[y>0])
+      
+      oa[[i]] <- mclustRestricted(y, restrict=TRUE)
+      c1[[i]] <- mclustRestricted(y[cond0==1], restrict=TRUE)
+      c2[[i]] <- mclustRestricted(y[cond0==2], restrict=TRUE)
+      
+      bf[i] <- jointPosterior(y[cond0==1], c1[[i]], alpha, m0, s0, a0, b0) + 
+        jointPosterior(y[cond0==2], c2[[i]], alpha, m0, s0, a0, b0) 
+      
+      den[i] <- jointPosterior(y, oa[[i]], alpha, m0, s0, a0, b0)
+      
+      comps.all[i] <- luOutlier(oa[[i]]$class)
+      comps.c1[i] <- luOutlier(c1[[i]]$class)
+      comps.c2[i] <- luOutlier(c2[[i]]$class)
+    }    
+    
       # obtain Bayes Factor score numerators for each permutation
       print("Performing permutations to evaluate independence of clustering and condition for each gene")
       bf.perm <- vector("list", nrow(exprs(SCdat)))
