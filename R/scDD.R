@@ -18,13 +18,12 @@
 #' @param prior_param A list of prior parameter values to be used when modeling each gene as a mixture of DP normals.  Default 
 #'    values are given that specify a vague prior distribution on the cluster-specific means and variances.
 #'    
-#' @param permutations The number of permutations to be used in calculating empirical p-values.  If set to zero,
-#'   the Bayes Factor permutation test will not be performed.  Instead, the genes with significantly different
-#'   expression distributions will be identified using the nonparametric Kolmogorov-Smirnov test, which tests the null hypothesis that 
+#' @param permutations The number of permutations to be used in calculating empirical p-values.  If set to zero (default),
+#'   the full Bayes Factor permutation test will not be performed.  Instead, a fast procedure to identify the genes with significantly different
+#'   expression distributions will be performed using the nonparametric Kolmogorov-Smirnov test, which tests the null hypothesis that 
 #'   the samples are generated from the same continuous distribution.  This test will yield
 #'   slightly lower power than the full permutation testing framework (this effect is more pronounced at smaller sample 
-#'   sizes, and is more pronounced in the DB category), but is orders of magnitude faster.  The overall power 
-#'   to detect DD genes in simulation was still comparable or favorable compared to existing methods, however. This option
+#'   sizes, and is more pronounced in the DB category), but is orders of magnitude faster.  This option
 #'   is recommended when compute resources are limited.  The remaining steps of the scDD framework will remain unchanged
 #'   (namely, categorizing the significant DD genes into patterns that represent the major distributional changes, 
 #'   as well as the ability to visualize the results with violin plots using the \code{sideViolin} function).
@@ -34,6 +33,10 @@
 #' @param adjust.perms Logical indicating whether or not to adjust the permutation tests for the sample
 #'   detection rate (proportion of nonzero values).  If true, the residuals of a linear model adjusted for 
 #'   detection rate are permuted, and new fitted values are obtained using these residuals.
+#'   
+#' @param n.cores integer number of cores to use when computing the Bayes Factor estimates for the full permutation testing 
+#'  framework.  Defaults to the number of cores returned by \code{parallel::detectCores()}.  To use fewer cores, specify a number
+#'  less than the number of cores on your machine.
 #' 
 #' @return List with four items: the first is a data frame with nine columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 
 #'  condition membership with clustering, Benjamini-Hochberg adjusted version of the previous column, p-value for test of difference in dropout rate (only for non-DD genes), 
@@ -46,6 +49,12 @@
 #' @export
 #'
 #' @importFrom BiocParallel bplapply  
+#' 
+#' @importFrom BiocParallel register
+#' 
+#' @importFrom BiocParallel MulticoreParam
+#' 
+#' @importFrom parallel detectCores
 #' 
 #' @import Biobase 
 #'  
@@ -77,8 +86,8 @@
 #' 
 #' RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
 
-scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0=0.01), permutations=100,
-                  testZeroes=TRUE, adjust.perms=FALSE){
+scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0=0.01), permutations=0,
+                  testZeroes=TRUE, adjust.perms=FALSE, n.cores=parallel::detectCores()){
   
   # check whether SCdat is a member of the ExpressionSet class
   if(!("ExpressionSet" %in% class(SCdat))){
@@ -98,7 +107,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
   }
   
   # cluster each gene in SCdat
-  print("Clustering observed expression data for each gene")
+  message("Clustering observed expression data for each gene")
   
   oa <- c1 <- c2 <- vector("list", nrow(exprs(SCdat)))
   bf <- den <- comps.all <- comps.c1 <- comps.c2 <- rep(NA, nrow(exprs(SCdat)))
@@ -152,7 +161,10 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     }    
     
       # obtain Bayes Factor score numerators for each permutation
-      print("Performing permutations to evaluate independence of clustering and condition for each gene")
+      message("Performing permutations to evaluate independence of clustering and condition for each gene")
+      message(paste0("Setting up parallel back-end using ", n.cores, " cores" ))
+      BiocParallel::register(BPPARAM = BiocParallel::MulticoreParam(workers=n.cores))
+      
       bf.perm <- vector("list", nrow(exprs(SCdat)))
       names(bf.perm) <- rownames(exprs(SCdat))
       
@@ -166,7 +178,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
           
           if (g%%1000 == 0){
             t2 <- proc.time()
-            print(paste0(g, " genes completed at ", date(), ", took ", round((t2-t1)[3]/60, 2), " minutes")) 
+            message(paste0(g, " genes completed at ", date(), ", took ", round((t2-t1)[3]/60, 2), " minutes")) 
             t1 <- t2
           }
         }
@@ -186,7 +198,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
           
           if (g%%1000 == 0){
             t2 <- proc.time()
-            print(paste0(g, " genes completed at ", date(), ", took ", round((t2-t1)[3]/60, 2), " minutes")) 
+            message(paste0(g, " genes completed at ", date(), ", took ", round((t2-t1)[3]/60, 2), " minutes")) 
             t1 <- t2
           }
         }
@@ -200,7 +212,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
       }
   }
   
-  print("Classifying significant genes into patterns")
+  message("Classifying significant genes into patterns")
   dd.cats <- classifyDD(exprs(SCdat), SCdat$condition, sig, oa, c1, c2, alpha=alpha, m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE)
   
   cats <- rep("NS", nrow(exprs(SCdat)))

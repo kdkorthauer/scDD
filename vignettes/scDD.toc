@@ -6,5 +6,5 @@
 \contentsline {section}{\numberline {6}Formatting and Preprocessing}{5}{section.6}
 \contentsline {subsection}{\numberline {6.1}Constructing an ExpressionSet object}{5}{subsection.6.1}
 \contentsline {subsection}{\numberline {6.2}Filtering and Normalization}{6}{subsection.6.2}
-\contentsline {section}{\numberline {7}Plotting}{6}{section.7}
+\contentsline {section}{\numberline {7}Plotting}{7}{section.7}
 \contentsline {section}{\numberline {8}Session Info}{7}{section.8}

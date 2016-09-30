@@ -1,0 +1,10 @@
+\BOOKMARK [1][]{section.1}{1 Introduction}{}% 1
+\BOOKMARK [1][]{section.2}{2 Background}{}% 2
+\BOOKMARK [1][]{section.3}{3 Identify and Classify DD genes}{}% 3
+\BOOKMARK [1][]{section.4}{4 Alternate test for Differential Distributions}{}% 4
+\BOOKMARK [1][]{section.5}{5 Simulation}{}% 5
+\BOOKMARK [1][]{section.6}{6 Formatting and Preprocessing}{}% 6
+\BOOKMARK [2][]{subsection.6.1}{6.1 Constructing an ExpressionSet object}{section.6}% 7
+\BOOKMARK [2][]{subsection.6.2}{6.2 Filtering and Normalization}{section.6}% 8
+\BOOKMARK [1][]{section.7}{7 Plotting}{}% 9
+\BOOKMARK [1][]{section.8}{8 Session Info}{}% 10

@@ -4,10 +4,10 @@
 \documentclass{article}
 \usepackage{underscore}
 
-\RequirePackage{/Library/Frameworks/R.framework/Versions/3.2/Resources/library/BiocStyle/resources/tex/Bioconductor}
+\RequirePackage{/Library/Frameworks/R.framework/Versions/3.3/Resources/library/BiocStyle/resources/tex/Bioconductor}
 
-\AtBeginDocument{\bibliographystyle{/Library/Frameworks/R.framework/Versions/3.2/Resources/library/BiocStyle/resources/tex/unsrturl}}  
-  \bioctitle[scDD]{scDD: Bayesian Nonparametric Mixture Modeling of Single-Cell RNA-seq Experiments}
+\AtBeginDocument{\bibliographystyle{/Library/Frameworks/R.framework/Versions/3.3/Resources/library/BiocStyle/resources/tex/unsrturl}}  
+  \bioctitle[scDD]{scDD: A statistical approach for identifying differential distributions in single-cell RNA-seq experiments}
     \author{Keegan Korthauer\footnote{\email{keegan@jimmy.harvard.edu}}}
 
   
@@ -28,7 +28,7 @@ The \Rpackage{scDD} package models single-cell gene expression data (from single
 
 Our aim is two-fold: (1) to detect which genes have different expression distributions across two biological conditions and (2) to classify those differences into informative patterns.  Note that in (1) we explicitly say differences in 'distributions' rather than differences in 'average', which would correspond to traditional DE (differential expression) analysis in bulk RNA-seq.  By examining the entire distribution, we are able to detect more subtle differences as well as describe complex patterns, such as the existence of subgroups of cells within and across condition that express a given gene at a different level.
 
-We start by assuming that the log-transformed nonzero expression values arise out of a Dirichlet Process Mixture of normals model.  This allows us to characterize expression distributions in terms of the number of modes (or clusters).  To detect differences in these distributions across conditions, an approximate Bayes Factor score is used which compares the conditional likelihood under the hypothesis of Equivalent distributions (ED) where one clustering process governs both conditions jointly, with the hypothesis of Differential distributions (DD) where each condition is generated from its own clustering process.  Significance of the scores for each gene are evaluated via empirical p-values after permutation.  Zero values are considered by also implementing a $\chi^2$ test of whether the proportion of zero values differs by condition (adjusted for overall sample detection rate).  More details are provided in \cite{korthauer2015}.
+We start by assuming that the log-transformed nonzero expression values arise out of a Dirichlet Process Mixture of normals model.  This allows us to characterize expression distributions in terms of the number of modes (or clusters).  To detect differences in these distributions across conditions, an approximate Bayes Factor score is used which compares the conditional likelihood under the hypothesis of Equivalent distributions (ED) where one clustering process governs both conditions jointly, with the hypothesis of Differential distributions (DD) where each condition is generated from its own clustering process.  In the full framework, significance of the scores for each gene are evaluated via empirical p-values after permutation.  Optionally, a fast implementation obtains the p-values from the non-parametric Kolmogorov-Smirnov test.  Zero values are considered by also implementing a $\chi^2$ test of whether the proportion of zero values differs by condition (adjusted for overall sample detection rate).  More details are provided in \cite{korthauer2015}.
 
 After the detection step is carried out, the significantly DD genes are classified into four informative patterns based on the number of clusters detected and whether they overlap.  These patterns, depicted in Figure~\ref{DD}, include DE (differential expression of unimodal genes), DP (differential proportion for multimodal genes), DM (differential modality), and DB (both differential modality and mean expression levels).  Genes where a differential proportion of zeroes were identified are classified as DZ (differential zero).
 
@@ -60,7 +60,7 @@ Next, we load the toy simulated example \Rclass{ExpressionSet} object that we wi
 \end{Sinput}
 \end{Schunk}
 
-Verify that this object is a member of the \Rclass{ExpressionSet} class and that it contains 200 samples and 30 genes
+Verify that this object is a member of the \Rclass{ExpressionSet} class and that it contains 200 samples and 30 genes.  Note that the input gene set needs to be in \Rclass{ExpressionSet} format, and should contain normalized counts.  In practice, it is also advisable to filter the input gene set to remove genes that have an extremely high proportion of zeroes (see Section 6). 
 \begin{Schunk}
 \begin{Sinput}
 > class(scDatExSim)
@@ -89,28 +89,26 @@ NULL
 \end{Soutput}
 \end{Schunk}
 
-Specify the arguments that we'll pass to the \Rfunction{scDD} function.  We will perform 100 permutations on each of the 30 genes.
+Next, specify the hyperparameter arguments that we'll pass to the \Rfunction{scDD} function.  These values reflect heavy-tailed distributions over the paramaters and are robust to many different settings in simulation (see \cite{korthauer2015} for more details).
 \begin{Schunk}
 \begin{Sinput}
 > prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
-> nperms <- 100
 \end{Sinput}
 \end{Schunk}
  
-Finally, call the \Rfunction{scDD} function to perform permutations, classify DD genes, and return the results.  We won't perform the test for a difference in the proportion of zeroes since none exists in this simulated toy example data.  We also won't perform adjusted permutations to offset the effects of detection rate on mean expression level, since these are also absent in our toy simulated example.  Note that this step will take significantly longer with more genes and/or more permutations, but multiple cores will automatically be utilized (if available) via the \Rpackage{BiocParallel} package.  In practice, it is recommended that at least 1000 permutations are carried out.
+Finally, call the \Rfunction{scDD} function to test for differential distributions, classify DD genes, and return the results.  We won't perform the test for a difference in the proportion of zeroes since none exists in this simulated toy example data, but this option can be invoked by changing the \Rcode{testZeroes} option to \Rcode{TRUE}.  Note that the default option is to use a fast test of differential distributions that involves the Kolmogorov-Smirnov test instead of the full permutation testing framework.  This provides a fast implementation of the method at the cost of potentially slightly decreased power compared to the full scDD framework described in the manuscript (see Section 4 for more details).
 
 \begin{Schunk}
 \begin{Sinput}
-> RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE,
-+             adjust.perms=FALSE)
+> RES <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
 \end{Sinput}
 \end{Schunk}
 
 The \Robject{RES} object is a list with four items: the first is a data frame with nine columns: 
 \begin{enumerate}
   \item \Rcode{gene}: gene name (matches rownames of SCdat)
-  \item \Rcode{nonzero.pvalue}: permutation p-value for testing of independence of condition membership with clustering
-  \item \Rcode{nonzero.pvalue.adj}: Benjamini-Hochberg adjusted permutation p-value for testing of independence of condition membership with clustering
+  \item \Rcode{nonzero.pvalue}: p-value for KS test of differential distributions
+  \item \Rcode{nonzero.pvalue.adj}: Benjamini-Hochberg adjusted p-value for KS test of differential distributions
   \item \Rcode{zero.pvalue}: p-value for test of difference in dropout rate (only for non-DD genes and if \Rcode{testZeroes==TRUE})
   \item \Rcode{zero.pvalue.adj}: Benjamini-Hochberg adjusted p-value for test of difference in dropout rate (only for non-DD genes and if \Rcode{testZeroes==TRUE})
   \item \Rcode{DDcategory}: name of the DD pattern (DE, DP, DM, DB, DZ), or NC (no call), or NS (not significant).  
@@ -119,24 +117,24 @@ The \Robject{RES} object is a list with four items: the first is a data frame wi
   \item \Rcode{Clusters.c2}: the number of clusters identified in condition 2 alone
 \end{enumerate}
   The remaining three elements are data frames (first for condition 1 and 2 combined, then condition 1 alone, then condition 2 alone) that contains the cluster memberships for each sample (cluster 1,2,3,...) in columns and genes in rows.  Zeroes, which are not involved in the clustering, are labeled as zero.  
-  
 
 \section{Alternate test for Differential Distributions}
 
-The first step in the scDD framework that identifies Differential Distributions was designed to have optimal power to detect differences in expression distributions, but the utilization of a permutation test on the Bayes Factor can be computationally demanding.  While this is not an issue when machines with multiple cores are available since the code takes advantage of parallel processing, we also provide an option to use an alternate test to detect distributional differences that avoides the use of a permutation test.  This optional test is the Kolmogorov-Smirnov test, which examines the null hypothesis that two samples are generated from the same continuous distribution.  While the use of this test yielded slighlty lower power in simulations than the full permutation testing framework at lower sample sizes (primarily affecting the DB pattern genes), it does not require permutations and thus is orders of magnitude faster.  The overall power to detect DD genes in simulation was still comparable or favorable to exisiting methods for differential expression analysis of scRNA-seq experiments.  
+The first step in the scDD framework that identifies Differential Distributions was designed to have optimal power to detect differences in expression distributions, but the utilization of a permutation test on the Bayes Factor can be computationally demanding.  While this is not an issue when machines with multiple cores are available since the code takes advantage of parallel processing, we also provide the option to use an alternate test to detect distributional differences that avoides the use of a permutation test.  This option (default) uses the Kolmogorov-Smirnov test, which examines the null hypothesis that two samples are generated from the same continuous distribution.  While the use of this test yielded slighlty lower power in simulations than the full permutation testing framework at lower sample sizes (50-75 cells in each condition) and primarily affected the DB pattern genes, it does not require permutations and thus is orders of magnitude faster.  The overall power to detect DD genes in simulation was still comparable or favorable to exisiting methods for differential expression analysis of scRNA-seq experiments. 
 
 The remaining steps of the scDD framework remain unchanged if the alternate test is used.  That is, the Dirichlet process mixture model is still fit to the observed expression measurements so that the significant DD genes can be categorized into patterns that represent the major distributional changes, and results can still be visualized with violin plots using the \Rfunction{sideViolin} function described in the Plotting section.  
 
-The option to use the Kolmogorov-Smirnov test instead of the full permutation testing procedure is invoked by setting the number of permutations to zero (the \Rcode{permutations} argument) when calling the main \Rfunction{scDD} function, as follows.  
+The option to use the full permutation testing procedure instead of the Kolmogorov-Smirnov test is invoked by setting the number of permutations to something other than zero (\Rcode{permutations}) when calling the main \Rfunction{scDD} function as follows:
 
 \begin{Schunk}
 \begin{Sinput}
-> RES_KS <- scDD(scDatExSim, prior_param=prior_param, permutations=0, testZeroes=FALSE,
-+             adjust.perms=FALSE)
+> RES_perm <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE, permutations=100)
 \end{Sinput}
 \end{Schunk}
 
-The results object returned by \Rfunction{scDD} remains exactly as described in the previous section, with the exception that the \Rcode{nonzero.pvalue} and \Rcode{nonzero.pvalue.adj} columns of the \Rfunction{Genes} data frame now contain the p-values and Benjamini-Hochberg adjusted p-values of the Kolmogorov-Smirnov test rather than the permutation test. 
+The line above will run 100 permutations of every gene.   In practice, it is recommended that at least 1000 permutations are carried out if using the full permutation testing option.  Note that this option will take significantly longer than the default option to use the alternate KS test, and computation time will increase with more genes and/or more permutations, but multiple cores will automatically be utilized (if available) via the \Rpackage{BiocParallel} package.  By default, \Rpackage{BiocParallel} will use all cores on the machine, but you can optionally specificy the number of cores to use by changing the \Rcode{n.cores} argument in the \Rcode{scDD} function call.
+
+The results object returned by \Rfunction{scDD} remains exactly as described in the previous section, with the exception that the \Rcode{nonzero.pvalue} and \Rcode{nonzero.pvalue.adj} columns of the \Rfunction{Genes} data frame now contain the p-values and Benjamini-Hochberg adjusted p-values of the perumtaiton test of the Bayes Factor for independence of condition membership with clustering. 
 
 \section{Simulation}
 
@@ -382,22 +380,23 @@ Here is the output of \Rfunction{sessionInfo} on the system where this document 
 > toLatex(sessionInfo())
 \end{Sinput}
 \begin{itemize}\raggedright
-  \item R version 3.2.2 (2015-08-14), \verb|x86_64-apple-darwin13.4.0|
-  \item Locale: \verb|en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8|
-  \item Base packages: base, datasets, graphics, grDevices, methods, parallel,
+  \item R version 3.3.1 (2016-06-21), \verb|x86_64-apple-darwin13.4.0|
+  \item Locale: \verb|C/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8|
+  \item Base packages: base, datasets, grDevices, graphics, methods, parallel,
     stats, utils
-  \item Other packages: Biobase~2.30.0, BiocGenerics~0.16.1, gridExtra~2.2.1,
+  \item Other packages: Biobase~2.32.0, BiocGenerics~0.18.0, gridExtra~2.2.1,
     scDD~1.1.0
-  \item Loaded via a namespace (and not attached): abind~1.4-3, arm~1.8-6,
-    BiocParallel~1.4.3, BiocStyle~1.8.0, bitops~1.0-6, blockmodeling~0.1.8,
-    caTools~1.17.1, coda~0.18-1, colorspace~1.2-6, crayon~1.3.1, digest~0.6.9,
-    EBSeq~1.10.0, fields~8.3-6, futile.logger~1.4.1, futile.options~1.0.0,
-    gdata~2.17.0, ggplot2~2.1.0, gplots~2.17.0, grid~3.2.2, gtable~0.2.0,
-    gtools~3.5.0, KernSmooth~2.23-15, labeling~0.3, lambda.r~1.1.7,
-    lattice~0.20-33, lme4~1.1-11, maps~3.1.0, MASS~7.3-45, Matrix~1.2-4,
-    mclust~5.1, memoise~1.0.0, minqa~1.2.4, munsell~0.4.3, nlme~3.1-126,
-    nloptr~1.0.4, outliers~0.14, plyr~1.8.3, Rcpp~0.12.4, scales~0.4.0,
-    spam~1.3-0, splines~3.2.2, testthat~0.11.0, tools~3.2.2
+  \item Loaded via a namespace (and not attached): BiocParallel~1.6.6,
+    BiocStyle~2.0.3, EBSeq~1.12.0, KernSmooth~2.23-15, MASS~7.3-45,
+    Matrix~1.2-7.1, R6~2.1.3, Rcpp~0.12.7, abind~1.4-5, arm~1.9-1, bitops~1.0-6,
+    blockmodeling~0.1.8, caTools~1.17.1, coda~0.18-1, colorspace~1.2-6,
+    crayon~1.3.2, devtools~1.12.0, digest~0.6.10, fields~8.4-1, gdata~2.17.0,
+    ggplot2~2.1.0, gplots~3.0.1, grid~3.3.1, gtable~0.2.0, gtools~3.5.0,
+    labeling~0.3, lattice~0.20-33, lme4~1.1-12, magrittr~1.5, maps~3.1.1,
+    mclust~5.2, memoise~1.0.0, minqa~1.2.4, munsell~0.4.3, nlme~3.1-128,
+    nloptr~1.0.4, outliers~0.14, plyr~1.8.4, roxygen2~5.0.1, scales~0.4.0,
+    spam~1.4-0, splines~3.3.1, stringi~1.1.1, stringr~1.1.0, testthat~1.0.2,
+    tools~3.3.1, withr~1.0.2
 \end{itemize}\end{Schunk}
 
 \bibliography{vignette}

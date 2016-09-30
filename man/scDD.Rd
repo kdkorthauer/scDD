@@ -5,7 +5,8 @@
 \title{scDD}
 \usage{
 scDD(SCdat, prior_param = list(alpha = 0.1, mu0 = 0, s0 = 0.01, a0 = 0.01, b0
-  = 0.01), permutations = 100, testZeroes = TRUE, adjust.perms = FALSE)
+  = 0.01), permutations = 0, testZeroes = TRUE, adjust.perms = FALSE,
+  n.cores = parallel::detectCores())
 }
 \arguments{
 \item{SCdat}{An object of class \code{ExpressionSet} that contains normalized single-cell expression and metadata, where the \code{assayData} 
@@ -17,13 +18,12 @@ experiment can be contained in the \code{experimentData} slot.}
 \item{prior_param}{A list of prior parameter values to be used when modeling each gene as a mixture of DP normals.  Default 
 values are given that specify a vague prior distribution on the cluster-specific means and variances.}
 
-\item{permutations}{The number of permutations to be used in calculating empirical p-values.  If set to zero,
-the Bayes Factor permutation test will not be performed.  Instead, the genes with significantly different
-expression distributions will be identified using the nonparametric Kolmogorov-Smirnov test, which tests the null hypothesis that 
+\item{permutations}{The number of permutations to be used in calculating empirical p-values.  If set to zero (default),
+the full Bayes Factor permutation test will not be performed.  Instead, a fast procedure to identify the genes with significantly different
+expression distributions will be performed using the nonparametric Kolmogorov-Smirnov test, which tests the null hypothesis that 
 the samples are generated from the same continuous distribution.  This test will yield
 slightly lower power than the full permutation testing framework (this effect is more pronounced at smaller sample 
-sizes, and is more pronounced in the DB category), but is orders of magnitude faster.  The overall power 
-to detect DD genes in simulation was still comparable or favorable compared to existing methods, however. This option
+sizes, and is more pronounced in the DB category), but is orders of magnitude faster.  This option
 is recommended when compute resources are limited.  The remaining steps of the scDD framework will remain unchanged
 (namely, categorizing the significant DD genes into patterns that represent the major distributional changes, 
 as well as the ability to visualize the results with violin plots using the \code{sideViolin} function).}
@@ -33,6 +33,10 @@ as well as the ability to visualize the results with violin plots using the \cod
 \item{adjust.perms}{Logical indicating whether or not to adjust the permutation tests for the sample
 detection rate (proportion of nonzero values).  If true, the residuals of a linear model adjusted for 
 detection rate are permuted, and new fitted values are obtained using these residuals.}
+
+\item{n.cores}{integer number of cores to use when computing the Bayes Factor estimates for the full permutation testing 
+framework.  Defaults to the number of cores returned by \code{parallel::detectCores()}.  To use fewer cores, specify a number
+less than the number of cores on your machine.}
 }
 \value{
 List with four items: the first is a data frame with nine columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 

@@ -137,7 +137,7 @@ permMclust <- function(y, nperms, condition, remove.zeroes=TRUE, log.transf=TRUE
     c2 <- mclustRestricted(y2, restrict=restrict)
     
     bf.p <- jointPosterior(y1, c1, alpha, m0, s0, a0, b0) + 
-      jointPosterior(y2, c2, alpha=0.01, m0, s0, a0, b0) 
+      jointPosterior(y2, c2, alpha, m0, s0, a0, b0) 
     return(bf.p)
   }
   
