@@ -1,24 +1,71 @@
- 	
+%\VignetteEngine{knitr::knitr} 	
 %\VignetteIndexEntry{Using scDD}
 
-\documentclass{article}
+\documentclass{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
 \usepackage{underscore}
 
 \RequirePackage{/Library/Frameworks/R.framework/Versions/3.3/Resources/library/BiocStyle/resources/tex/Bioconductor}
 
-\AtBeginDocument{\bibliographystyle{/Library/Frameworks/R.framework/Versions/3.3/Resources/library/BiocStyle/resources/tex/unsrturl}}  
+\AtBeginDocument{\bibliographystyle{/Library/Frameworks/R.framework/Versions/3.3/Resources/library/BiocStyle/resources/tex/unsrturl}}
+
+
   \bioctitle[scDD]{scDD: A statistical approach for identifying differential distributions in single-cell RNA-seq experiments}
     \author{Keegan Korthauer\footnote{\email{keegan@jimmy.harvard.edu}}}
-
-  
-\usepackage{Sweave}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
-\input{scDD-concordance}
 
 \maketitle
 \tableofcontents
-
-
 
 \section{Introduction}
 
@@ -30,9 +77,9 @@ Our aim is two-fold: (1) to detect which genes have different expression distrib
 
 We start by assuming that the log-transformed nonzero expression values arise out of a Dirichlet Process Mixture of normals model.  This allows us to characterize expression distributions in terms of the number of modes (or clusters).  To detect differences in these distributions across conditions, an approximate Bayes Factor score is used which compares the conditional likelihood under the hypothesis of Equivalent distributions (ED) where one clustering process governs both conditions jointly, with the hypothesis of Differential distributions (DD) where each condition is generated from its own clustering process.  In the full framework, significance of the scores for each gene are evaluated via empirical p-values after permutation.  Optionally, a fast implementation obtains the p-values from the non-parametric Kolmogorov-Smirnov test.  Zero values are considered by also implementing a $\chi^2$ test of whether the proportion of zero values differs by condition (adjusted for overall sample detection rate).  More details are provided in \cite{korthauer2015}.
 
-After the detection step is carried out, the significantly DD genes are classified into four informative patterns based on the number of clusters detected and whether they overlap.  These patterns, depicted in Figure~\ref{DD}, include DE (differential expression of unimodal genes), DP (differential proportion for multimodal genes), DM (differential modality), and DB (both differential modality and mean expression levels).  Genes where a differential proportion of zeroes were identified are classified as DZ (differential zero).
+After the detection step is carried out, the significantly DD genes are classified into four informative patterns based on the number of clusters detected and whether they overlap.  These patterns, depicted in Figure~\ref{figure/DD}, include DE (differential expression of unimodal genes), DP (differential proportion for multimodal genes), DM (differential modality), and DB (both differential modality and mean expression levels).  Genes where a differential proportion of zeroes were identified are classified as DZ (differential zero).
 
-\incfig{DD}{0.4\textwidth}{Illustration of informative DD patterns}{} 
+\incfig{figure/DD}{0.4\textwidth}{Illustration of informative DD patterns}{DD} 
 
 The rest of this vignette outlines the main functionality of the \Rpackage{scDD} package.  This includes:
 
@@ -47,62 +94,78 @@ The rest of this vignette outlines the main functionality of the \Rpackage{scDD}
 In this section, we demonstrate how to use the main function \Rfunction{scDD} to find genes with differential distributions and classify them into the patterns of interest described in the previous section. 
 
 First, we need to load the \Rpackage{scDD} package.  For each of the following sections in this vignette, we assume this step has been carried out.
-\begin{Schunk}
-\begin{Sinput}
-> library(scDD)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hlstd{(scDD)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Next, we load the toy simulated example \Rclass{ExpressionSet} object that we will use for identifying and classifying DD genes.
-\begin{Schunk}
-\begin{Sinput}
-> data(scDatExSim)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{data}\hlstd{(scDatExSim)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Verify that this object is a member of the \Rclass{ExpressionSet} class and that it contains 200 samples and 30 genes.  Note that the input gene set needs to be in \Rclass{ExpressionSet} format, and should contain normalized counts.  In practice, it is also advisable to filter the input gene set to remove genes that have an extremely high proportion of zeroes (see Section 6). 
-\begin{Schunk}
-\begin{Sinput}
-> class(scDatExSim)
-\end{Sinput}
-\begin{Soutput}
-[1] "ExpressionSet"
-attr(,"package")
-[1] "Biobase"
-\end{Soutput}
-\begin{Sinput}
-> show(scDatExSim)
-\end{Sinput}
-\begin{Soutput}
-ExpressionSet (storageMode: lockedEnvironment)
-assayData: 30 features, 200 samples 
-  element names: exprs 
-protocolData: none
-phenoData
-  sampleNames: Sample1 Sample2 ... Sample200 (200 total)
-  varLabels: condition
-  varMetadata: labelDescription
-featureData: none
-experimentData: use 'experimentData(object)'
-Annotation:  
-NULL
-\end{Soutput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{class}\hlstd{(scDatExSim)}
+\end{alltt}
+\begin{verbatim}
+## [1] "ExpressionSet"
+## attr(,"package")
+## [1] "Biobase"
+\end{verbatim}
+\begin{alltt}
+\hlkwd{show}\hlstd{(scDatExSim)}
+\end{alltt}
+\begin{verbatim}
+## ExpressionSet (storageMode: lockedEnvironment)
+## assayData: 30 features, 200 samples 
+##   element names: exprs 
+## protocolData: none
+## phenoData
+##   sampleNames: Sample1 Sample2 ... Sample200 (200 total)
+##   varLabels: condition
+##   varMetadata: labelDescription
+## featureData: none
+## experimentData: use 'experimentData(object)'
+## Annotation:
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 Next, specify the hyperparameter arguments that we'll pass to the \Rfunction{scDD} function.  These values reflect heavy-tailed distributions over the paramaters and are robust to many different settings in simulation (see \cite{korthauer2015} for more details).
-\begin{Schunk}
-\begin{Sinput}
-> prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
-\end{Sinput}
-\end{Schunk}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{prior_param}\hlkwb{=}\hlkwd{list}\hlstd{(}\hlkwc{alpha}\hlstd{=}\hlnum{0.01}\hlstd{,} \hlkwc{mu0}\hlstd{=}\hlnum{0}\hlstd{,} \hlkwc{s0}\hlstd{=}\hlnum{0.01}\hlstd{,} \hlkwc{a0}\hlstd{=}\hlnum{0.01}\hlstd{,} \hlkwc{b0}\hlstd{=}\hlnum{0.01}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
  
 Finally, call the \Rfunction{scDD} function to test for differential distributions, classify DD genes, and return the results.  We won't perform the test for a difference in the proportion of zeroes since none exists in this simulated toy example data, but this option can be invoked by changing the \Rcode{testZeroes} option to \Rcode{TRUE}.  Note that the default option is to use a fast test of differential distributions that involves the Kolmogorov-Smirnov test instead of the full permutation testing framework.  This provides a fast implementation of the method at the cost of potentially slightly decreased power compared to the full scDD framework described in the manuscript (see Section 4 for more details).
 
-\begin{Schunk}
-\begin{Sinput}
-> RES <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{RES} \hlkwb{<-} \hlkwd{scDD}\hlstd{(scDatExSim,} \hlkwc{prior_param}\hlstd{=prior_param,} \hlkwc{testZeroes}\hlstd{=}\hlnum{FALSE}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Clustering observed expression data for each gene}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Notice! Number of permutations is set to zero; using Kolmogorov-Smirnov to test for differences in distributions instead of the Bayes Factor permutation test}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Classifying significant genes into patterns}}\end{kframe}
+\end{knitrout}
 
 The \Robject{RES} object is a list with four items: the first is a data frame with nine columns: 
 \begin{enumerate}
@@ -124,13 +187,23 @@ The first step in the scDD framework that identifies Differential Distributions 
 
 The remaining steps of the scDD framework remain unchanged if the alternate test is used.  That is, the Dirichlet process mixture model is still fit to the observed expression measurements so that the significant DD genes can be categorized into patterns that represent the major distributional changes, and results can still be visualized with violin plots using the \Rfunction{sideViolin} function described in the Plotting section.  
 
-The option to use the full permutation testing procedure instead of the Kolmogorov-Smirnov test is invoked by setting the number of permutations to something other than zero (\Rcode{permutations}) when calling the main \Rfunction{scDD} function as follows:
+The option to use the full permutation testing procedure instead of the Kolmogorov-Smirnov test is invoked by setting the number of permutations to something other than zero (the \Rcode{permutations} argument in \Rfunction{scDD}) when calling the main \Rfunction{scDD} function as follows:
 
-\begin{Schunk}
-\begin{Sinput}
-> RES_perm <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE, permutations=100)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{RES_perm} \hlkwb{<-} \hlkwd{scDD}\hlstd{(scDatExSim,} \hlkwc{prior_param}\hlstd{=prior_param,} \hlkwc{testZeroes}\hlstd{=}\hlnum{FALSE}\hlstd{,} \hlkwc{permutations}\hlstd{=}\hlnum{100}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Clustering observed expression data for each gene}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Performing permutations to evaluate independence of clustering and condition for each gene}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Setting up parallel back-end using 4 cores}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Classifying significant genes into patterns}}\end{kframe}
+\end{knitrout}
 
 The line above will run 100 permutations of every gene.   In practice, it is recommended that at least 1000 permutations are carried out if using the full permutation testing option.  Note that this option will take significantly longer than the default option to use the alternate KS test, and computation time will increase with more genes and/or more permutations, but multiple cores will automatically be utilized (if available) via the \Rpackage{BiocParallel} package.  By default, \Rpackage{BiocParallel} will use all cores on the machine, but you can optionally specificy the number of cores to use by changing the \Rcode{n.cores} argument in the \Rcode{scDD} function call.
 
@@ -141,64 +214,78 @@ The results object returned by \Rfunction{scDD} remains exactly as described in 
 Here we show how to generate a simulated single-cell RNA-seq dataset which contains multi-modal genes.  The \Rfunction{simulateSet} function simulates data from a two-condition experiment with a specified number of genes that fall into each of the patterns of interest.  For DD genes, these include DE (differential expression of unimodal genes), DP (differential proportion for multimodal genes), DM (differential modality), and DB (both differential modality and mean expression levels), and for ED genes these include EE (equivalent expression for unimodal genes) and EP (equivalent proportion for multimodal genes).  The simulation parameters are based on observed data from two conditions, so the function requires an \Rclass{ExpressionSet} formatted dataset as input.
 
 First, we load the toy example \Rclass{ExpressionSet} to simulate from
-\begin{Schunk}
-\begin{Sinput}
-> data(scDatEx)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{data}\hlstd{(scDatEx)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 We'll verify that this object is a member of the \Rclass{ExpressionSet} class and that it contains 142 samples and 500 genes
-\begin{Schunk}
-\begin{Sinput}
-> class(scDatEx)
-\end{Sinput}
-\begin{Soutput}
-[1] "ExpressionSet"
-attr(,"package")
-[1] "Biobase"
-\end{Soutput}
-\begin{Sinput}
-> show(scDatEx)
-\end{Sinput}
-\begin{Soutput}
-ExpressionSet (storageMode: lockedEnvironment)
-assayData: 500 features, 142 samples 
-  element names: exprs 
-protocolData: none
-phenoData
-  sampleNames: C1.073 C1.074 ... C2.070 (142 total)
-  varLabels: condition
-  varMetadata: labelDescription
-featureData: none
-experimentData: use 'experimentData(object)'
-Annotation:  
-NULL
-\end{Soutput}
-\end{Schunk}
-
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{class}\hlstd{(scDatEx)}
+\end{alltt}
+\begin{verbatim}
+## [1] "ExpressionSet"
+## attr(,"package")
+## [1] "Biobase"
+\end{verbatim}
+\begin{alltt}
+\hlkwd{show}\hlstd{(scDatEx)}
+\end{alltt}
+\begin{verbatim}
+## ExpressionSet (storageMode: lockedEnvironment)
+## assayData: 500 features, 142 samples 
+##   element names: exprs 
+## protocolData: none
+## phenoData
+##   sampleNames: C1.073 C1.074 ... C2.070 (142 total)
+##   varLabels: condition
+##   varMetadata: labelDescription
+## featureData: none
+## experimentData: use 'experimentData(object)'
+## Annotation:
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 Next we need to set the arguments that will be passed to the \Rfunction{simulateSet} function.  In this example we will simulate 30 genes total, with 5 genes of each type and 100 samples in each of two conditions.  We also set a random seed for reproducibility.
 
-\begin{Schunk}
-\begin{Sinput}
-> nDE <- 5
-> nDP <- 5
-> nDM <- 5
-> nDB <- 5
-> nEE <- 5
-> nEP <- 5
-> numSamples <- 100
-> seed <- 816
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{nDE} \hlkwb{<-} \hlnum{5}
+\hlstd{nDP} \hlkwb{<-} \hlnum{5}
+\hlstd{nDM} \hlkwb{<-} \hlnum{5}
+\hlstd{nDB} \hlkwb{<-} \hlnum{5}
+\hlstd{nEE} \hlkwb{<-} \hlnum{5}
+\hlstd{nEP} \hlkwb{<-} \hlnum{5}
+\hlstd{numSamples} \hlkwb{<-} \hlnum{100}
+\hlstd{seed} \hlkwb{<-} \hlnum{816}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Finally, we'll create the simulated set with specified numbers of DE, DP, DM, DM, EE, and EP genes and specified number of samples, where DE gene fold changes represent 2 standard deviations of the observed fold change distribution, and multimodal genes have cluster mean distance of 4 standard deviations.
-\begin{Schunk}
-\begin{Sinput}
-> SD <- simulateSet(scDatEx, numSamples=numSamples, nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB, 
-+                   nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE, 
-+                   random.seed=seed)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{SD} \hlkwb{<-} \hlkwd{simulateSet}\hlstd{(scDatEx,} \hlkwc{numSamples}\hlstd{=numSamples,} \hlkwc{nDE}\hlstd{=nDE,} \hlkwc{nDP}\hlstd{=nDP,} \hlkwc{nDM}\hlstd{=nDM,} \hlkwc{nDB}\hlstd{=nDB,}
+                  \hlkwc{nEE}\hlstd{=nEE,} \hlkwc{nEP}\hlstd{=nEP,} \hlkwc{sd.range}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,}\hlnum{2}\hlstd{),} \hlkwc{modeFC}\hlstd{=}\hlnum{4}\hlstd{,} \hlkwc{plots}\hlstd{=}\hlnum{FALSE}\hlstd{,}
+                  \hlkwc{random.seed}\hlstd{=seed)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Identifying a set of genes to simulate from...}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Simulating DE fold changes...}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Simulating individual genes...}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Done! Simulated 5 DE, 5 DP, 5 DM, 5 DB, 5 EE, and 5 EP genes}}\end{kframe}
+\end{knitrout}
 
 The matrix in the first list element of the \Robject{SD} object contains simulated expression values.  The second element stores the fold change/modal distance values which can be useful in assessing performance of a differential expression method.
 
@@ -209,91 +296,108 @@ In this subsection, we provide a quick example of how to construct an object of 
 
 Here we will convert the simulated data object \Robject{SD} returned by \Rfunction{simulateSet} (from the previous section) into an \Rclass{ExpressionSet} object. First, load the \Rpackage{Biobase} package:
 
-\begin{Schunk}
-\begin{Sinput}
-> library(Biobase)   
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hlstd{(Biobase)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Next, create a vector of condition membership labels (these should be 1 or 2).  In our simulated dataset, we generated \Robject{numSamples} samples in each of two conditions.
 
-\begin{Schunk}
-\begin{Sinput}
-> condition <- c(rep(1, numSamples), rep(2, numSamples))
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{condition} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{1}\hlstd{, numSamples),} \hlkwd{rep}\hlstd{(}\hlnum{2}\hlstd{, numSamples))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 The rows and columns of the expression matrix should have unique names, and the names of the columns should to correspond to the names of the condition membership labels in \Robject{condition}.
 
-\begin{Schunk}
-\begin{Sinput}
-> rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
-> colnames(SD[[1]]) <- names(condition) <- paste0("Sample", 1:ncol(SD[[1]]), sep="")
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{rownames}\hlstd{(SD[[}\hlnum{1}\hlstd{]])} \hlkwb{<-} \hlkwd{paste0}\hlstd{(}\hlkwd{rownames}\hlstd{(SD[[}\hlnum{1}\hlstd{]]),} \hlnum{1}\hlopt{:}\hlkwd{nrow}\hlstd{(SD[[}\hlnum{1}\hlstd{]]),} \hlkwc{sep}\hlstd{=}\hlstr{""}\hlstd{)}
+\hlkwd{colnames}\hlstd{(SD[[}\hlnum{1}\hlstd{]])} \hlkwb{<-} \hlkwd{names}\hlstd{(condition)} \hlkwb{<-} \hlkwd{paste0}\hlstd{(}\hlstr{"Sample"}\hlstd{,} \hlnum{1}\hlopt{:}\hlkwd{ncol}\hlstd{(SD[[}\hlnum{1}\hlstd{]]),} \hlkwc{sep}\hlstd{=}\hlstr{""}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Once our labeling is intact, we can call the \Rfunction{ExpressionSet} function and specify the two relevant pieces of information.  Optionally, additional experiment information can be stored in additional slots; see \Rpackage{Biobase} package.
-\begin{Schunk}
-\begin{Sinput}
-> SDExpressionSet <- ExpressionSet(assayData=SD[[1]], 
-+                     phenoData=as(data.frame(condition), "AnnotatedDataFrame"))
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{SDExpressionSet} \hlkwb{<-} \hlkwd{ExpressionSet}\hlstd{(}\hlkwc{assayData}\hlstd{=SD[[}\hlnum{1}\hlstd{]],}
+                    \hlkwc{phenoData}\hlstd{=}\hlkwd{as}\hlstd{(}\hlkwd{data.frame}\hlstd{(condition),} \hlstr{"AnnotatedDataFrame"}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 \subsection{Filtering and Normalization}
 
 In this subsection, we demonstrate the utility of the \Rfunction{preprocess} function, which can be helpful if working with raw data, or data which contains genes that are predominantly zero (common in single-cell RNA-seq experiments).  This function takes as input a list of data matrices, one for each condition.
 
 First, load the toy example data list:
-\begin{Schunk}
-\begin{Sinput}
-> data(scDatExList)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{data}\hlstd{(scDatExList)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Verify that the data is formatted as a list of 2 matrices (one for each of 2 conditions), that each matrix has 100 rows (one for each gene), and that the number of columns in each matrix corresponds to the number of samples in each condition (78 and 64, respectively):
-\begin{Schunk}
-\begin{Sinput}
-> str(scDatExList)
-\end{Sinput}
-\begin{Soutput}
-List of 2
- $ C1: num [1:100, 1:78] 0 53.3 0 2 0 ...
-  ..- attr(*, "dimnames")=List of 2
-  .. ..$ : chr [1:100] "MKL2" "CD109" "ABTB1" "MAST2" ...
-  .. ..$ : chr [1:78] "C1.073" "C1.074" "C1.075" "C1.076" ...
- $ C2: num [1:100, 1:64] 6 17 0 0 0 ...
-  ..- attr(*, "dimnames")=List of 2
-  .. ..$ : chr [1:100] "MKL2" "CD109" "ABTB1" "MAST2" ...
-  .. ..$ : chr [1:64] "C2.001" "C2.002" "C2.003" "C2.004" ...
-NULL
-\end{Soutput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{str}\hlstd{(scDatExList)}
+\end{alltt}
+\begin{verbatim}
+## List of 2
+##  $ C1: num [1:100, 1:78] 0 53.3 0 2 0 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : chr [1:100] "MKL2" "CD109" "ABTB1" "MAST2" ...
+##   .. ..$ : chr [1:78] "C1.073" "C1.074" "C1.075" "C1.076" ...
+##  $ C2: num [1:100, 1:64] 6 17 0 0 0 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : chr [1:100] "MKL2" "CD109" "ABTB1" "MAST2" ...
+##   .. ..$ : chr [1:64] "C2.001" "C2.002" "C2.003" "C2.004" ...
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 Obtain the names of the conditions to pass to the preprocess function:
-\begin{Schunk}
-\begin{Sinput}
-> condition.names <- names(scDatExList)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{condition.names} \hlkwb{<-} \hlkwd{names}\hlstd{(scDatExList)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Finally, apply the \Rfunction{preprocess} function to reformat the data into one data matrix with 100 rows and $78+64=142$ columns.  In this example, we set the \Robject{zero.thresh} argument to 1 so that genes are filtered out if they are all zero, and we set the \Robject{median_norm} argument to \Rcode{FALSE} to return raw data (no normalization is carried out).
 
-\begin{Schunk}
-\begin{Sinput}
-> scDatExMat <- preprocess(scDatExList, ConditionNames=condition.names, 
-+                         zero.thresh=1, median_norm=FALSE)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{scDatExMat} \hlkwb{<-} \hlkwd{preprocess}\hlstd{(scDatExList,} \hlkwc{ConditionNames}\hlstd{=condition.names,}
+                        \hlkwc{zero.thresh}\hlstd{=}\hlnum{1}\hlstd{,} \hlkwc{median_norm}\hlstd{=}\hlnum{FALSE}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Now, apply the preprocess function again, but this time use a more stringent threshold on the proportion of zeroes and apply median normalization.  In this example, we set the \Robject{zero.thresh} argument to 0.75 so that genes with more than 75 percent zeroes are filtered out and we set the \Robject{median_norm} argument to \Rcode{TRUE} to return median normalized counts.
 
-\begin{Schunk}
-\begin{Sinput}
-> scDatExMatNormThresh <- preprocess(scDatExList, ConditionNames=condition.names, 
-+                                    zero.thresh=0.75, median_norm=TRUE)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{scDatExMatNormThresh} \hlkwb{<-} \hlkwd{preprocess}\hlstd{(scDatExList,} \hlkwc{ConditionNames}\hlstd{=condition.names,}
+                                   \hlkwc{zero.thresh}\hlstd{=}\hlnum{0.75}\hlstd{,} \hlkwc{median_norm}\hlstd{=}\hlnum{TRUE}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 \section{Plotting}
 
@@ -302,102 +406,134 @@ of the log-transformed data.  A count of 1 is added before log-transformation so
 
 We illustrate this function by displaying the six types of simulated genes using the toy example simulated dataset.  First, load the toy simulated dataset:
 
-\begin{Schunk}
-\begin{Sinput}
-> data(scDatExSim)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{data}\hlstd{(scDatExSim)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Next, load the Biobase package to facilitate subset operations on ExpressionSet class objects:
-\begin{Schunk}
-\begin{Sinput}
-> library(Biobase)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hlstd{(Biobase)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
-The following lines will produce the figures in Figure~\ref{scDD-DDplots}.
+The following lines will produce the figures in Figure~\ref{figure/plotGrid-1}.
 
 Plot side by side violin plots for Gene 1 (DE):
-\begin{Schunk}
-\begin{Sinput}
-> sideViolin(exprs(scDatExSim)[1,], scDatExSim$condition, 
-+            title.gene=featureNames(scDatExSim)[1])
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{sideViolin}\hlstd{(}\hlkwd{exprs}\hlstd{(scDatExSim)[}\hlnum{1}\hlstd{,], scDatExSim}\hlopt{$}\hlstd{condition,}
+           \hlkwc{title.gene}\hlstd{=}\hlkwd{featureNames}\hlstd{(scDatExSim)[}\hlnum{1}\hlstd{])}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Plot side by side violin plots for Gene 6 (DP):
-\begin{Schunk}
-\begin{Sinput}
-> sideViolin(exprs(scDatExSim)[6,], scDatExSim$condition, 
-+            title.gene=featureNames(scDatExSim)[6])
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{sideViolin}\hlstd{(}\hlkwd{exprs}\hlstd{(scDatExSim)[}\hlnum{6}\hlstd{,], scDatExSim}\hlopt{$}\hlstd{condition,}
+           \hlkwc{title.gene}\hlstd{=}\hlkwd{featureNames}\hlstd{(scDatExSim)[}\hlnum{6}\hlstd{])}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Plot side by side violin plots for Gene 11 (DM):
-\begin{Schunk}
-\begin{Sinput}
-> sideViolin(exprs(scDatExSim)[11,], scDatExSim$condition, 
-+            title.gene=featureNames(scDatExSim)[11])
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{sideViolin}\hlstd{(}\hlkwd{exprs}\hlstd{(scDatExSim)[}\hlnum{11}\hlstd{,], scDatExSim}\hlopt{$}\hlstd{condition,}
+           \hlkwc{title.gene}\hlstd{=}\hlkwd{featureNames}\hlstd{(scDatExSim)[}\hlnum{11}\hlstd{])}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Plot side by side violin plots for Gene 16 (DB):
-\begin{Schunk}
-\begin{Sinput}
-> sideViolin(exprs(scDatExSim)[16,], scDatExSim$condition, 
-+            title.gene=featureNames(scDatExSim)[16])
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{sideViolin}\hlstd{(}\hlkwd{exprs}\hlstd{(scDatExSim)[}\hlnum{16}\hlstd{,], scDatExSim}\hlopt{$}\hlstd{condition,}
+           \hlkwc{title.gene}\hlstd{=}\hlkwd{featureNames}\hlstd{(scDatExSim)[}\hlnum{16}\hlstd{])}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Plot side by side violin plots for Gene 21 (EP):
-\begin{Schunk}
-\begin{Sinput}
-> sideViolin(exprs(scDatExSim)[21,], scDatExSim$condition, 
-+            title.gene=featureNames(scDatExSim)[21])
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{sideViolin}\hlstd{(}\hlkwd{exprs}\hlstd{(scDatExSim)[}\hlnum{21}\hlstd{,], scDatExSim}\hlopt{$}\hlstd{condition,}
+           \hlkwc{title.gene}\hlstd{=}\hlkwd{featureNames}\hlstd{(scDatExSim)[}\hlnum{21}\hlstd{])}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Plot side by side violin plots for Gene 26 (EE):
-\begin{Schunk}
-\begin{Sinput}
-> sideViolin(exprs(scDatExSim)[26,], scDatExSim$condition, 
-+            title.gene=featureNames(scDatExSim)[26])
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{sideViolin}\hlstd{(}\hlkwd{exprs}\hlstd{(scDatExSim)[}\hlnum{26}\hlstd{,], scDatExSim}\hlopt{$}\hlstd{condition,}
+           \hlkwc{title.gene}\hlstd{=}\hlkwd{featureNames}\hlstd{(scDatExSim)[}\hlnum{26}\hlstd{])}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
 
 
 The plot objects returned by \Rfunction{sideViolin} are standard \Rpackage{ggplot2} objects, and thus can be manipulated into multipanel figures with the help of the \Rpackage{gridExtra} or \Rpackage{cowplot} packages.
 
+\incfig{figure/plotGrid-1}{0.92\textwidth}{Example Simulated DD genes}{grid} 
 
-\incfig{scDD-DDplots}{0.92\textwidth}{Example Simulated DD genes}{} 
-
-  
 \section{Session Info}
 Here is the output of \Rfunction{sessionInfo} on the system where this document was compiled:
 
-\begin{Schunk}
-\begin{Sinput}
-> toLatex(sessionInfo())
-\end{Sinput}
-\begin{itemize}\raggedright
-  \item R version 3.3.1 (2016-06-21), \verb|x86_64-apple-darwin13.4.0|
-  \item Locale: \verb|C/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8|
-  \item Base packages: base, datasets, grDevices, graphics, methods, parallel,
-    stats, utils
-  \item Other packages: Biobase~2.32.0, BiocGenerics~0.18.0, gridExtra~2.2.1,
-    scDD~1.1.0
-  \item Loaded via a namespace (and not attached): BiocParallel~1.6.6,
-    BiocStyle~2.0.3, EBSeq~1.12.0, KernSmooth~2.23-15, MASS~7.3-45,
-    Matrix~1.2-7.1, R6~2.1.3, Rcpp~0.12.7, abind~1.4-5, arm~1.9-1, bitops~1.0-6,
-    blockmodeling~0.1.8, caTools~1.17.1, coda~0.18-1, colorspace~1.2-6,
-    crayon~1.3.2, devtools~1.12.0, digest~0.6.10, fields~8.4-1, gdata~2.17.0,
-    ggplot2~2.1.0, gplots~3.0.1, grid~3.3.1, gtable~0.2.0, gtools~3.5.0,
-    labeling~0.3, lattice~0.20-33, lme4~1.1-12, magrittr~1.5, maps~3.1.1,
-    mclust~5.2, memoise~1.0.0, minqa~1.2.4, munsell~0.4.3, nlme~3.1-128,
-    nloptr~1.0.4, outliers~0.14, plyr~1.8.4, roxygen2~5.0.1, scales~0.4.0,
-    spam~1.4-0, splines~3.3.1, stringi~1.1.1, stringr~1.1.0, testthat~1.0.2,
-    tools~3.3.1, withr~1.0.2
-\end{itemize}\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{sessionInfo}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## R version 3.3.1 (2016-06-21)
+## Platform: x86_64-apple-darwin13.4.0 (64-bit)
+## Running under: OS X 10.11.6 (El Capitan)
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] parallel  stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
+## 
+## other attached packages:
+## [1] gridExtra_2.2.1     Biobase_2.32.0      BiocGenerics_0.18.0
+## [4] scDD_1.1.0          knitr_1.14         
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_0.12.7         highr_0.6           formatR_1.4        
+##  [4] nloptr_1.0.4        plyr_1.8.4          outliers_0.14      
+##  [7] bitops_1.0-6        tools_3.3.1         mclust_5.2         
+## [10] testthat_1.0.2      digest_0.6.10       lme4_1.1-12        
+## [13] evaluate_0.9        gtable_0.2.0        nlme_3.1-128       
+## [16] lattice_0.20-33     blockmodeling_0.1.8 Matrix_1.2-7.1     
+## [19] spam_1.4-0          coda_0.18-1         stringr_1.1.0      
+## [22] maps_3.1.1          fields_8.4-1        gtools_3.5.0       
+## [25] caTools_1.17.1      grid_3.3.1          R6_2.1.3           
+## [28] BiocParallel_1.6.6  arm_1.9-1           gdata_2.17.0       
+## [31] EBSeq_1.12.0        minqa_1.2.4         ggplot2_2.1.0      
+## [34] magrittr_1.5        scales_0.4.0        gplots_3.0.1       
+## [37] MASS_7.3-45         splines_3.3.1       abind_1.4-5        
+## [40] colorspace_1.2-6    labeling_0.3        KernSmooth_2.23-15 
+## [43] stringi_1.1.1       munsell_0.4.3       crayon_1.3.2
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 \bibliography{vignette}
 \end{document}

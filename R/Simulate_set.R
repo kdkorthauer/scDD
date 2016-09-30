@@ -95,15 +95,15 @@ if(!is.null(plot.file)){
   pdf(file=paste0(plot.file))
 }
 
-print("Identifying a set of genes to simulate from...")  
+message("Identifying a set of genes to simulate from...")  
 index <- findIndex(SCdat)
-print("Simulating DE fold changes...")  
-FC <- findFC(SCdat, index, sd.range=sd.range, N=6, overExpressionProb = 0.5, plot.FC=TRUE)
+message("Simulating DE fold changes...")  
+FC <- findFC(SCdat, index, sd.range=sd.range, N=6, overExpressionProb = 0.5, plot.FC=plots)
 
 constantZero <- NULL
 generateZero <- "empirical"
 
-print("Simulating individual genes...")
+message("Simulating individual genes...")
 
 # pull off matrix of expression values for condition 1
 Dataset1 <- exprs(SCdat[,SCdat$condition==1])
@@ -207,7 +207,7 @@ pe_mat2 <- pe_mat + unifmat
 pe_mat2[pe_mat==0] <- 0
 
 SD <- list(Simulated_Data=pe_mat2, FC=fcs)
-print(paste0("Done! Simulated ", nDE, " DE, ", nDP, " DP, ", nDM, " DM, ", nDB, " DB, ", nEE, " EE, and ", nEP, " EP genes "))
+message(paste0("Done! Simulated ", nDE, " DE, ", nDP, " DP, ", nDM, " DM, ", nDB, " DB, ", nEE, " EE, and ", nEP, " EP genes "))
 return(SD)
 }
 

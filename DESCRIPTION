@@ -23,6 +23,7 @@ Imports:
     Biobase
 Suggests:
     BiocStyle,
+    knitr,
     gridExtra
 License: GPL-2
 RoxygenNote: 5.0.1
