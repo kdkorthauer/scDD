@@ -108,21 +108,35 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
   
   # cluster each gene in SCdat
   message("Clustering observed expression data for each gene")
+  message(paste0("Setting up parallel back-end using ", n.cores, " cores" ))
+  BiocParallel::register(BPPARAM = BiocParallel::MulticoreParam(workers=n.cores))
   
   oa <- c1 <- c2 <- vector("list", nrow(exprs(SCdat)))
   bf <- den <- comps.all <- comps.c1 <- comps.c2 <- rep(NA, nrow(exprs(SCdat)))
-
+  
   if (permutations == 0){
-    
-    for (i in 1:nrow(exprs(SCdat))){
-      y <- exprs(SCdat)[i,]
+
+    # function to fit one gene 
+    genefit <- function(y){
       cond0 <- SCdat$condition[y>0]
       y <- log(y[y>0])
       
-      oa[[i]] <- mclustRestricted(y, restrict=TRUE)
-      c1[[i]] <- mclustRestricted(y[cond0==1], restrict=TRUE)
-      c2[[i]] <- mclustRestricted(y[cond0==2], restrict=TRUE)
+      oa <- mclustRestricted(y, restrict=TRUE)
+      c1 <- mclustRestricted(y[cond0==1], restrict=TRUE)
+      c2 <- mclustRestricted(y[cond0==2], restrict=TRUE)
+    
+      return(list(
+        oa=oa,
+        c1=c1,
+        c2=c2
+      ))
     }
+    
+    out <- bplapply(1:nrow(exprs(SCdat)), function(x) genefit(exprs(SCdat)[x,]))
+    oa <- lapply(out, function(x) x[["oa"]])
+    c1 <- lapply(out, function(x) x[["c1"]])
+    c2 <- lapply(out, function(x) x[["c2"]])
+    rm(out); gc()
     
     comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class)))
     comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class)))
@@ -141,30 +155,44 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     pvals <- res_ks$p.unadj
     
   }else{ 
-    for (i in 1:nrow(exprs(SCdat))){
-      y <- exprs(SCdat)[i,]
+    
+    # function to fit one gene 
+    genefit <- function(y){
       cond0 <- SCdat$condition[y>0]
       y <- log(y[y>0])
       
-      oa[[i]] <- mclustRestricted(y, restrict=TRUE)
-      c1[[i]] <- mclustRestricted(y[cond0==1], restrict=TRUE)
-      c2[[i]] <- mclustRestricted(y[cond0==2], restrict=TRUE)
+      oa <- mclustRestricted(y, restrict=TRUE)
+      c1 <- mclustRestricted(y[cond0==1], restrict=TRUE)
+      c2 <- mclustRestricted(y[cond0==2], restrict=TRUE)
       
-      bf[i] <- jointPosterior(y[cond0==1], c1[[i]], alpha, m0, s0, a0, b0) + 
-        jointPosterior(y[cond0==2], c2[[i]], alpha, m0, s0, a0, b0) 
+      bf <- jointPosterior(y[cond0==1], c1, alpha, m0, s0, a0, b0) + 
+        jointPosterior(y[cond0==2], c2, alpha, m0, s0, a0, b0) 
       
-      den[i] <- jointPosterior(y, oa[[i]], alpha, m0, s0, a0, b0)
-      
-      comps.all[i] <- luOutlier(oa[[i]]$class)
-      comps.c1[i] <- luOutlier(c1[[i]]$class)
-      comps.c2[i] <- luOutlier(c2[[i]]$class)
-    }    
+      den <- jointPosterior(y, oa, alpha, m0, s0, a0, b0)
+      return(list(
+        oa=oa,
+        c1=c1,
+        c2=c2,
+        bf=bf,
+        den=den
+      ))
+    }
     
+    out <- bplapply(1:nrow(exprs(SCdat)), function(x) genefit(exprs(SCdat)[x,]))
+    oa <- lapply(out, function(x) x[["oa"]])
+    c1 <- lapply(out, function(x) x[["c1"]])
+    c2 <- lapply(out, function(x) x[["c2"]])
+    bf <- unlist(lapply(out, function(x) x[["bf"]]))
+    den<- unlist(lapply(out, function(x) x[["den"]]))
+    rm(out); gc()
+    
+    comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class)))
+    comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class)))
+    comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class)))
+  
       # obtain Bayes Factor score numerators for each permutation
       message("Performing permutations to evaluate independence of clustering and condition for each gene")
-      message(paste0("Setting up parallel back-end using ", n.cores, " cores" ))
-      BiocParallel::register(BPPARAM = BiocParallel::MulticoreParam(workers=n.cores))
-      
+
       bf.perm <- vector("list", nrow(exprs(SCdat)))
       names(bf.perm) <- rownames(exprs(SCdat))
       
