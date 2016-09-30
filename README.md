@@ -1,5 +1,5 @@
 # scDD
-Version 1.1.0 of R Package 'scDD'
+Version 1.2.0 of R Package 'scDD' (Release 2)
 
 To Install:
 
