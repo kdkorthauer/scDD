@@ -155,7 +155,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     pvals <- res_ks$p.unadj
     
   }else{ 
-    
+
     # function to fit one gene 
     genefit <- function(y){
       cond0 <- SCdat$condition[y>0]
@@ -167,7 +167,6 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
       
       bf <- jointPosterior(y[cond0==1], c1, alpha, m0, s0, a0, b0) + 
         jointPosterior(y[cond0==2], c2, alpha, m0, s0, a0, b0) 
-      
       den <- jointPosterior(y, oa, alpha, m0, s0, a0, b0)
       return(list(
         oa=oa,
@@ -185,14 +184,55 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     bf <- unlist(lapply(out, function(x) x[["bf"]]))
     den<- unlist(lapply(out, function(x) x[["den"]]))
     rm(out); gc()
+||||||| merged common ancestors
+      comps.all[i] <- luOutlier(oa[[i]]$class)
+      comps.c1[i] <- luOutlier(c1[[i]]$class)
+      comps.c2[i] <- luOutlier(c2[[i]]$class)
+    }    
+=======
+      den <- jointPosterior(y, oa, alpha, m0, s0, a0, b0)
+      return(list(
+        oa=oa,
+        c1=c1,
+        c2=c2,
+        bf=bf,
+        den=den
+      ))
+    }
+>>>>>>> 0d734f92fa31943904a1e4bf0df24a314a001d09
+    
+<<<<<<< HEAD
+    comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class)))
+    comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class)))
+    comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class)))
+  
+||||||| merged common ancestors
+=======
+    out <- bplapply(1:nrow(exprs(SCdat)), function(x) genefit(exprs(SCdat)[x,]))
+    oa <- lapply(out, function(x) x[["oa"]])
+    c1 <- lapply(out, function(x) x[["c1"]])
+    c2 <- lapply(out, function(x) x[["c2"]])
+    bf <- unlist(lapply(out, function(x) x[["bf"]]))
+    den<- unlist(lapply(out, function(x) x[["den"]]))
+    rm(out); gc()
     
     comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class)))
     comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class)))
     comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class)))
   
+>>>>>>> 0d734f92fa31943904a1e4bf0df24a314a001d09
       # obtain Bayes Factor score numerators for each permutation
       message("Performing permutations to evaluate independence of clustering and condition for each gene")
+<<<<<<< HEAD
 
+||||||| merged common ancestors
+      message(paste0("Setting up parallel back-end using ", n.cores, " cores" ))
+      BiocParallel::register(BPPARAM = BiocParallel::MulticoreParam(workers=n.cores))
+      
+=======
+      BiocParallel::register(BPPARAM = BiocParallel::MulticoreParam(workers=n.cores))
+      
+>>>>>>> 0d734f92fa31943904a1e4bf0df24a314a001d09
       bf.perm <- vector("list", nrow(exprs(SCdat)))
       names(bf.perm) <- rownames(exprs(SCdat))
       
