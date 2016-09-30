@@ -155,7 +155,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     pvals <- res_ks$p.unadj
     
   }else{ 
-    
+
     # function to fit one gene 
     genefit <- function(y){
       cond0 <- SCdat$condition[y>0]
@@ -185,7 +185,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     bf <- unlist(lapply(out, function(x) x[["bf"]]))
     den<- unlist(lapply(out, function(x) x[["den"]]))
     rm(out); gc()
-    
+
     comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class)))
     comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class)))
     comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class)))
