@@ -2,8 +2,7 @@
 #'
 #' Function to  obtain bayes factor for permutations of one gene's residuals
 #' 
-#' @details Obtains bayes factor numerator for data vector \code{y} representing one gene where \code{p1} denotes which 
-#   observations are in 'condition 1' (after permutation)
+#' @details Obtains bayes factor numerator for data vector \code{y} representing one gene 
 #' 
 #' @param y Numeric data vector for one gene
 #' 
@@ -89,8 +88,7 @@ permMclustCov <- function(y, nperms, C, condition, remove.zeroes=TRUE, log.trans
 #'
 #' Function to  obtain bayes factor numerator for permutations of one gene
 #' 
-#' @details Obtains bayes factor numerator for data vector \code{y} representing one gene where \code{p1} denotes which 
-#   observations are in 'condition 1' (after permutation)
+#' @details Obtains bayes factor numerator for data vector \code{y} representing one gene 
 #' 
 #' @inheritParams jointPosterior
 #' 
@@ -143,6 +141,96 @@ permMclust <- function(y, nperms, condition, remove.zeroes=TRUE, log.transf=TRUE
   
   bf.p <- unlist(bplapply(1:nperms, function(x) getPerm(y.orig, condition, restrict, remove.zeroes, log.transf)))
   
+  return(bf.p)
+}
+
+#' permMclustGene
+#'
+#' Function to obtain bayes factor for all permutations of one gene (not parallelized; to be used when parallelizing over Genes)
+#' 
+#' @details Obtains bayes factor for data vector \code{y} representing one gene 
+#' 
+#' @param y Numeric data vector for one gene
+#' 
+#' @inheritParams jointPosterior 
+#' 
+#' @inheritParams scDD
+#' 
+#' @inheritParams permMclustCov
+#' 
+#' @importFrom BiocParallel bplapply
+#'
+#' @return Bayes factor numerator for the current permutation
+permMclustGene <- function(y, adjust.perms, nperms, condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
+               alpha, m0, s0, a0, b0, C){
+  orig.y <- y
+  
+  if(remove.zeroes & log.transf){
+    C <- C[y>0]
+    cond <- condition[y>0]
+    y <- log(y[y>0])
+  }else if(log.transf){
+    C <- C[y>0]
+    cond <- condition
+    y <- log(y)
+  }else if(remove.zeroes){
+    C <- C[y>0]
+    cond <- condition[y>0]
+    y <- y[y>0]
+  }
+  
+  if (adjust.perms){
+    # fit reduced model
+    X <- model.matrix(~ C)
+    model <- lm(y ~ C)
+    params <- summary(model)$coef[,1]
+  }
+  
+  # for loop to go through all nperms permutations (not parallelized since this function is to be
+  # used when there are multiple genes running at a time)
+  bf.p <- rep(NA, nperms)
+  for (b in 1:nperms){
+    if (adjust.perms){
+      new.resid <- sample(residuals(model), replace=FALSE)
+      new.y0 <- as.vector(exp(X %*% params + new.resid))
+      new.y <- orig.y
+      new.y[new.y > 0] <- new.y0
+      y1 <- new.y[condition==1]
+      y2 <- new.y[condition==2]
+      
+      if(remove.zeroes & log.transf){
+        y1 <- log(y1[y1>0])
+        y2 <- log(y2[y2>0])
+      }else if(log.transf){
+        y1 <- log(y1)
+        y2 <- log(y2)
+      }else if(remove.zeroes){
+        y1 <- y1[y1>0]
+        y2 <- y2[y2>0]
+      }
+      
+      oa <- mclustRestricted(c(y1,y2), restrict=restrict)
+      c1 <- mclustRestricted(y1, restrict=restrict)
+      c2 <- mclustRestricted(y2, restrict=restrict)
+      
+      bf.p[b] <- jointPosterior(y1, c1, alpha, m0, s0, a0, b0) + 
+                 jointPosterior(y2, c2, alpha, m0, s0, a0, b0) -
+                 jointPosterior(c(y1,y2), oa, alpha, m0, s0, a0, b0)
+    }else{
+      # don't adjust permutations for covariates; don't need to calculate denominator
+      # of BF since it will be the same in observed and permuted sets with no residual adjustment
+      new <- sample(1:length(y), replace=FALSE)
+      new.y <- y[new]
+      y1 <- new.y[cond==1]
+      y2 <- new.y[cond==2]
+      
+      c1 <- mclustRestricted(y1, restrict=restrict)
+      c2 <- mclustRestricted(y2, restrict=restrict)
+      
+      bf.p[b] <- jointPosterior(y1, c1, alpha, m0, s0, a0, b0) + 
+                 jointPosterior(y2, c2, alpha, m0, s0, a0, b0) 
+    }
+  }
   return(bf.p)
 }
 

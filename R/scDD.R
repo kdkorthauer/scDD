@@ -37,6 +37,12 @@
 #' @param n.cores integer number of cores to use when computing the Bayes Factor estimates for the full permutation testing 
 #'  framework.  Defaults to the number of cores returned by \code{parallel::detectCores()}.  To use fewer cores, specify a number
 #'  less than the number of cores on your machine.
+#'  
+#' @param parallelBy For the permutation test (if invoked), the manner in which to parallelize.  The default option
+#'  is \code{"Genes"} which will spawn processes that divide up the genes across \code{n.cores} cores, and then loop through the permutations. 
+#'  The alternate option is \code{"Permutations"} which
+#'  loop through each gene and spawn processes that divide up the permutations across \code{n.cores} cores.  
+#'  The default option is recommended when analyzing more genes than the number of permutations.
 #' 
 #' @return List with four items: the first is a data frame with nine columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 
 #'  condition membership with clustering, Benjamini-Hochberg adjusted version of the previous column, p-value for test of difference in dropout rate (only for non-DD genes), 
@@ -87,12 +93,14 @@
 #' RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
 
 scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0=0.01), permutations=0,
-                  testZeroes=TRUE, adjust.perms=FALSE, n.cores=parallel::detectCores()){
+                  testZeroes=TRUE, adjust.perms=FALSE, n.cores=parallel::detectCores(), parallelBy=c("Genes", "Permutations")){
   
   # check whether SCdat is a member of the ExpressionSet class
   if(!("ExpressionSet" %in% class(SCdat))){
     stop("Please provide a valid 'ExpressionSet' object.")
   }
+  
+  parallelBy <- match.arg(parallelBy)
   
   # unpack prior param objects
   alpha = prior_param$alpha
@@ -192,50 +200,56 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
 
       # obtain Bayes Factor score numerators for each permutation
       message("Performing permutations to evaluate independence of clustering and condition for each gene")
+      message(paste0("Parallelizing by ", parallelBy))
       bf.perm <- vector("list", nrow(exprs(SCdat)))
       names(bf.perm) <- rownames(exprs(SCdat))
       
-      if(adjust.perms){
+      if(parallelBy=="Permutations"){
+        if(adjust.perms){
+          C <- apply(exprs(SCdat), 2, function(x) sum(x>0)/length(x))
+          
+          t1 <- proc.time()
+          for (g in 1:nrow(exprs(SCdat))){
+            bf.perm[[g]] <- permMclustCov(exprs(SCdat)[g,], permutations, C, SCdat$condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
+                                          alpha, m0, s0, a0, b0)
+            
+            if (g%%1000 == 0){
+              t2 <- proc.time()
+              message(paste0(g, " genes completed at ", date(), ", took ", round((t2-t1)[3]/60, 2), " minutes")) 
+              t1 <- t2
+            }
+          }
+          
+        }else{
+          t1 <- proc.time()
+          for (g in 1:nrow(exprs(SCdat))){
+            bf.perm[[g]] <- permMclust(exprs(SCdat[g,]), permutations, SCdat$condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
+                                       alpha, m0, s0, a0, b0)
+            
+            if (g%%1000 == 0){
+              t2 <- proc.time()
+              message(paste0(g, " genes completed at ", date(), ", took ", round((t2-t1)[3]/60, 2), " minutes")) 
+              t1 <- t2
+            }
+          }
+      }
+      }else if(parallelBy=="Genes"){
         C <- apply(exprs(SCdat), 2, function(x) sum(x>0)/length(x))
-        
-        t1 <- proc.time()
-        for (g in 1:nrow(exprs(SCdat))){
-          bf.perm[[g]] <- permMclustCov(exprs(SCdat)[g,], permutations, C, SCdat$condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
-                                        alpha, m0, s0, a0, b0)
-          
-          if (g%%1000 == 0){
-            t2 <- proc.time()
-            message(paste0(g, " genes completed at ", date(), ", took ", round((t2-t1)[3]/60, 2), " minutes")) 
-            t1 <- t2
-          }
-        }
-        
+        bf.perm <- bplapply(1:nrow(exprs(SCdat)), function(x) 
+              permMclustGene(exprs(SCdat)[x,], adjust.perms, permutations, SCdat$condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
+                             alpha, m0, s0, a0, b0, C))
+      }else{stop("Please specify either 'Permutations' or 'Genes' to parallelize by using the parallelizeBy argument")}
+      
+      if (adjust.perms){
         pvals <- sapply(1:nrow(exprs(SCdat)), function(x) sum( bf.perm[[x]] > bf[x] - den[x] ) )/(permutations)
-        if (testZeroes){
-          sig <- which(p.adjust(pvals, method="BH") < 0.025)
-        }else{
-          sig <- which(p.adjust(pvals, method="BH") < 0.05)
-        }
-        
       }else{
-        t1 <- proc.time()
-        for (g in 1:nrow(exprs(SCdat))){
-          bf.perm[[g]] <- permMclust(exprs(SCdat[g,]), permutations, SCdat$condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
-                                      alpha, m0, s0, a0, b0)
-          
-          if (g%%1000 == 0){
-            t2 <- proc.time()
-            message(paste0(g, " genes completed at ", date(), ", took ", round((t2-t1)[3]/60, 2), " minutes")) 
-            t1 <- t2
-          }
-        }
-        
         pvals <- sapply(1:nrow(exprs(SCdat)), function(x) sum( bf.perm[[x]] > bf[x]) ) / (permutations)
-        if (testZeroes){
-          sig <- which(p.adjust(pvals, method="BH") < 0.025)
-        }else{
-          sig <- which(p.adjust(pvals, method="BH") < 0.05)
-        }
+      }
+      
+      if (testZeroes){
+        sig <- which(p.adjust(pvals, method="BH") < 0.025)
+      }else{
+        sig <- which(p.adjust(pvals, method="BH") < 0.05)
       }
   }
   

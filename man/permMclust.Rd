@@ -37,6 +37,6 @@ Bayes factor numerator for the current permutation
 Function to  obtain bayes factor numerator for permutations of one gene
 }
 \details{
-Obtains bayes factor numerator for data vector \code{y} representing one gene where \code{p1} denotes which
+Obtains bayes factor numerator for data vector \code{y} representing one gene
 }
 

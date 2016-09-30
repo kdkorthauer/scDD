@@ -6,7 +6,8 @@
 \usage{
 scDD(SCdat, prior_param = list(alpha = 0.1, mu0 = 0, s0 = 0.01, a0 = 0.01, b0
   = 0.01), permutations = 0, testZeroes = TRUE, adjust.perms = FALSE,
-  n.cores = parallel::detectCores())
+  n.cores = parallel::detectCores(), parallelBy = c("Genes",
+  "Permutations"))
 }
 \arguments{
 \item{SCdat}{An object of class \code{ExpressionSet} that contains normalized single-cell expression and metadata, where the \code{assayData} 
@@ -37,6 +38,12 @@ detection rate are permuted, and new fitted values are obtained using these resi
 \item{n.cores}{integer number of cores to use when computing the Bayes Factor estimates for the full permutation testing 
 framework.  Defaults to the number of cores returned by \code{parallel::detectCores()}.  To use fewer cores, specify a number
 less than the number of cores on your machine.}
+
+\item{parallelBy}{For the permutation test (if invoked), the manner in which to parallelize.  The default option
+is \code{"Genes"} which will spawn processes that divide up the genes across \code{n.cores} cores, and then loop through the permutations. 
+The alternate option is \code{"Permutations"} which
+loop through each gene and spawn processes that divide up the permutations across \code{n.cores} cores.  
+The default option is recommended when analyzing more genes than the number of permutations.}
 }
 \value{
 List with four items: the first is a data frame with nine columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 
