@@ -44,6 +44,11 @@
 #'  loop through each gene and spawn processes that divide up the permutations across \code{n.cores} cores.  
 #'  The default option is recommended when analyzing more genes than the number of permutations.
 #' 
+#' @param condition A character object that contains the name of the column in \code{phenoData} that represents 
+#'  the biological group or condition of interest (e.g. treatment versus control).  Note that this variable should only contain two 
+#'  possible values since \code{scDD} can currently only handle two-group comparisons.  The default option assumes that there
+#'  is a column named "condition" that contains this variable. 
+#' 
 #' @return List with four items: the first is a data frame with nine columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 
 #'  condition membership with clustering, Benjamini-Hochberg adjusted version of the previous column, p-value for test of difference in dropout rate (only for non-DD genes), 
 #'  Benjamini-Hochberg adjusted version of the previous column, name of the 
@@ -93,7 +98,8 @@
 #' RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
 
 scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0=0.01), permutations=0,
-                  testZeroes=TRUE, adjust.perms=FALSE, n.cores=parallel::detectCores(), parallelBy=c("Genes", "Permutations")){
+                  testZeroes=TRUE, adjust.perms=FALSE, n.cores=parallel::detectCores(), parallelBy=c("Genes", "Permutations"),
+                  condition="condition"){
   
   # check whether SCdat is a member of the ExpressionSet class
   if(!("ExpressionSet" %in% class(SCdat))){
@@ -110,7 +116,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
   b0 = prior_param$b0
   
   # check that condition inputs are valid
-  if (length(unique(SCdat$condition)) > 2 | length(SCdat$condition) != ncol(exprs(SCdat))){
+  if (length(unique(phenoData(SCdat)[[condition]])) != 2 | length(phenoData(SCdat)[[condition]]) != ncol(exprs(SCdat))){
     stop("Error: Please specify valid condition labels.")
   }
   
@@ -126,7 +132,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
 
     # function to fit one gene 
     genefit <- function(y){
-      cond0 <- SCdat$condition[y>0]
+      cond0 <- phenoData(SCdat)[[condition]][y>0]
       y <- log(y[y>0])
       
       oa <- mclustRestricted(y, restrict=TRUE)
@@ -152,7 +158,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     
     message("Notice! Number of permutations is set to zero; using Kolmogorov-Smirnov to test for differences in distributions instead of the Bayes Factor permutation test")
     
-    res_ks <- testKS(exprs(SCdat), SCdat$condition, inclZero=FALSE)
+    res_ks <- testKS(exprs(SCdat), phenoData(SCdat)[[condition]], inclZero=FALSE)
     
     if (testZeroes){
       sig <- which(res_ks$p < 0.025)
@@ -166,7 +172,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
 
     # function to fit one gene 
     genefit <- function(y){
-      cond0 <- SCdat$condition[y>0]
+      cond0 <- phenoData(SCdat)[[condition]][y>0]
       y <- log(y[y>0])
       
       oa <- mclustRestricted(y, restrict=TRUE)
@@ -210,7 +216,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
           
           t1 <- proc.time()
           for (g in 1:nrow(exprs(SCdat))){
-            bf.perm[[g]] <- permMclustCov(exprs(SCdat)[g,], permutations, C, SCdat$condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
+            bf.perm[[g]] <- permMclustCov(exprs(SCdat)[g,], permutations, C, phenoData(SCdat)[[condition]], remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
                                           alpha, m0, s0, a0, b0)
             
             if (g%%1000 == 0){
@@ -223,7 +229,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
         }else{
           t1 <- proc.time()
           for (g in 1:nrow(exprs(SCdat))){
-            bf.perm[[g]] <- permMclust(exprs(SCdat[g,]), permutations, SCdat$condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
+            bf.perm[[g]] <- permMclust(exprs(SCdat[g,]), permutations, phenoData(SCdat)[[condition]], remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
                                        alpha, m0, s0, a0, b0)
             
             if (g%%1000 == 0){
@@ -236,7 +242,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
       }else if(parallelBy=="Genes"){
         C <- apply(exprs(SCdat), 2, function(x) sum(x>0)/length(x))
         bf.perm <- bplapply(1:nrow(exprs(SCdat)), function(x) 
-              permMclustGene(exprs(SCdat)[x,], adjust.perms, permutations, SCdat$condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
+              permMclustGene(exprs(SCdat)[x,], adjust.perms, permutations, phenoData(SCdat)[[condition]], remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
                              alpha, m0, s0, a0, b0, C))
       }else{stop("Please specify either 'Permutations' or 'Genes' to parallelize by using the parallelizeBy argument")}
       
@@ -254,12 +260,12 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
   }
   
   message("Classifying significant genes into patterns")
-  dd.cats <- classifyDD(exprs(SCdat), SCdat$condition, sig, oa, c1, c2, alpha=alpha, m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE)
+  dd.cats <- classifyDD(exprs(SCdat), phenoData(SCdat)[[condition]], sig, oa, c1, c2, alpha=alpha, m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE)
   
   cats <- rep("NS", nrow(exprs(SCdat)))
   cats[sig] <- dd.cats
   
-  extraDP <- feDP(exprs(SCdat), SCdat$condition, sig, oa, c1, c2, log.nonzero=TRUE,
+  extraDP <- feDP(exprs(SCdat), phenoData(SCdat)[[condition]], sig, oa, c1, c2, log.nonzero=TRUE,
                   testZeroes=testZeroes, adjust.perms=adjust.perms)
   cats[-sig] <- names(extraDP)
   
@@ -269,33 +275,33 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
   }else{
     NCs <- which(p.adjust(pvals, method="BH") > 0.05 & cats == "NC")
   }
-  NC.cats <- classifyDD(exprs(SCdat), SCdat$condition, NCs, oa, c1, c2, alpha=alpha, m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE)
+  NC.cats <- classifyDD(exprs(SCdat), phenoData(SCdat)[[condition]], NCs, oa, c1, c2, alpha=alpha, m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE)
   cats[NCs] <- NC.cats
   
   # zero test
   ns <- which(!(cats %in% c("DE", "DP", "DM", "DB")))
   pvals.z <- rep(NA, nrow(exprs(SCdat)))
   if (testZeroes){
-    ztest <- testZeroes(exprs(SCdat), SCdat$condition, ns)
+    ztest <- testZeroes(exprs(SCdat), phenoData(SCdat)[[condition]], ns)
     pvals.z[ns] <- ztest
     cats[p.adjust(pvals.z, method="BH") < 0.025] <- "DZ"
   }
   
   # build MAP objects
-  MAP1 <- matrix(NA, nrow=nrow(exprs(SCdat)), ncol=sum(SCdat$condition==1))
-  MAP2 <- matrix(NA, nrow=nrow(exprs(SCdat)), ncol=sum(SCdat$condition==2))
+  MAP1 <- matrix(NA, nrow=nrow(exprs(SCdat)), ncol=sum(phenoData(SCdat)[[condition]]==1))
+  MAP2 <- matrix(NA, nrow=nrow(exprs(SCdat)), ncol=sum(phenoData(SCdat)[[condition]]==2))
   MAP <- matrix(NA, nrow=nrow(exprs(SCdat)), ncol=ncol(exprs(SCdat)))
   rownames(MAP1) <- rownames(MAP2) <- rownames(MAP) <- featureNames(SCdat)
-  colnames(MAP1) <- sampleNames(SCdat[,SCdat$condition==1])
-  colnames(MAP2) <- sampleNames(SCdat[,SCdat$condition==2])
+  colnames(MAP1) <- sampleNames(SCdat[,phenoData(SCdat)[[condition]]==1])
+  colnames(MAP2) <- sampleNames(SCdat[,phenoData(SCdat)[[condition]]==2])
   colnames(MAP) <- sampleNames(SCdat)
-  MAP1[exprs(SCdat[, SCdat$condition==1])==0] <- 0
-  MAP2[exprs(SCdat[, SCdat$condition==2])==0] <- 0
+  MAP1[exprs(SCdat[, phenoData(SCdat)[[condition]]==1])==0] <- 0
+  MAP2[exprs(SCdat[, phenoData(SCdat)[[condition]]==2])==0] <- 0
   MAP[exprs(SCdat)==0] <- 0
   
   for (g in 1:nrow(exprs(SCdat))){
-    MAP1[g,][exprs(SCdat[g, SCdat$condition==1])!=0] <- c1[[g]]$class + 1 
-    MAP2[g,][exprs(SCdat[g, SCdat$condition==2])!=0] <- c2[[g]]$class + 1 
+    MAP1[g,][exprs(SCdat[g, phenoData(SCdat)[[condition]]==1])!=0] <- c1[[g]]$class + 1 
+    MAP2[g,][exprs(SCdat[g, phenoData(SCdat)[[condition]]==2])!=0] <- c2[[g]]$class + 1 
     MAP[g,][exprs(SCdat[g, ])!=0] <- oa[[g]]$class + 1 
   }
   
