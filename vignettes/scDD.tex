@@ -111,7 +111,7 @@ Next, we load the toy simulated example \Rclass{ExpressionSet} object that we wi
 \end{kframe}
 \end{knitrout}
 
-Verify that this object is a member of the \Rclass{ExpressionSet} class and that it contains 200 samples and 30 genes.  Note that the input gene set needs to be in \Rclass{ExpressionSet} format, and should contain normalized counts.  In practice, it is also advisable to filter the input gene set to remove genes that have an extremely high proportion of zeroes (see Section 6). 
+Verify that this object is a member of the \Rclass{ExpressionSet} class and that it contains 200 samples and 30 genes.  The \Rcode{phenoData} slot (which contains a matrix of metadata for the cells) should have a column that contains the biological condition or grouping of interest.  In this example data, that variable is the 'condition' variable.  Note that the input gene set needs to be in \Rclass{ExpressionSet} format, and should contain normalized counts.  In practice, it is also advisable to filter the input gene set to remove genes that have an extremely high proportion of zeroes (see Section 6). 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
@@ -151,7 +151,7 @@ Next, specify the hyperparameter arguments that we'll pass to the \Rfunction{scD
 \end{kframe}
 \end{knitrout}
  
-Finally, call the \Rfunction{scDD} function to test for differential distributions, classify DD genes, and return the results.  We won't perform the test for a difference in the proportion of zeroes since none exists in this simulated toy example data, but this option can be invoked by changing the \Rcode{testZeroes} option to \Rcode{TRUE}.  Note that the default option is to use a fast test of differential distributions that involves the Kolmogorov-Smirnov test instead of the full permutation testing framework.  This provides a fast implementation of the method at the cost of potentially slightly decreased power compared to the full scDD framework described in the manuscript (see Section 4 for more details).
+Finally, call the \Rfunction{scDD} function to test for differential distributions, classify DD genes, and return the results.  If the biological condition or grouping variable in the \Rcode{phenoData} slot is named something other than 'condition', you'll need to specify the name of the variable as an argument to the \Rfunction{scDD} function (set the \Rcode{condition} argument equal to the name of the relevant column).  We won't perform the test for a difference in the proportion of zeroes since none exists in this simulated toy example data, but this option can be invoked by changing the \Rcode{testZeroes} option to \Rcode{TRUE}.  Note that the default option is to use a fast test of differential distributions that involves the Kolmogorov-Smirnov test instead of the full permutation testing framework.  This provides a fast implementation of the method at the cost of potentially slightly decreased power compared to the full scDD framework described in the manuscript (see Section 4 for more details).
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -517,7 +517,7 @@ Here is the output of \Rfunction{sessionInfo} on the system where this document 
 ## 
 ## other attached packages:
 ## [1] gridExtra_2.2.1     Biobase_2.32.0      BiocGenerics_0.18.0
-## [4] scDD_1.1.0          knitr_1.14         
+## [4] scDD_1.2.0          knitr_1.14         
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] Rcpp_0.12.7         highr_0.6           formatR_1.4        

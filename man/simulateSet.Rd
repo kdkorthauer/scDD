@@ -7,7 +7,7 @@
 simulateSet(SCdat, numSamples = 100, nDE = 250, nDP = 250, nDM = 250,
   nDB = 250, nEE = 5000, nEP = 4000, sd.range = c(1, 3), modeFC = c(2,
   3, 4), plots = TRUE, plot.file = NULL, random.seed = 284,
-  varInflation = NULL)
+  varInflation = NULL, condition = "condition")
 }
 \arguments{
 \item{SCdat}{An object of class \code{ExpressionSet} that contains normalized single-cell expression and metadata, where the \code{assayData} 
@@ -45,6 +45,11 @@ of fold changes to randomly select.}
 variance inflation factor to use when simulating data.  Useful for sensitivity studies to assess the impact of 
 confounding effects on differential variance across conditions. Currently assumes all samples within a 
 condition are subject to the same variance inflation factor.}
+
+\item{condition}{A character object that contains the name of the column in \code{phenoData} that represents 
+the biological group or condition of interest (e.g. treatment versus control).  Note that this variable should only contain two 
+possible values since \code{scDD} can currently only handle two-group comparisons.  The default option assumes that there
+is a column named "condition" that contains this variable.}
 }
 \value{
 A named list of two items: the first (labeled 'Simulated_Data') is a matrix of simulated 

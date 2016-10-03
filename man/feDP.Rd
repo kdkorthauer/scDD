@@ -11,7 +11,7 @@ feDP(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero = TRUE,
 \item{pe_mat}{Matrix with genes in rows and samples in columns.  Column names 
 indicate condition.}
 
-\item{condition}{Vector of condition indicators, where each item is equal to 1 or 2.}
+\item{condition}{Vector of condition indicators (with two possible values).}
 
 \item{sig_genes}{Vector of the indices of significantly DD genes (indicating the row
 number of \code{pe_mat})}

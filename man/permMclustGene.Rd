@@ -5,7 +5,7 @@
 \title{permMclustGene}
 \usage{
 permMclustGene(y, adjust.perms, nperms, condition, remove.zeroes = TRUE,
-  log.transf = TRUE, restrict = TRUE, alpha, m0, s0, a0, b0, C)
+  log.transf = TRUE, restrict = TRUE, alpha, m0, s0, a0, b0, C, ref)
 }
 \arguments{
 \item{y}{Numeric data vector for one gene}
@@ -16,7 +16,10 @@ detection rate are permuted, and new fitted values are obtained using these resi
 
 \item{nperms}{Number of permutations of residuals to evaulate}
 
-\item{condition}{Vector of condition indicators for each sample}
+\item{condition}{A character object that contains the name of the column in \code{phenoData} that represents 
+the biological group or condition of interest (e.g. treatment versus control).  Note that this variable should only contain two 
+possible values since \code{scDD} can currently only handle two-group comparisons.  The default option assumes that there
+is a column named "condition" that contains this variable.}
 
 \item{remove.zeroes}{Logical indicating whether zeroes need to be removed from \code{y}}
 
@@ -35,6 +38,8 @@ detection rate are permuted, and new fitted values are obtained using these resi
 \item{b0}{Prior scale parameter value for the generating distribution of cluster precision}
 
 \item{C}{Matrix of confounder variables, where there is one row for each sample and one column for each covariate.}
+
+\item{ref}{one of two possible values in condition; represents the referent category.}
 }
 \value{
 Bayes factor numerator for the current permutation

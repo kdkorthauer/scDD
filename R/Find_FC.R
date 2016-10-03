@@ -28,11 +28,14 @@
 
 
 
-findFC <- function(SCdat, index, sd.range = c(1,3), N = 4, overExpressionProb = 0.5, plot.FC=FALSE){
+findFC <- function(SCdat, index, sd.range = c(1,3), N = 4, overExpressionProb = 0.5, plot.FC=FALSE, condition="condition"){
 
+  # reference category/condition - the first listed one
+  ref <- unique(phenoData(SCdat)[[condition]])[1]
+  
 # separate ExpressionSet by condition  
-Dataset1 <- SCdat[,SCdat$condition==1]
-Dataset2 <- SCdat[,SCdat$condition==2]
+Dataset1 <- SCdat[,phenoData(SCdat)[[condition]]==ref]
+Dataset2 <- SCdat[,phenoData(SCdat)[[condition]]!=ref]
 
 ### Find Mean Difference
 x1bar <- apply(exprs(Dataset1)[index,], 1, function(x) if(sum(x!=0)>0){ mean(x[x!=0]) }else{0})

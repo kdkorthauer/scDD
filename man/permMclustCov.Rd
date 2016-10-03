@@ -5,7 +5,7 @@
 \title{permMclustCov}
 \usage{
 permMclustCov(y, nperms, C, condition, remove.zeroes = TRUE,
-  log.transf = TRUE, restrict = FALSE, alpha, m0, s0, a0, b0)
+  log.transf = TRUE, restrict = FALSE, alpha, m0, s0, a0, b0, ref)
 }
 \arguments{
 \item{y}{Numeric data vector for one gene}
@@ -31,6 +31,8 @@ permMclustCov(y, nperms, C, condition, remove.zeroes = TRUE,
 \item{a0}{Prior shape parameter value for the generating distribution of cluster precision}
 
 \item{b0}{Prior scale parameter value for the generating distribution of cluster precision}
+
+\item{ref}{one of two possible values in condition; represents the referent category.}
 }
 \value{
 Bayes factor numerator for the current permutation

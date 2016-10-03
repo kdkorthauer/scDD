@@ -5,7 +5,7 @@
 \title{sideViolin}
 \usage{
 sideViolin(y, cond, MAP = NULL, logT = TRUE, title.gene = "",
-  conditionLabels = NULL, axes.titles = TRUE)
+  conditionLabels = unique(cond), axes.titles = TRUE)
 }
 \arguments{
 \item{y}{Numeric vector of data to plot.}

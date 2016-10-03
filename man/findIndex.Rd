@@ -4,7 +4,7 @@
 \alias{findIndex}
 \title{findIndex}
 \usage{
-findIndex(SCdat)
+findIndex(SCdat, condition = "condition")
 }
 \arguments{
 \item{SCdat}{An object of class \code{ExpressionSet} that contains normalized single-cell expression and metadata, where the \code{assayData} 
@@ -12,6 +12,11 @@ slot contains one row for each gene and one sample for each column.  The \code{P
 (either 1 or 2) that indicates which 
 condition each sample belongs to (in the same order as the columns of \code{assayData}).  Optional additional metadata about the 
 experiment can be contained in the \code{experimentData} slot.}
+
+\item{condition}{A character object that contains the name of the column in \code{phenoData} that represents 
+the biological group or condition of interest (e.g. treatment versus control).  Note that this variable should only contain two 
+possible values since \code{scDD} can currently only handle two-group comparisons.  The default option assumes that there
+is a column named "condition" that contains this variable.}
 }
 \value{
 Vector of indices for a reasonable set of genes that can be used for simulation.

@@ -7,7 +7,7 @@
 scDD(SCdat, prior_param = list(alpha = 0.1, mu0 = 0, s0 = 0.01, a0 = 0.01, b0
   = 0.01), permutations = 0, testZeroes = TRUE, adjust.perms = FALSE,
   n.cores = parallel::detectCores(), parallelBy = c("Genes",
-  "Permutations"))
+  "Permutations"), condition = "condition")
 }
 \arguments{
 \item{SCdat}{An object of class \code{ExpressionSet} that contains normalized single-cell expression and metadata, where the \code{assayData} 
@@ -44,6 +44,11 @@ is \code{"Genes"} which will spawn processes that divide up the genes across \co
 The alternate option is \code{"Permutations"} which
 loop through each gene and spawn processes that divide up the permutations across \code{n.cores} cores.  
 The default option is recommended when analyzing more genes than the number of permutations.}
+
+\item{condition}{A character object that contains the name of the column in \code{phenoData} that represents 
+the biological group or condition of interest (e.g. treatment versus control).  Note that this variable should only contain two 
+possible values since \code{scDD} can currently only handle two-group comparisons.  The default option assumes that there
+is a column named "condition" that contains this variable.}
 }
 \value{
 List with four items: the first is a data frame with nine columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 

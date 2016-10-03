@@ -5,13 +5,13 @@
 \title{classifyDD}
 \usage{
 classifyDD(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, a0, b0,
-  log.nonzero = TRUE)
+  log.nonzero = TRUE, ref)
 }
 \arguments{
 \item{pe_mat}{Matrix with genes in rows and samples in columns.  Column names 
 indicate condition.}
 
-\item{condition}{Vector of condition indicators, where each item is equal to 1 or 2.}
+\item{condition}{Vector of condition indicators (with two possible values).}
 
 \item{sig_genes}{Vector of the indices of significantly DD genes (indicating the row
 number of \code{pe_mat})}
@@ -36,6 +36,8 @@ each nonzero sample in condition 2 only fit}
 \item{b0}{Prior scale parameter value for the generating distribution of cluster precision}
 
 \item{log.nonzero}{Logical indicating whether to perform log transformation of nonzero values.}
+
+\item{ref}{one of two possible values in condition; represents the referent category.}
 }
 \value{
 cat Character vector of the same length as \code{sig_genes} that indicates which category of 

@@ -65,26 +65,27 @@
 #' 
 
 
-sideViolin <- function(y, cond, MAP=NULL, logT=TRUE, title.gene="", conditionLabels=NULL, axes.titles=TRUE){
+sideViolin <- function(y, cond, MAP=NULL, logT=TRUE, title.gene="", conditionLabels=unique(cond), axes.titles=TRUE){
+  ref <- unique(cond)[1]
   
   shps1 <- shps2 <- c("a", "c", "d", "e", "f")
   if(!is.null(MAP)){
     shps1 <- shps1[MAP[[1]] + 1]
     shps2 <- shps2[MAP[[2]] + 1]
   }else{
-    shps1 <- rep(shps1[1], sum(cond==1))
-    shps2 <- rep(shps2[1], sum(cond==2))
+    shps1 <- rep(shps1[1], sum(cond==ref))
+    shps2 <- rep(shps2[1], sum(cond!=ref))
   }
   
   if (logT){
-    shps1[y[cond==1]==0] <- "b"
-    shps2[y[cond==2]==0] <- "b"
+    shps1[y[cond==ref]==0] <- "b"
+    shps2[y[cond!=ref]==0] <- "b"
     y <- log(y+1)
   }
   
   if (length(conditionLabels)==2){
-    cond[cond==1] <- conditionLabels[1]
-    cond[cond==2] <- conditionLabels[2]
+    cond[cond==ref] <- conditionLabels[1]
+    cond[cond!=ref] <- conditionLabels[2]
   }
   
   if(axes.titles){

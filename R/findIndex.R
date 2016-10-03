@@ -6,6 +6,8 @@
 #'   (either 1 or 2) that indicates which 
 #'   condition each sample belongs to (in the same order as the columns of \code{assayData}).  Optional additional metadata about the 
 #'   experiment can be contained in the \code{experimentData} slot.
+#'  
+#' @inheritParams scDD 
 #' 
 #' @import Biobase
 #'
@@ -16,11 +18,14 @@
 #' @return Vector of indices for a reasonable set of genes that can be used for simulation.
 
 
-findIndex <- function(SCdat){
+findIndex <- function(SCdat, condition="condition"){
+
+# reference category/condition - the first listed one
+ref <- unique(phenoData(SCdat)[[condition]])[1]
   
 # separate ExpressionSet by condition  
-Dataset1 <- SCdat[,SCdat$condition==1]
-Dataset2 <- SCdat[,SCdat$condition==2]
+Dataset1 <- SCdat[,phenoData(SCdat)[[condition]]==ref]
+Dataset2 <- SCdat[,phenoData(SCdat)[[condition]]!=ref]
   
 ### Find zero-percent
 zeropercent <- matrix(data=0, nrow=dim(Dataset1)[1], ncol=2)

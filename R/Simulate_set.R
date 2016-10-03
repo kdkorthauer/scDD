@@ -90,15 +90,18 @@
 
 simulateSet <- function(SCdat, numSamples=100, nDE=250, nDP=250, nDM=250, nDB=250, 
                          nEE=5000, nEP=4000, sd.range=c(1,3), modeFC=c(2,3,4), plots=TRUE, plot.file=NULL, random.seed=284,
-                         varInflation=NULL){
+                         varInflation=NULL, condition="condition"){
 if(!is.null(plot.file)){
   pdf(file=paste0(plot.file))
 }
 
+# reference category/condition - the first listed one
+ref <- unique(phenoData(SCdat)[[condition]])[1]  
+  
 message("Identifying a set of genes to simulate from...")  
-index <- findIndex(SCdat)
+index <- findIndex(SCdat, condition)
 message("Simulating DE fold changes...")  
-FC <- findFC(SCdat, index, sd.range=sd.range, N=6, overExpressionProb = 0.5, plot.FC=plots)
+FC <- findFC(SCdat, index, sd.range=sd.range, N=6, overExpressionProb = 0.5, plot.FC=plots, condition)
 
 constantZero <- NULL
 generateZero <- "empirical"
@@ -106,7 +109,7 @@ generateZero <- "empirical"
 message("Simulating individual genes...")
 
 # pull off matrix of expression values for condition 1
-Dataset1 <- exprs(SCdat[,SCdat$condition==1])
+Dataset1 <- exprs(SCdat[,phenoData(SCdat)[[condition]]==ref])
 
 set.seed(random.seed)
 

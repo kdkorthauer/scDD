@@ -34,7 +34,7 @@ getPosteriorParams <- function(y, mcobj, alpha, m0, s0, a0, b0){
 #' @param pe_mat Matrix with genes in rows and samples in columns.  Column names 
 #'  indicate condition.
 #'
-#' @param condition Vector of condition indicators, where each item is equal to 1 or 2.
+#' @param condition Vector of condition indicators (with two possible values).
 #' 
 #' @param sig_genes Vector of the indices of significantly DD genes (indicating the row
 #'  number of \code{pe_mat})
@@ -50,12 +50,13 @@ getPosteriorParams <- function(y, mcobj, alpha, m0, s0, a0, b0){
 #'  
 #' @param log.nonzero Logical indicating whether to perform log transformation of nonzero values.
 #'
+#' @param ref one of two possible values in condition; represents the referent category.
 #'
 #' @return cat Character vector of the same length as \code{sig_genes} that indicates which category of 
 #'  DD each significant gene belongs to (DE, DP, DM, DB, or NC (no call))
 #' 
 
-classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, a0, b0, log.nonzero=TRUE){
+classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, a0, b0, log.nonzero=TRUE, ref){
     
     ms <- 3
     
@@ -122,8 +123,8 @@ classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, 
       
       
       
-      params.c1 <- getPosteriorParams(y[cond==1], mc.c1[[g]], alpha, m0, s0, a0, b0)
-      params.c2 <- getPosteriorParams(y[cond==2], mc.c2[[g]], alpha, m0, s0, a0, b0)
+      params.c1 <- getPosteriorParams(y[cond==ref], mc.c1[[g]], alpha, m0, s0, a0, b0)
+      params.c2 <- getPosteriorParams(y[cond!=ref], mc.c2[[g]], alpha, m0, s0, a0, b0)
       
       c.c1.no <- findOutliers(c1[[g]], min.size=ms)
       c.c2.no <- findOutliers(c2[[g]], min.size=ms)
@@ -207,7 +208,7 @@ testZeroes <- function(dat, cond, these=1:nrow(dat)){
     y <- dat[these[j],]
     if (sum(y==0) > 0){
       M0 <- arm::bayesglm(y>0 ~ detection, family=binomial(link="logit"))
-      M1 <- arm::bayesglm(y>0 ~ detection + cond, family=binomial(link="logit"))
+      M1 <- arm::bayesglm(y>0 ~ detection + factor(cond), family=binomial(link="logit"))
       pval[j] <- anova(M1, M0, test="Chisq")[2,5]
     }
   }
@@ -263,9 +264,9 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE,
     
     # detect shifts in mean (to catch DP genes with an incorrect # components)
     if(adjust.perms){
-      pval.ns[s] <- summary(lm(y ~ cdr0 + cond))$coef[3,4]
+      pval.ns[s] <- summary(lm(y ~ cdr0 + factor(cond)))$coef[3,4]
     }else{
-      pval.ns[s] <- t.test(y~cond)$p.value	
+      pval.ns[s] <- t.test(y~factor(cond))$p.value	
     }
   
     # check whether clustering process is consistent within each condition as overall

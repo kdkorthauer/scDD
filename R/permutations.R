@@ -22,11 +22,13 @@
 #' 
 #' @param restrict Logical indicating whether to perform restricted Mclust clustering where close-together clusters are joined.
 #' 
+#' @param ref one of two possible values in condition; represents the referent category.
+#' 
 #' @importFrom BiocParallel bplapply
 #'
 #' @return Bayes factor numerator for the current permutation
 
-permMclustCov <- function(y, nperms, C, condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=FALSE, alpha, m0, s0, a0, b0){
+permMclustCov <- function(y, nperms, C, condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=FALSE, alpha, m0, s0, a0, b0, ref){
   orig.y <- y
   
   if(remove.zeroes & log.transf){
@@ -55,8 +57,8 @@ permMclustCov <- function(y, nperms, C, condition, remove.zeroes=TRUE, log.trans
     new.y <- orig.y
     new.y[new.y > 0] <- new.y0
     
-    y1 <- new.y[condition==1]
-    y2 <- new.y[condition==2]
+    y1 <- new.y[condition==ref]
+    y2 <- new.y[condition!=ref]
     if(remove.zeroes & log.transf){
       y1 <- log(y1[y1>0])
       y2 <- log(y2[y2>0])
@@ -104,6 +106,8 @@ permMclustCov <- function(y, nperms, C, condition, remove.zeroes=TRUE, log.trans
 #' 
 #' @param log.transf Logical indicating whether the data is in the raw scale (if so, will be log-transformed)
 #' 
+#' @param ref one of two possible values in condition; represents the referent category.
+#' 
 #' @param restrict Logical indicating whether to perform restricted Mclust clustering where close-together clusters are joined.
 #' 
 #' @importFrom BiocParallel bplapply
@@ -111,7 +115,7 @@ permMclustCov <- function(y, nperms, C, condition, remove.zeroes=TRUE, log.trans
 #'
 #' @return Bayes factor numerator for the current permutation
 
-permMclust <- function(y, nperms, condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=FALSE, alpha, m0, s0, a0, b0){
+permMclust <- function(y, nperms, condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=FALSE, alpha, m0, s0, a0, b0, ref){
   
   y.orig <- y
   
@@ -128,8 +132,8 @@ permMclust <- function(y, nperms, condition, remove.zeroes=TRUE, log.transf=TRUE
     }
     new <- sample(1:length(y), replace=FALSE)
     new.y <- y[new]
-    y1 <- new.y[cond==1]
-    y2 <- new.y[cond==2]
+    y1 <- new.y[cond==ref]
+    y2 <- new.y[cond!=ref]
     
     c1 <- mclustRestricted(y1, restrict=restrict)
     c2 <- mclustRestricted(y2, restrict=restrict)
@@ -151,6 +155,8 @@ permMclust <- function(y, nperms, condition, remove.zeroes=TRUE, log.transf=TRUE
 #' @details Obtains bayes factor for data vector \code{y} representing one gene 
 #' 
 #' @param y Numeric data vector for one gene
+#'
+#' @param ref one of two possible values in condition; represents the referent category.
 #' 
 #' @inheritParams jointPosterior 
 #' 
@@ -162,7 +168,7 @@ permMclust <- function(y, nperms, condition, remove.zeroes=TRUE, log.transf=TRUE
 #'
 #' @return Bayes factor numerator for the current permutation
 permMclustGene <- function(y, adjust.perms, nperms, condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
-               alpha, m0, s0, a0, b0, C){
+               alpha, m0, s0, a0, b0, C, ref){
   orig.y <- y
   
   if(remove.zeroes & log.transf){
@@ -195,8 +201,8 @@ permMclustGene <- function(y, adjust.perms, nperms, condition, remove.zeroes=TRU
       new.y0 <- as.vector(exp(X %*% params + new.resid))
       new.y <- orig.y
       new.y[new.y > 0] <- new.y0
-      y1 <- new.y[condition==1]
-      y2 <- new.y[condition==2]
+      y1 <- new.y[condition==ref]
+      y2 <- new.y[condition!=ref]
       
       if(remove.zeroes & log.transf){
         y1 <- log(y1[y1>0])
@@ -221,8 +227,8 @@ permMclustGene <- function(y, adjust.perms, nperms, condition, remove.zeroes=TRU
       # of BF since it will be the same in observed and permuted sets with no residual adjustment
       new <- sample(1:length(y), replace=FALSE)
       new.y <- y[new]
-      y1 <- new.y[cond==1]
-      y2 <- new.y[cond==2]
+      y1 <- new.y[cond==ref]
+      y2 <- new.y[cond!=ref]
       
       c1 <- mclustRestricted(y1, restrict=restrict)
       c2 <- mclustRestricted(y2, restrict=restrict)

@@ -5,7 +5,7 @@
 \title{findFC}
 \usage{
 findFC(SCdat, index, sd.range = c(1, 3), N = 4, overExpressionProb = 0.5,
-  plot.FC = FALSE)
+  plot.FC = FALSE, condition = "condition")
 }
 \arguments{
 \item{SCdat}{An object of class \code{ExpressionSet} that contains normalized single-cell expression and metadata, where the \code{assayData} 
@@ -25,6 +25,11 @@ of fold changes to randomly select.}
 values to sample.}
 
 \item{plot.FC}{Logical indicating whether or not to plot the observed and simulated log2 fold changes.}
+
+\item{condition}{A character object that contains the name of the column in \code{phenoData} that represents 
+the biological group or condition of interest (e.g. treatment versus control).  Note that this variable should only contain two 
+possible values since \code{scDD} can currently only handle two-group comparisons.  The default option assumes that there
+is a column named "condition" that contains this variable.}
 }
 \value{
 FC.vec Return Fold Change Vectors
