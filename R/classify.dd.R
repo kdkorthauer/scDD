@@ -262,6 +262,11 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE,
     cdr0 <- cdr[y>0]
     y <- log(y[y>0])
     
+    # add runif(-0.1,0.1) jitter if all y vals are identical
+    if (length(unique(y))==1){
+      y <- y + runif(length(y), -0.1, 0.1)
+    }
+    
     # detect shifts in mean (to catch DP genes with an incorrect # components)
     if(adjust.perms){
       pval.ns[s] <- summary(lm(y ~ cdr0 + factor(cond)))$coef[3,4]
