@@ -256,6 +256,8 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE,
   pval.ns <- rep(NA, length(ns_genes))
   s <- 1
   
+  ref <- unique(condition)[1]
+  
   for (g in ns_genes){
     y <- pe_mat[g,]
     cond <- condition[y>0]
@@ -263,7 +265,7 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE,
     y <- log(y[y>0])
     
     # add runif(-0.1,0.1) jitter if all y vals are identical
-    if (length(unique(y))==1){
+    if (length(unique(y[cond==ref]))==1 | length(unique(y[cond!=ref]))==1){
       y <- y + runif(length(y), -0.1, 0.1)
     }
     
