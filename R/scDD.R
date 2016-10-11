@@ -123,6 +123,14 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
   # reference category/condition - the first listed one
   ref <- unique(phenoData(SCdat)[[condition]])[1]
   
+  # check for genes that are all (or almost all) zeroes 
+  nofit <- which((rowSums(exprs(SCdat)[,phenoData(SCdat)[[condition]]==ref]>0) <= 1) |
+                 (rowSums(exprs(SCdat)[,phenoData(SCdat)[[condition]]!=ref]>0) <= 1))
+  
+  if (length(nofit) > 0){
+    stop("Error: There exist genes in this set that are all (or almost all) zero.  Please remove genes with 0 or 1 nonzero measurements per condition prior to running scDD")    
+  }
+  
   # cluster each gene in SCdat
   message("Clustering observed expression data for each gene")
   message(paste0("Setting up parallel back-end using ", n.cores, " cores" ))
