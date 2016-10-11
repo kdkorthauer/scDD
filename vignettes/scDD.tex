@@ -111,7 +111,7 @@ Next, we load the toy simulated example \Rclass{ExpressionSet} object that we wi
 \end{kframe}
 \end{knitrout}
 
-Verify that this object is a member of the \Rclass{ExpressionSet} class and that it contains 200 samples and 30 genes.  The \Rcode{phenoData} slot (which contains a matrix of metadata for the cells) should have a column that contains the biological condition or grouping of interest.  In this example data, that variable is the 'condition' variable.  Note that the input gene set needs to be in \Rclass{ExpressionSet} format, and should contain normalized counts.  In practice, it is also advisable to filter the input gene set to remove genes that have an extremely high proportion of zeroes (see Section 6). 
+Verify that this object is a member of the \Rclass{ExpressionSet} class and that it contains 200 samples and 30 genes.  The \Rcode{phenoData} slot (which contains a matrix of metadata for the cells) should have a column that contains the biological condition or grouping of interest.  In this example data, that variable is the 'condition' variable.  Note that the input gene set needs to be in \Rclass{ExpressionSet} format, and should contain normalized counts.  In practice, it is also advisable to filter the input gene set to remove genes that have an extremely high proportion of zeroes (see Section 6).  More specifically, the test for differential distributions of the expressed measurements will not be carried out on genes where only one or fewer cells had a nonzero measurement (these genes will still be tested for differential proportion of zeroes (DZ) if the \Rcode{testZeroes} parameter is set to \Rcode{TRUE}, however).
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}

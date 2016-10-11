@@ -129,7 +129,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
   
   if (length(tofit) < nrow(exprs(SCdat))){
     if(testZeroes){
-      message("Notice: There exist genes that are all (or almost all) zero. Only testing for DZ in genes with 0 or 1 nonzero measurements per condition")    
+      message("Notice: There exist genes that are all (or almost all) zero. For genes with 0 or 1 nonzero measurements per condition, only testing for DZ")    
     }else{
       message("Notice: There exist genes that are all (or almost all) zero. Skipping genes with 0 or 1 nonzero measurements per condition")    
     }
@@ -304,6 +304,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     ztest <- testZeroes(exprs(SCdat), phenoData(SCdat)[[condition]], ns)
     pvals.z[ns] <- ztest
     cats.all[p.adjust(pvals.z, method="BH") < 0.025] <- "DZ"
+    cats.all[p.adjust(pvals.z, method="BH") >= 0.025] <- "NS"
   }
   
   # build MAP objects
