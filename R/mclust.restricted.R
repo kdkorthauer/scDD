@@ -22,6 +22,11 @@
 
 
 mclustRestricted <- function(y, restrict=TRUE){
+  # add runif(-0.1,0.1) jitter if all y vals are identical
+  if (length(unique(y))==1){
+    y <- y + runif(length(y), -0.1, 0.1)
+  }
+  
   mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=1:5))	
   cl <- mc$classification
   comps <- mc$G
