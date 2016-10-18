@@ -7,7 +7,7 @@
 scDD(SCdat, prior_param = list(alpha = 0.1, mu0 = 0, s0 = 0.01, a0 = 0.01, b0
   = 0.01), permutations = 0, testZeroes = TRUE, adjust.perms = FALSE,
   n.cores = parallel::detectCores(), parallelBy = c("Genes",
-  "Permutations"), condition = "condition")
+  "Permutations"), condition = "condition", min.size = 3)
 }
 \arguments{
 \item{SCdat}{An object of class \code{ExpressionSet} that contains normalized single-cell expression and metadata, where the \code{assayData} 
@@ -49,6 +49,10 @@ The default option is recommended when analyzing more genes than the number of p
 the biological group or condition of interest (e.g. treatment versus control).  Note that this variable should only contain two 
 possible values since \code{scDD} can currently only handle two-group comparisons.  The default option assumes that there
 is a column named "condition" that contains this variable.}
+
+\item{min.size}{a positive integer that specifies the minimum size of a cluster (number of cells) for it to be used
+during the classification step.  Any clusters containing fewer than \code{min.size} cells will be considered an outlier
+cluster and ignored in the classfication algorithm.  The default value is three.}
 }
 \value{
 List with four items: the first is a data frame with nine columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 

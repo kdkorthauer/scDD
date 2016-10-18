@@ -5,7 +5,7 @@
 \title{classifyDD}
 \usage{
 classifyDD(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, a0, b0,
-  log.nonzero = TRUE, adjust.perms = FALSE, ref)
+  log.nonzero = TRUE, adjust.perms = FALSE, ref, min.size = 3)
 }
 \arguments{
 \item{pe_mat}{Matrix with genes in rows and samples in columns.  Column names 
@@ -42,6 +42,10 @@ detection rate (proportion of nonzero values).  If true, the residuals of a line
 detection rate are permuted, and new fitted values are obtained using these residuals.}
 
 \item{ref}{one of two possible values in condition; represents the referent category.}
+
+\item{min.size}{a positive integer that specifies the minimum size of a cluster (number of cells) for it to be used
+during the classification step.  Any clusters containing fewer than \code{min.size} cells will be considered an outlier
+cluster and ignored in the classfication algorithm.  The default value is three.}
 }
 \value{
 cat Character vector of the same length as \code{sig_genes} that indicates which category of 

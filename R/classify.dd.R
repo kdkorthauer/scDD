@@ -59,10 +59,8 @@ getPosteriorParams <- function(y, mcobj, alpha, m0, s0, a0, b0){
 #' 
 
 classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, a0, b0, log.nonzero=TRUE, 
-                      adjust.perms=FALSE, ref){
-    
-    ms <- 3
-    
+                      adjust.perms=FALSE, ref, min.size=3){
+    ms <- min.size
     mc.oa <- oa
     mc.c1 <- c1
     mc.c2 <- c2
@@ -253,7 +251,7 @@ testZeroes <- function(dat, cond, these=1:nrow(dat)){
 #'  the permutation test belong to the DP category
 #' 
 feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE, 
-                 testZeroes=FALSE, adjust.perms=FALSE){
+                 testZeroes=FALSE, adjust.perms=FALSE, min.size=3){
   if(testZeroes){
     pval.thresh <- 0.025
   }else{
@@ -265,9 +263,9 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE,
   c2 <- lapply(c2, function(x) x[[1]])
   
   ns_genes <- (1:nrow(pe_mat))[-sig_genes]
-  c.oa <- sapply(ns_genes, function(x) luOutlier(oa[[x]]))
-  c.c1 <- sapply(ns_genes, function(x) luOutlier(c1[[x]]))
-  c.c2 <- sapply(ns_genes, function(x) luOutlier(c2[[x]]))
+  c.oa <- sapply(ns_genes, function(x) luOutlier(oa[[x]], min.size))
+  c.c1 <- sapply(ns_genes, function(x) luOutlier(c1[[x]], min.size))
+  c.c2 <- sapply(ns_genes, function(x) luOutlier(c2[[x]], min.size))
   
   cdr <- apply(pe_mat, 2, function(x) sum(x>0)/length(x))
   cat <- rep(NA, length(ns_genes))
@@ -297,9 +295,9 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE,
     # check whether clustering process is consistent within each condition as overall
     if (c.c1[s]==c.c2[s] & c.c1[s]==c.oa[s] & c.oa[s]>1){
       # non-outlying cluster names
-      c.oa.no <- findOutliers(oa[[g]])
-      c.c1.no <- findOutliers(c1[[g]])
-      c.c2.no <- findOutliers(c2[[g]])
+      c.oa.no <- findOutliers(oa[[g]], min.size)
+      c.c1.no <- findOutliers(c1[[g]], min.size)
+      c.c2.no <- findOutliers(c2[[g]], min.size)
       
       test <- 1*(fisher.test(table(oa[[g]][oa[[g]] %in% c.oa.no], cond[oa[[g]] %in% c.oa.no]))$p.value < 0.05)
       if (test==1){

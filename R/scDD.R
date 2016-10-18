@@ -48,6 +48,10 @@
 #'  the biological group or condition of interest (e.g. treatment versus control).  Note that this variable should only contain two 
 #'  possible values since \code{scDD} can currently only handle two-group comparisons.  The default option assumes that there
 #'  is a column named "condition" that contains this variable. 
+#'  
+#' @param min.size a positive integer that specifies the minimum size of a cluster (number of cells) for it to be used
+#'  during the classification step.  Any clusters containing fewer than \code{min.size} cells will be considered an outlier
+#'  cluster and ignored in the classfication algorithm.  The default value is three.  
 #' 
 #' @return List with four items: the first is a data frame with nine columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 
 #'  condition membership with clustering, Benjamini-Hochberg adjusted version of the previous column, p-value for test of difference in dropout rate (only for non-DD genes), 
@@ -99,7 +103,7 @@
 
 scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0=0.01), permutations=0,
                   testZeroes=TRUE, adjust.perms=FALSE, n.cores=parallel::detectCores(), parallelBy=c("Genes", "Permutations"),
-                  condition="condition"){
+                  condition="condition", min.size=3){
   
   # check whether SCdat is a member of the ExpressionSet class
   if(!("ExpressionSet" %in% class(SCdat))){
@@ -182,9 +186,9 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     c2 <- lapply(out, function(x) x[["c2"]])
     rm(out); gc()
     
-    comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class)))
-    comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class)))
-    comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class)))
+    comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class, min.size)))
+    comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class, min.size)))
+    comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class, min.size)))
     
     message("Notice! Number of permutations is set to zero; using Kolmogorov-Smirnov to test for differences in distributions instead of the Bayes Factor permutation test")
     
@@ -229,9 +233,9 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
     den<- unlist(lapply(out, function(x) x[["den"]]))
     rm(out); gc()
     
-    comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class)))
-    comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class)))
-    comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class)))
+    comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class, min.size)))
+    comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class, min.size)))
+    comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class, min.size)))
   
 
       # obtain Bayes Factor score numerators for each permutation
@@ -290,13 +294,13 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
   }
   
   message("Classifying significant genes into patterns")
-  dd.cats <- classifyDD(exprs(SCdat)[tofit,], phenoData(SCdat)[[condition]], sig, oa, c1, c2, alpha=alpha, m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE, ref=ref)
+  dd.cats <- classifyDD(exprs(SCdat)[tofit,], phenoData(SCdat)[[condition]], sig, oa, c1, c2, alpha=alpha, m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE, ref=ref, min.size=min.size)
   
   cats <- rep("NS", nrow(exprs(SCdat)[tofit,]))
   cats[sig] <- dd.cats
   
   extraDP <- feDP(exprs(SCdat)[tofit,], phenoData(SCdat)[[condition]], sig, oa, c1, c2, log.nonzero=TRUE,
-                  testZeroes=testZeroes, adjust.perms=adjust.perms)
+                  testZeroes=testZeroes, adjust.perms=adjust.perms, min.size=min.size)
   cats[-sig] <- names(extraDP)
   
   # classify additional genes with evidence of DD in the form of a mean shift found by 'extraDP'
@@ -305,7 +309,7 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
   }else{
     NCs <- which(p.adjust(pvals, method="BH") > 0.05 & cats == "NC")
   }
-  NC.cats <- classifyDD(exprs(SCdat)[tofit,], phenoData(SCdat)[[condition]], NCs, oa, c1, c2, alpha=alpha, m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE, ref=ref)
+  NC.cats <- classifyDD(exprs(SCdat)[tofit,], phenoData(SCdat)[[condition]], NCs, oa, c1, c2, alpha=alpha, m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE, ref=ref, min.size=min.size)
   cats[NCs] <- NC.cats
   
   cats.all <- pvals.all <- rep(NA, nrow(exprs(SCdat)))

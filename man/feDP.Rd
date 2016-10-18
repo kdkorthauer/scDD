@@ -5,7 +5,7 @@
 \title{feDP}
 \usage{
 feDP(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero = TRUE,
-  testZeroes = FALSE, adjust.perms = FALSE)
+  testZeroes = FALSE, adjust.perms = FALSE, min.size = 3)
 }
 \arguments{
 \item{pe_mat}{Matrix with genes in rows and samples in columns.  Column names 
@@ -32,6 +32,10 @@ each nonzero sample in condition 2 only fit}
 \item{adjust.perms}{Logical indicating whether or not to adjust the permutation tests for the sample
 detection rate (proportion of nonzero values).  If true, the residuals of a linear model adjusted for 
 detection rate are permuted, and new fitted values are obtained using these residuals.}
+
+\item{min.size}{a positive integer that specifies the minimum size of a cluster (number of cells) for it to be used
+during the classification step.  Any clusters containing fewer than \code{min.size} cells will be considered an outlier
+cluster and ignored in the classfication algorithm.  The default value is three.}
 }
 \value{
 cat Character vector of the same length as \code{sig_genes} that indicates which nonsignificant genes by
