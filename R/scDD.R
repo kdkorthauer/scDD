@@ -134,7 +134,22 @@ scDD <- function(SCdat, prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0
       message("Notice: There exist genes that are all (or almost all) zero. Skipping genes with 0 or 1 nonzero measurements per condition")    
     }
   }
-
+  
+  # check for genes for which all nonzero values are identical within at least one of the conditions
+  # These will cause problems in model fitting
+  skipConstant <- which( apply(exprs(SCdat)[tofit,phenoData(SCdat)[[condition]]==ref], 1, 
+                                function(x) length(unique(x[x>0])) == 1) |
+                         apply(exprs(SCdat)[tofit,phenoData(SCdat)[[condition]]!=ref], 1, 
+                                function(x) length(unique(x[x>0])) == 1) )
+  if (length(skipConstant) > 0){
+    if(testZeroes){
+      message("Notice: There exist genes with constant nonzero values. These genes will only be considered for the DZ pattern.")    
+    }else{
+      message("Notice: There exist genes with constant nonzero values. Skipping these genes.")    
+    }
+    tofit <- tofit[-skipConstant]
+  }
+  
   # cluster each gene in SCdat
   message("Clustering observed expression data for each gene")
   message(paste0("Setting up parallel back-end using ", n.cores, " cores" ))
