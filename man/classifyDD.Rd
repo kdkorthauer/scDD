@@ -5,7 +5,7 @@
 \title{classifyDD}
 \usage{
 classifyDD(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, a0, b0,
-  log.nonzero = TRUE, ref)
+  log.nonzero = TRUE, adjust.perms = FALSE, ref)
 }
 \arguments{
 \item{pe_mat}{Matrix with genes in rows and samples in columns.  Column names 
@@ -36,6 +36,10 @@ each nonzero sample in condition 2 only fit}
 \item{b0}{Prior scale parameter value for the generating distribution of cluster precision}
 
 \item{log.nonzero}{Logical indicating whether to perform log transformation of nonzero values.}
+
+\item{adjust.perms}{Logical indicating whether or not to adjust the permutation tests for the sample
+detection rate (proportion of nonzero values).  If true, the residuals of a linear model adjusted for 
+detection rate are permuted, and new fitted values are obtained using these residuals.}
 
 \item{ref}{one of two possible values in condition; represents the referent category.}
 }

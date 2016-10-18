@@ -31,6 +31,8 @@ getPosteriorParams <- function(y, mcobj, alpha, m0, s0, a0, b0){
 #'
 #' @inheritParams jointPosterior
 #' 
+#' @inheritParams scDD
+#' 
 #' @param pe_mat Matrix with genes in rows and samples in columns.  Column names 
 #'  indicate condition.
 #'
@@ -56,7 +58,8 @@ getPosteriorParams <- function(y, mcobj, alpha, m0, s0, a0, b0){
 #'  DD each significant gene belongs to (DE, DP, DM, DB, or NC (no call))
 #' 
 
-classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, a0, b0, log.nonzero=TRUE, ref){
+classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, a0, b0, log.nonzero=TRUE, 
+                      adjust.perms=FALSE, ref){
     
     ms <- 3
     
@@ -72,6 +75,8 @@ classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, 
     c.c1 <- sapply(sig_genes, function(x) luOutlier(c1[[x]], min.size=ms))
     c.c2 <- sapply(sig_genes, function(x) luOutlier(c2[[x]], min.size=ms))
     
+    cdr <- apply(pe_mat, 2, function(x) sum(x>0)/length(x))
+    
     # for each gene
     cat <- rep(NA, length(sig_genes))
     
@@ -82,9 +87,11 @@ classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, 
       
       if (log.nonzero){
         cond <- condition[y>0]
+        cdr0 <- cdr[y>0]
         y <- log(y[y>0])
       }else{
         cond <- condition
+        cdr0 <- cdr
       }
       
       if(length(unique(c1[[g]])) != max(c1[[g]])){
@@ -161,8 +168,19 @@ classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, 
               cat[s] <- "NC"
             }
           }else if(c.oa[s]>c.c1[s]){ # equal number of clusters within each conditon (at least 2) and more than that overall
-            if (sum(comparisons)> c.oa[s]*(c.oa[s]-1)){
-              cat[s] <- "DE"
+            if (sum(comparisons)> c.c1[s]*(c.c1[s]-1)){
+              # Require that the multimodal DE genes show evidence of an overall shift in mean
+              # in addition to having at most one pair of component overlaps
+              if(adjust.perms){
+                comparison <- summary(lm(y ~ cdr0 + factor(cond)))$coef[3,4]
+              }else{
+                comparison <- t.test(y~factor(cond))$p.value	
+              }
+              if (comparison < 0.01){
+                cat[s] <- "DE"
+              }else{
+                cat[s] <- "NC"
+              }
             }else{
               cat[s] <- "NC"
             }
