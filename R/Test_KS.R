@@ -50,7 +50,7 @@ testKS <- function(dat, condition, inclZero=TRUE, numDE=NULL, DEIndex){
       x1 <- (x1[x1>0])
       x2 <- (x2[x2>0])
     }
-    ks.test(x1,x2, exact=FALSE)$p.value
+    suppressWarnings(ks.test(x1,x2, exact=FALSE))$p.value
   }
   
   ks.pval.unadj <- apply(dat, 1, function(x) onegene(x) )
