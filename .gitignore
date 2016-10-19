@@ -4,8 +4,9 @@
 scDD.Rproj
 vignettes/DD.pdf
 vignettes/plotGrid-1.pdf
-.bbl
-.log
-.synctex.gz
-.toc
+vignettes/*.bbl
+vignettes/*.log
+vignettes/*synctex.gz
+vignettes/*.toc
 vignettes/scDD-concordance.tex
+vignettes/scDD.pdf
