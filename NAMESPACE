@@ -19,3 +19,11 @@ importFrom(mclust,Mclust)
 importFrom(mclust,mclustBIC)
 importFrom(outliers,grubbs.test)
 importFrom(parallel,detectCores)
+importFrom("grDevices", "dev.off", "hcl", "pdf")
+importFrom("graphics", "abline", "axis", "hist", "lines", "par",
+             "plot", "points", "rect")
+importFrom("stats", "anova", "binomial", "density", "fisher.test",
+             "ks.test", "lm", "model.matrix", "p.adjust", "quantile",
+             "rbinom", "residuals", "rnbinom", "rt", "runif", "t.test",
+             "var")
+
