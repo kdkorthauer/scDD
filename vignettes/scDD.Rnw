@@ -4,7 +4,7 @@
 \documentclass{article}
 \usepackage{underscore}
 
-<<style-knitr, eval=TRUE, echo=FALSE, results="asis", cache=TRUE>>=
+<<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
 BiocStyle::latex()
 @
 
@@ -12,7 +12,6 @@ BiocStyle::latex()
     \author{Keegan Korthauer\footnote{\email{keegan@jimmy.harvard.edu}}}
 
 \begin{document}
-\SweaveOpts{concordance=TRUE}
 
 \maketitle
 \tableofcontents
