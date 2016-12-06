@@ -1,10 +1,14 @@
 #' findIndex
 #'
-#' Find a reasonable set of genes (one mode and at least 25% nonzero values) to use for simulation.
-#' @param SCdat An object of class \code{ExpressionSet} that contains normalized single-cell expression and metadata, where the \code{assayData} 
-#'   slot contains one row for each gene and one sample for each column.  The \code{PhenoData} slot should contain a vector of numeric values
+#' Find a reasonable set of genes (one mode and at least 25% nonzero values) 
+#' to use for simulation.
+#' @param SCdat An object of class \code{ExpressionSet} that contains 
+#' normalized single-cell expression and metadata, where the \code{assayData} 
+#'   slot contains one row for each gene and one sample for each column.  
+#'   The \code{PhenoData} slot should contain a vector of numeric values
 #'   (either 1 or 2) that indicates which 
-#'   condition each sample belongs to (in the same order as the columns of \code{assayData}).  Optional additional metadata about the 
+#'   condition each sample belongs to (in the same order as the columns 
+#'   of \code{assayData}).  Optional additional metadata about the 
 #'   experiment can be contained in the \code{experimentData} slot.
 #'  
 #' @inheritParams scDD 
@@ -15,10 +19,15 @@
 #' 
 #' @importFrom BiocParallel bplapply
 #' 
-#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+#' Kendziorski C. A statistical approach for identifying differential 
+#' distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+#' \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+#' 1077-y}
 #'
-#' @return Vector of indices for a reasonable set of genes that can be used for simulation.
+#' @return Vector of indices for a reasonable set of genes that can be used 
+#' for simulation.
 
 
 findIndex <- function(SCdat, condition="condition"){

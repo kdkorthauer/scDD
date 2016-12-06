@@ -3,21 +3,38 @@
 \docType{data}
 \name{scDatExSim}
 \alias{scDatExSim}
-\title{Toy example of simulated data}
-\format{An object of class \code{\link[Biobase]{ExpressionSet}} containing data for 30 genes for 200 samples
- (100 from condition 1 and 100 from condition 2).  Condition labels (1 or 2) are stored in the phenoData slot.  
- Row names of the assayData slot contain the two letter category label that the gene was simulated from (e.g.  'EE', 'DB', ...)
+\title{Data: Toy example of simulated data}
+\format{An object of class \code{\link[Biobase]{ExpressionSet}} containing 
+data for 30 genes for 200 samples
+ (100 from condition 1 and 100 from condition 2).  Condition labels (1 or 2)
+  are stored in the phenoData slot.  
+ Row names of the assayData slot contain the two letter category label that
+  the gene was simulated from (e.g.  'EE', 'DB', ...)
  along with the row number (1-30).}
 \usage{
 data(scDatExSim)
 }
+\value{
+An RData object, see Format section for details
+}
 \description{
-Toy example data in \code{\link[Biobase]{ExpressionSet}} format for 500 genes to illustrate how to generate simulated data from example data
- using \code{\link{simulateSet}}.  Contains 5 genes from each category (DE, DP, DM, DB, EE, and EP).
+Toy example data in \code{\link[Biobase]{ExpressionSet}} format for 500 
+genes to illustrate how to generate simulated data from example data
+ using \code{\link{simulateSet}}.  Contains 5 genes from each category 
+ (DE, DP, DM, DB, EE, and EP).
+}
+\examples{
+
+# load toy example of simulated data
+data(scDatExSim)
 }
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. A statistical approach for identifying differential 
+distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+\url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+1077-y}
 }
 \keyword{datasets}
 

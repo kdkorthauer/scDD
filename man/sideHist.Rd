@@ -11,15 +11,24 @@ sideHist(x, y, logT = TRUE, title.gene = "")
 
 \item{y}{Second numeric vector of data to plot.}
 
-\item{logT}{Logical that indicates whether to take the log(x+1) transformation.}
+\item{logT}{Logical that indicates whether to take the log(x+1) 
+transformation.}
 
-\item{title.gene}{Character vector that contains the gene name that you are plotting}
+\item{title.gene}{Character vector that contains the gene name that you 
+are plotting}
+}
+\value{
+NULL (creates a baseR plot)
 }
 \description{
 Plots two histograms side by side with smoothed density overlay
 }
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. A statistical approach for identifying differential 
+distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+\url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+1077-y}
 }
 

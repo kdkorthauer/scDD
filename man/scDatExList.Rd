@@ -3,19 +3,34 @@
 \docType{data}
 \name{scDatExList}
 \alias{scDatExList}
-\title{Toy example data list}
-\format{A list of two matrices (one for each of two conditions) labeled "C1" and "C2".  Each matrix contains data for 100 genes
+\title{Data: Toy example data list}
+\format{A list of two matrices (one for each of two conditions) labeled 
+"C1" and "C2".  Each matrix contains data for 100 genes
   and a variable number of samples (78 in C1 and 64 in C2).}
 \usage{
 data(scDatExList)
 }
+\value{
+An RData object, see Format section for details
+}
 \description{
-Toy example data list (one item for each of two conditions) for 100 genes to illustrate how to use the function
+Toy example data list (one item for each of two conditions) for 100 genes
+ to illustrate how to use the function
  \code{\link{preprocess}}.
 }
+\examples{
+
+# load toy example data list 
+data(scDatExList)
+
+}
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. A statistical approach for identifying differential 
+distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+\url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+1077-y}
 }
 \keyword{datasets}
 

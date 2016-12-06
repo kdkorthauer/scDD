@@ -3,19 +3,34 @@
 \docType{data}
 \name{scDatEx}
 \alias{scDatEx}
-\title{Toy example data}
-\format{An object of class \code{\link[Biobase]{ExpressionSet}} containing data for 500 genes for 142 samples
- (78 from condition 1 and 64 from condition 2).  Condition labels (1 or 2) are stored in the phenoData slot.}
+\title{Data: Toy example data}
+\format{An object of class \code{\link[Biobase]{ExpressionSet}} containing
+ data for 500 genes for 142 samples
+ (78 from condition 1 and 64 from condition 2).  Condition labels (1 or 2)
+  are stored in the phenoData slot.}
 \usage{
 data(scDatEx)
 }
+\value{
+An RData object, see Format section for details
+}
 \description{
-Toy example data in \code{\link[Biobase]{ExpressionSet}} format for 500 genes to illustrate how to generate simulated data from example data
+Toy example data in \code{\link[Biobase]{ExpressionSet}} format for 500 
+genes to illustrate how to generate simulated data from example data
  using \code{\link{simulateSet}}.
 }
+\examples{
+
+# load toy example data 
+data(scDatEx) 
+}
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. A statistical approach for identifying differential 
+distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+\url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+1077-y}
 }
 \keyword{datasets}
 

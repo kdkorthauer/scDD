@@ -10,7 +10,8 @@ singleCellSimu(Dataset1, Method, index, FC, modeFC, DP, Validation = FALSE,
   constantZero = NULL, varInflation = NULL)
 }
 \arguments{
-\item{Dataset1}{Numeric matrix of expression values with genes in rows and samples in columns.}
+\item{Dataset1}{Numeric matrix of expression values with genes in rows and 
+samples in columns.}
 
 \item{Method}{Type of simulation should choose from "DE" "DP" "DM" "DB"}
 
@@ -18,7 +19,8 @@ singleCellSimu(Dataset1, Method, index, FC, modeFC, DP, Validation = FALSE,
 
 \item{FC}{Fold Change values for DE Simulation}
 
-\item{modeFC}{Vector of values to use for fold changes between modes for DP, DM, and DB.}
+\item{modeFC}{Vector of values to use for fold changes between modes for DP,
+DM, and DB.}
 
 \item{DP}{Differetial Proportion vector}
 
@@ -26,32 +28,46 @@ singleCellSimu(Dataset1, Method, index, FC, modeFC, DP, Validation = FALSE,
 
 \item{numGenes}{numeric value for the number of genes to simulate}
 
-\item{numDE}{numeric value for the number of genes that will differ between two conditions}
+\item{numDE}{numeric value for the number of genes that will differ between
+two conditions}
 
-\item{numSamples}{numeric value for the number of samples in each condition to simulate}
+\item{numSamples}{numeric value for the number of samples in each condition 
+to simulate}
 
-\item{generateZero}{Specification of how to generate the zero values.  If "\code{empirical}" (default), the
-observed proportion of zeroes in each gene is used for the simuated data, and the nonzeroes are simulated from a 
-truncated negative binomial distribution.  If "\code{simulated}", all values are simulated out of
-a negative binomial distribution, includling the zeroes.  If "\code{constant}", then each gene has a fixed 
-proportion of zeroes equal to \code{constantZero}.}
+\item{generateZero}{Specification of how to generate the zero values.
+If "\code{empirical}" (default), the
+ observed proportion of zeroes in each gene is used for the simuated data, 
+ and the nonzeroes are simulated from a 
+ truncated negative binomial distribution.  If "\code{simulated}", all 
+ values are simulated out of
+ a negative binomial distribution, includling the zeroes.  
+ If "\code{constant}", then each gene has a fixed 
+ proportion of zeroes equal to \code{constantZero}.}
 
-\item{constantZero}{Numeric value between 0 and 1 that indicates the fixed proportion of zeroes for every gene.
-Ignored if \code{generateZero} method is not equal to "\code{constant}".}
+\item{constantZero}{Numeric value between 0 and 1 that indicates the fixed 
+proportion of zeroes for every gene.
+ Ignored if \code{generateZero} method is not equal to "\code{constant}".}
 
-\item{varInflation}{Optional numeric vector with one element for each condition that corresponds to the multiplicative 
-variance inflation factor to use when simulating data.  Useful for sensitivity studies to assess the impact of 
-confounding effects on differential variance across conditions. Currently assumes all samples within a 
-condition are subject to the same variance inflation factor.}
+\item{varInflation}{Optional numeric vector with one element for each 
+condition that corresponds to the multiplicative 
+ variance inflation factor to use when simulating data.  Useful for 
+ sensitivity studies to assess the impact of 
+ confounding effects on differential variance across conditions. Currently 
+ assumes all samples within a 
+ condition are subject to the same variance inflation factor.}
 }
 \value{
-Simulated_Data A list object where the first element contains a matrix of 
-the simulated dataset, the second element contains the DEIndex, and the third 
-element contains the fold change (between two conditions for DE, between two modes 
+Simulated_Data A list object where the first element contains a 
+matrix of 
+the simulated dataset, the second element contains the DEIndex, and the 
+third 
+element contains the fold change (between two conditions for DE, between 
+two modes 
 for DP, DM, and DB).
 }
 \description{
-Called by \code{\link{simulateSet}} to simulate a specified number of genes from 
+Called by \code{\link{simulateSet}} to simulate a specified number of genes 
+from 
   one DD category at a time.
 }
 

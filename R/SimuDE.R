@@ -2,19 +2,23 @@
 #'
 #' Simulation for Classic Differentially Expressed Case.
 #' 
-#' @details Method called by main function \code{\link{singleCellSimu}} to simulate genes 
-#'  that have different means in each condition. Not intended to be called directly by user.
+#' @details Method called by main function \code{\link{singleCellSimu}} to 
+#' simulate genes 
+#'  that have different means in each condition. Not intended to be called 
+#'  directly by user.
 #'
 #' @inheritParams singleCellSimu
 #'
-#' @param Simulated_Data Required input empty matrix to provide structure information of 
+#' @param Simulated_Data Required input empty matrix to provide structure 
+#' information of 
 #'  output matrix with simulated data
 #'
 #' @param DEIndex Index for DE genes
 #'
 #' @param samplename The name for genes that chosen for simulation
 #'
-#' @param Zeropercent_Base Zero percentage for corresponding gene expression values 
+#' @param Zeropercent_Base Zero percentage for corresponding gene 
+#' expression values 
 #'
 #' @param coeff Relationship coefficients for Mean and Variance
 #'
@@ -22,12 +26,17 @@
 #' 
 #' @param f Fold change values (number of SDs) for each gene 
 #' 
-#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+#' Kendziorski C. A statistical approach for identifying differential 
+#' distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+#' \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+#' 1077-y}
 #'
 #' @return Simulated_Data Simulated dataset for DE
 
-simuDE <- function(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC, coeff, RP, modeFC,
+simuDE <- function(Dataset1, Simulated_Data, DEIndex, samplename, 
+                   Zeropercent_Base, f, FC, coeff, RP, modeFC,
                    generateZero, constantZero, varInflation){
   
 numGenes <- nrow(Simulated_Data)
@@ -84,29 +93,36 @@ for(i in 1:numGenes){
 # calculate empirical means and variances with fold change
 MVC2 <- matrix(data=0,nrow=numGenes,ncol=2)
 if(generateZero %in% c("empirical", "constant")){
-  MVC2[,1:2] <- t(sapply(1:length(samplename), function(x) calcMV(Dataset1[samplename[x],], FC=FCSimu[x], include.zeroes=FALSE)))
+  MVC2[,1:2] <- t(sapply(1:length(samplename), function(x) 
+    calcMV(Dataset1[samplename[x],], FC=FCSimu[x], include.zeroes=FALSE)))
 }else{
-  MVC2[,1:2] <- t(sapply(1:length(samplename), function(x) calcMV(Dataset1[samplename[x],], FC=FCSimu[x], include.zeroes=TRUE)))
+  MVC2[,1:2] <- t(sapply(1:length(samplename), function(x) 
+    calcMV(Dataset1[samplename[x],], FC=FCSimu[x], include.zeroes=TRUE)))
 }
 
 # calculate r and p parameters of NB
 RPC2 <- t(apply(MVC2[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2])))
 
-# m.factor = (1 + v/m^2)^((c-1)/2)
-# v.factor = ( (1 + v/m^2)^(2c) - (1 + v/m^2)^c ) /  ( (1 + v/m^2)^2 - (1+m/v^2))
+
 if(!is.null(varInflation)){
   MVC2.Infl1 <- MVC2
-  MVC2.Infl1[,1] <- MVC2[,1]*(1 + MVC2[,2]/(MVC2[,1]^2))^((varInflation[1]-1)/2) 
-  MVC2.Infl1[,2] <- MVC2[,2]*( ((1 + MVC2[,2]/(MVC2[,1]^2))^(2*varInflation[1])-(1 + MVC2[,2]/(MVC2[,1]^2))^varInflation[1]) / 
-                               ((1 + MVC2[,2]/(MVC2[,1]^2))^2-(1 + MVC2[,2]/(MVC2[,1]^2))) )
+  MVC2.Infl1[,1] <- MVC2[,1]*(1 + MVC2[,2]/(MVC2[,1]^2))^((varInflation[1]-1)/2)
+  MVC2.Infl1[,2] <- MVC2[,2]*( ((1 + MVC2[,2]/(MVC2[,1]^2))^(2*varInflation[1])-
+                                  (1 + MVC2[,2]/(MVC2[,1]^2))^varInflation[1]) /
+                               ((1 + MVC2[,2]/(MVC2[,1]^2))^2-(1 + MVC2[,2]/
+                                                                (MVC2[,1]^2))) )
   
   MVC2.Infl2 <- MVC2
-  MVC2.Infl2[,1] <- MVC2[,1]*(1 + MVC2[,2]/(MVC2[,1]^2))^((varInflation[2]-1)/2) 
-  MVC2.Infl2[,2] <- MVC2[,2]*( ((1 + MVC2[,2]/(MVC2[,1]^2))^(2*varInflation[2])-(1 + MVC2[,2]/(MVC2[,1]^2))^varInflation[2]) / 
-                                 ((1 + MVC2[,2]/(MVC2[,1]^2))^2-(1 + MVC2[,2]/(MVC2[,1]^2))) )
+  MVC2.Infl2[,1] <- MVC2[,1]*(1 + MVC2[,2]/(MVC2[,1]^2))^((varInflation[2]-1)/2)
+  MVC2.Infl2[,2] <- MVC2[,2]*( ((1 + MVC2[,2]/(MVC2[,1]^2))^(2*varInflation[2])-
+                                  (1 + MVC2[,2]/(MVC2[,1]^2))^varInflation[2]) /
+                                 ((1 + MVC2[,2]/(MVC2[,1]^2))^2-(1 + MVC2[,2]/
+                                                                (MVC2[,1]^2))) )
   
-  RPC2 <- cbind(RPC2, t(apply(MVC2.Infl1[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
-  RPC2 <- cbind(RPC2, t(apply(MVC2.Infl2[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
+  RPC2 <- cbind(RPC2, t(apply(MVC2.Infl1[,1:2,drop=FALSE], 1, 
+                              function(x) calcRP(x[1], x[2]))))
+  RPC2 <- cbind(RPC2, t(apply(MVC2.Infl2[,1:2,drop=FALSE], 1, 
+                              function(x) calcRP(x[1], x[2]))))
 }
 
 # now simulate genes in condition 2
@@ -155,15 +171,19 @@ for(i in 1:numGenes){
   }else{
     if(i%in%DEIndex){
       if(!is.null(varInflation)){
-        Simulated_Data[i,((numSamples+1):(2*numSamples))] <- rnbinom(numSamples,RPC2[i,1],1-RPC2[i,2])
+        Simulated_Data[i,((numSamples+1):(2*numSamples))] <- rnbinom(numSamples,
+                                                        RPC2[i,1],1-RPC2[i,2])
       }else{
-        Simulated_Data[i,((numSamples+1):(2*numSamples))] <- rnbinom(numSamples,RPC2[i,5],1-RPC2[i,6])
+        Simulated_Data[i,((numSamples+1):(2*numSamples))] <- rnbinom(numSamples,
+                                                        RPC2[i,5],1-RPC2[i,6])
       }
     }else{
       if(!is.null(varInflation)){
-        Simulated_Data[i,((numSamples+1):(2*numSamples))] <- rnbinom(numSamples,RP[i,1],1-RP[i,2])
+        Simulated_Data[i,((numSamples+1):(2*numSamples))] <- rnbinom(numSamples,
+                                                        RP[i,1],1-RP[i,2])
       }else{
-        Simulated_Data[i,((numSamples+1):(2*numSamples))] <- rnbinom(numSamples,RP[i,5],1-RP[i,6])
+        Simulated_Data[i,((numSamples+1):(2*numSamples))] <- rnbinom(numSamples,
+                                                        RP[i,5],1-RP[i,6])
       }
     }
   }

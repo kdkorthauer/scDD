@@ -1,20 +1,26 @@
 #' preprocess
 #'
-#' Function to preprocess a list of data matrices to (1) combine into one matrix and (2)
-#'  only keep genes with a certain number of nonzero entries.
+#' Function to preprocess a list of data matrices to (1) combine 
+#' into one matrix and (2)
+#' only keep genes with a certain number of nonzero entries.
 #'
 #' 
-#' @param DataList A list object where each item contains a matrix of data with rows 
-#'  designating genes and samples designating columns.  The name of the list objects represents
+#' @param DataList A list object where each item contains a matrix of 
+#'  data with rows 
+#'  designating genes and samples designating columns.  
+#'  The name of the list objects represents
 #'  their condition.
 #'
-#' @param ConditionNames Character vector of length 1 or 2 which contains the name(s) of the
+#' @param ConditionNames Character vector of length 1 or 2 
+#' which contains the name(s) of the
 #'  conditions (the names of the items in \code{DataList}) to be processed.
 #' 
-#' @param zero.thresh A numeric value between 0 and 1 that represents the maximum proportion
+#' @param zero.thresh A numeric value between 0 and 1 that represents
+#'  the maximum proportion
 #'  of zeroes per gene allowable in the processed dataset
 #'  
-#' @param median_norm Logical indicating whether or not to normalize the data using Median Normalization from \code{EBSeq}
+#' @param median_norm Logical indicating whether or not to normalize the data
+#'  using Median Normalization from \code{EBSeq}
 #' 
 #' @export
 #' 
@@ -22,22 +28,30 @@
 #' 
 #' @importFrom EBSeq GetNormalizedMat
 #'
-#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+#' Kendziorski C. A statistical approach for identifying differential 
+#' distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222.
+#' \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+#' 1077-y}
 #'
-#' @return pe_mat Processed matrix with genes in rows and samples in columns.  Column names 
+#' @return pe_mat Processed matrix with genes in rows and samples in columns. 
+#'  Column names 
 #'  indicate condition.
 #'  
-#'  @examples 
+#' @examples 
 #'  
 #'  # load toy example data list
 #'  
 #'  data(scDatExList)
 #'  
 #'  
-#'  # check that the data is formated as a list of 2 matrices (one for each of 2 conditions), 
-#'  # that each matrix has 100 rows (one for each gene), and that the number of columns in 
-#'  # each matrix corresponds to the number of samples in each condition (78 and 64, respectively)
+#'  # check that the data is formated as a list of 2 matrices 
+#'  # (one for each of 2 conditions), 
+#'  # that each matrix has 100 rows (one for each gene), 
+#'  # and that the number of columns in 
+#'  # each matrix corresponds to the number of samples in 
+#'  # each condition (78 and 64, respectively)
 #'  
 #'  str(scDatExList)
 #'  
@@ -47,26 +61,30 @@
 #'  condition.names <- names(scDatExList)
 #'  
 #'  
-#'  # apply the preprocess function to reformat the data into one data matrix with 100 rows and
-#'  # 78+64=142 columns
-#'  # set the zero.thresh argument to 1 so that genes are filtered out if they are all zero
-#'  # set the median_norm argument to FALSE to return raw data
+#'  # apply the preprocess function to reformat the data into one 
+#'  # data matrix with 100 rows and 78+64=142 columns
+#'  # set the zero.thresh argument to 1 so that genes are filtered out if they
+#'  # are all zero set the median_norm argument to FALSE to return raw data
 #'  
 #'  scDatExMat <- preprocess(scDatExList, ConditionNames=condition.names, 
 #'                           zero.thresh=1, median_norm=FALSE)
 #'  
 #'  
-#'  # apply the preprocess function again, but this time threshold on the proportion of zeroes 
-#'  # and apply median normalization
-#'  # set the zero.thresh argument to 0.75 so that genes with more than 75% zeroes are filtered out
+#'  # apply the preprocess function again, but this time threshold on the 
+#'  # proportion of zeroes and apply median normalization
+#'  # set the zero.thresh argument to 0.75 so that genes with more than 75% 
+#'  # zeroes are filtered out 
 #'  # set the median_norm argument to TRUE to return median normalized counts
 #'  
-#'  scDatExMatNormThresh <- preprocess(scDatExList, ConditionNames=condition.names, 
+#'  scDatExMatNormThresh <- preprocess(scDatExList, 
+#'                                     ConditionNames=condition.names, 
 #'                                     zero.thresh=0.75, median_norm=TRUE)
 
-preprocess <- function(DataList, ConditionNames, zero.thresh=0.9, median_norm=FALSE){
+preprocess <- function(DataList, ConditionNames, 
+                       zero.thresh=0.9, median_norm=FALSE){
   if(!is.list(DataList)){
-    stop("Input data must be a list of data matrices, where each item is a different condition")
+    stop("Input data must be a list of data matrices, 
+         where each item is a different condition")
   }
   if(length(ConditionNames)==1){
     these <- which(names(DataList) %in% ConditionNames)

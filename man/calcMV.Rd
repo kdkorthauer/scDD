@@ -10,28 +10,38 @@ calcMV(a, FC = 1, FC.thresh = NA, threshold = Inf,
 \arguments{
 \item{a}{Numeric vector of values to calculate empirical mean and variance.}
 
-\item{FC}{Fold change for the mean and standard deviation.  Default value is 1.}
+\item{FC}{Fold change for the mean and standard deviation.  Default value 
+is 1.}
 
-\item{FC.thresh}{Alternate fold change for the mean and standard deviation when the (log nonzero) mean is above the value of \code{threshold}.
-Default value is \code{FC}.}
+\item{FC.thresh}{Alternate fold change for the mean and standard deviation 
+when the (log nonzero) mean is above the value of \code{threshold}.  
+ Default value is \code{FC}.}
 
-\item{threshold}{Mean threshold value which dictates which fold change value to use for multiplying mean and standard deviation.
+\item{threshold}{Mean threshold value which dictates which fold change value
+to use for multiplying mean and standard deviation.
 Default value is Inf (so \code{FC} is always used).}
 
-\item{include.zeroes}{Logical value indicating whether the zero values should be included in the calculations of the empirical means 
-and variances.}
+\item{include.zeroes}{Logical value indicating whether the zero values 
+should be included in the calculations of the empirical means 
+   and variances.}
 }
 \value{
-MV Vector of two elements, first contains the empirical mean estimate, second contains the empirical variance estimate (optionally 
+MV Vector of two elements, first contains the empirical mean 
+estimate, second contains the empirical variance estimate (optionally 
   multiplied by a fold change).
 }
 \description{
-Calculate empirical means and variances of selected genes in a given dataset.
+Calculate empirical means and variances of selected genes in a given 
+ dataset.
 }
 \details{
-Calculate empirical means and variances of selected genes in a given dataset. Optionally, multiply
- the means and standard deviations by a fold change value, which can also vary by mean value.  If the mean is
- below some specified threshold \code{threshold}, use one fold change value \code{FC}.  If above the threshold, use the alternate 
- fold change value \code{FC.thresh}.  Estimates of mean and variance are robust to outliers.
+Calculate empirical means and variances of selected genes in a 
+given dataset. Optionally, multiply
+ the means and standard deviations by a fold change value, which can also 
+ vary by mean value.  If the mean is
+ below some specified threshold \code{threshold}, use one fold change value 
+ \code{FC}.  If above the threshold, use the alternate 
+ fold change value \code{FC.thresh}.  Estimates of mean and variance are 
+ robust to outliers.
 }
 

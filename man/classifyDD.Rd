@@ -8,22 +8,25 @@ classifyDD(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, a0, b0,
   log.nonzero = TRUE, adjust.perms = FALSE, ref, min.size = 3)
 }
 \arguments{
-\item{pe_mat}{Matrix with genes in rows and samples in columns.  Column names 
-indicate condition.}
+\item{pe_mat}{Matrix with genes in rows and samples in columns.
+Column names indicate condition.}
 
 \item{condition}{Vector of condition indicators (with two possible values).}
 
-\item{sig_genes}{Vector of the indices of significantly DD genes (indicating the row
-number of \code{pe_mat})}
+\item{sig_genes}{Vector of the indices of significantly DD genes 
+(indicating the row number of \code{pe_mat})}
 
-\item{oa}{List item with one item for each gene where the first element contains the cluster membership for 
-each nonzero sample in the overall (pooled) fit.}
+\item{oa}{List item with one item for each gene where the first element 
+contains the cluster membership for 
+ each nonzero sample in the overall (pooled) fit.}
 
-\item{c1}{List item with one item for each gene where the first element contains the cluster membership for 
-each nonzero sample in condition 1 only fit}
+\item{c1}{List item with one item for each gene where the first element 
+contains the cluster membership for 
+ each nonzero sample in condition 1 only fit}
 
-\item{c2}{List item with one item for each gene where the first element contains the cluster membership for 
-each nonzero sample in condition 2 only fit}
+\item{c2}{List item with one item for each gene where the first element 
+contains the cluster membership for 
+ each nonzero sample in condition 2 only fit}
 
 \item{alpha}{Value for the Dirichlet concentration parameter}
 
@@ -31,31 +34,47 @@ each nonzero sample in condition 2 only fit}
 
 \item{s0}{Prior precision value for generating distribution of cluster means}
 
-\item{a0}{Prior shape parameter value for the generating distribution of cluster precision}
+\item{a0}{Prior shape parameter value for the generating distribution of 
+cluster precision}
 
-\item{b0}{Prior scale parameter value for the generating distribution of cluster precision}
+\item{b0}{Prior scale parameter value for the generating distribution of 
+cluster precision}
 
-\item{log.nonzero}{Logical indicating whether to perform log transformation of nonzero values.}
+\item{log.nonzero}{Logical indicating whether to perform log 
+transformation of nonzero values.}
 
-\item{adjust.perms}{Logical indicating whether or not to adjust the permutation tests for the sample
-detection rate (proportion of nonzero values).  If true, the residuals of a linear model adjusted for 
-detection rate are permuted, and new fitted values are obtained using these residuals.}
+\item{adjust.perms}{Logical indicating whether or not to adjust the 
+permutation tests for the sample
+  detection rate (proportion of nonzero values).  If true, the 
+  residuals of a linear model adjusted for 
+  detection rate are permuted, and new fitted values are 
+  obtained using these residuals.}
 
-\item{ref}{one of two possible values in condition; represents the referent category.}
+\item{ref}{one of two possible values in condition; 
+represents the referent category.}
 
-\item{min.size}{a positive integer that specifies the minimum size of a cluster (number of cells) for it to be used
-during the classification step.  Any clusters containing fewer than \code{min.size} cells will be considered an outlier
-cluster and ignored in the classfication algorithm.  The default value is three.}
+\item{min.size}{a positive integer that specifies the minimum size of a 
+cluster (number of cells) for it to be used
+ during the classification step.  Any clusters containing fewer than 
+ \code{min.size} cells will be considered an outlier
+ cluster and ignored in the classfication algorithm.  The default value
+  is three.}
 }
 \value{
-cat Character vector of the same length as \code{sig_genes} that indicates which category of 
+cat Character vector of the same length as \code{sig_genes} that 
+indicates which category of 
  DD each significant gene belongs to (DE, DP, DM, DB, or NC (no call))
 }
 \description{
-Classify significantly DD genes into the four categories (DE, DP, DM or DB) based on posterior distributions of cluster mean parameters
+Classify significantly DD genes into the four categories (DE, DP, DM or DB)
+ based on posterior distributions of cluster mean parameters
 }
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. A statistical approach for identifying differential 
+distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+\url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+1077-y}
 }
 

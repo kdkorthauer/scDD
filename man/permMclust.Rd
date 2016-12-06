@@ -14,11 +14,14 @@ permMclust(y, nperms, condition, remove.zeroes = TRUE, log.transf = TRUE,
 
 \item{condition}{Vector of condition indicators for each sample}
 
-\item{remove.zeroes}{Logical indicating whether zeroes need to be removed from \code{y}}
+\item{remove.zeroes}{Logical indicating whether 
+zeroes need to be removed from \code{y}}
 
-\item{log.transf}{Logical indicating whether the data is in the raw scale (if so, will be log-transformed)}
+\item{log.transf}{Logical indicating whether the data is 
+in the raw scale (if so, will be log-transformed)}
 
-\item{restrict}{Logical indicating whether to perform restricted Mclust clustering where close-together clusters are joined.}
+\item{restrict}{Logical indicating whether to perform restricted Mclust
+clustering where close-together clusters are joined.}
 
 \item{alpha}{Value for the Dirichlet concentration parameter}
 
@@ -26,11 +29,14 @@ permMclust(y, nperms, condition, remove.zeroes = TRUE, log.transf = TRUE,
 
 \item{s0}{Prior precision value for generating distribution of cluster means}
 
-\item{a0}{Prior shape parameter value for the generating distribution of cluster precision}
+\item{a0}{Prior shape parameter value for the generating distribution of 
+cluster precision}
 
-\item{b0}{Prior scale parameter value for the generating distribution of cluster precision}
+\item{b0}{Prior scale parameter value for the generating distribution of 
+cluster precision}
 
-\item{ref}{one of two possible values in condition; represents the referent category.}
+\item{ref}{one of two possible values in condition; 
+represents the referent category.}
 }
 \value{
 Bayes factor numerator for the current permutation
@@ -39,10 +45,15 @@ Bayes factor numerator for the current permutation
 Function to  obtain bayes factor numerator for permutations of one gene
 }
 \details{
-Obtains bayes factor numerator for data vector \code{y} representing one gene
+Obtains bayes factor numerator for data vector
+ \code{y} representing one gene
 }
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R,
+ Kendziorski C. A statistical approach for identifying differential 
+ distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+\url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+1077-y}
 }
 

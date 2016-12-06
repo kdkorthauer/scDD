@@ -10,69 +10,114 @@ scDD(SCdat, prior_param = list(alpha = 0.1, mu0 = 0, s0 = 0.01, a0 = 0.01, b0
   "Permutations"), condition = "condition", min.size = 3)
 }
 \arguments{
-\item{SCdat}{An object of class \code{ExpressionSet} that contains normalized single-cell expression and metadata, where the \code{assayData} 
-slot contains one row for each gene and one sample for each column.  The \code{PhenoData} slot should contain a vector of numeric values
-(either 1 or 2) that indicates which 
-condition each sample belongs to (in the same order as the columns of \code{assayData}).  Optional additional metadata about the 
-experiment can be contained in the \code{experimentData} slot.}
+\item{SCdat}{An object of class \code{ExpressionSet} that contains 
+normalized single-cell expression and metadata, where the \code{assayData} 
+  slot contains one row for each gene and one sample for each column.  
+  The \code{PhenoData} slot should contain a vector of numeric values
+  (either 1 or 2) that indicates which 
+  condition each sample belongs to (in the same order as the columns of 
+  \code{assayData}).  Optional additional metadata about the 
+  experiment can be contained in the \code{experimentData} slot.}
 
-\item{prior_param}{A list of prior parameter values to be used when modeling each gene as a mixture of DP normals.  Default 
-values are given that specify a vague prior distribution on the cluster-specific means and variances.}
+\item{prior_param}{A list of prior parameter values to be used when modeling
+each gene as a mixture of DP normals.  Default 
+  values are given that specify a vague prior distribution on the 
+  cluster-specific means and variances.}
 
-\item{permutations}{The number of permutations to be used in calculating empirical p-values.  If set to zero (default),
-the full Bayes Factor permutation test will not be performed.  Instead, a fast procedure to identify the genes with significantly different
-expression distributions will be performed using the nonparametric Kolmogorov-Smirnov test, which tests the null hypothesis that 
-the samples are generated from the same continuous distribution.  This test will yield
-slightly lower power than the full permutation testing framework (this effect is more pronounced at smaller sample 
-sizes, and is more pronounced in the DB category), but is orders of magnitude faster.  This option
-is recommended when compute resources are limited.  The remaining steps of the scDD framework will remain unchanged
-(namely, categorizing the significant DD genes into patterns that represent the major distributional changes, 
-as well as the ability to visualize the results with violin plots using the \code{sideViolin} function).}
+\item{permutations}{The number of permutations to be used in calculating 
+empirical p-values.  If set to zero (default),
+  the full Bayes Factor permutation test will not be performed.  Instead, 
+  a fast procedure to identify the genes with significantly different
+  expression distributions will be performed using the nonparametric 
+  Kolmogorov-Smirnov test, which tests the null hypothesis that 
+  the samples are generated from the same continuous distribution.  
+  This test will yield
+  slightly lower power than the full permutation testing framework 
+  (this effect is more pronounced at smaller sample 
+  sizes, and is more pronounced in the DB category), but is orders of 
+  magnitude faster.  This option
+  is recommended when compute resources are limited.  The remaining 
+  steps of the scDD framework will remain unchanged
+  (namely, categorizing the significant DD genes into patterns that 
+  represent the major distributional changes, 
+  as well as the ability to visualize the results with violin plots 
+  using the \code{sideViolin} function).}
 
-\item{testZeroes}{Logical indicating whether or not to test for a difference in the proportion of zeroes}
+\item{testZeroes}{Logical indicating whether or not to test for a 
+difference in the proportion of zeroes}
 
-\item{adjust.perms}{Logical indicating whether or not to adjust the permutation tests for the sample
-detection rate (proportion of nonzero values).  If true, the residuals of a linear model adjusted for 
-detection rate are permuted, and new fitted values are obtained using these residuals.}
+\item{adjust.perms}{Logical indicating whether or not to adjust the 
+permutation tests for the sample
+  detection rate (proportion of nonzero values).  If true, the 
+  residuals of a linear model adjusted for 
+  detection rate are permuted, and new fitted values are 
+  obtained using these residuals.}
 
-\item{n.cores}{integer number of cores to use when computing the Bayes Factor estimates for the full permutation testing 
-framework.  Defaults to the number of cores returned by \code{parallel::detectCores()}.  To use fewer cores, specify a number
-less than the number of cores on your machine.}
+\item{n.cores}{integer number of cores to use when computing the Bayes 
+Factor estimates for the full permutation testing 
+ framework.  Defaults to the number of cores returned by 
+ \code{parallel::detectCores()}.  To use fewer cores, specify a number
+ less than the number of cores on your machine.}
 
-\item{parallelBy}{For the permutation test (if invoked), the manner in which to parallelize.  The default option
-is \code{"Genes"} which will spawn processes that divide up the genes across \code{n.cores} cores, and then loop through the permutations. 
-The alternate option is \code{"Permutations"} which
-loop through each gene and spawn processes that divide up the permutations across \code{n.cores} cores.  
-The default option is recommended when analyzing more genes than the number of permutations.}
+\item{parallelBy}{For the permutation test (if invoked), the manner in 
+which to parallelize.  The default option
+ is \code{"Genes"} which will spawn processes that divide up the genes 
+ across \code{n.cores} cores, and then loop through the permutations. 
+ The alternate option is \code{"Permutations"} which
+ loop through each gene and spawn processes that divide up the permutations 
+ across \code{n.cores} cores.  
+ The default option is recommended when analyzing more genes than the number
+  of permutations.}
 
-\item{condition}{A character object that contains the name of the column in \code{phenoData} that represents 
-the biological group or condition of interest (e.g. treatment versus control).  Note that this variable should only contain two 
-possible values since \code{scDD} can currently only handle two-group comparisons.  The default option assumes that there
-is a column named "condition" that contains this variable.}
+\item{condition}{A character object that contains the name of the column in 
+\code{phenoData} that represents 
+ the biological group or condition of interest (e.g. treatment versus 
+ control).  Note that this variable should only contain two 
+ possible values since \code{scDD} can currently only handle two-group 
+ comparisons.  The default option assumes that there
+ is a column named "condition" that contains this variable.}
 
-\item{min.size}{a positive integer that specifies the minimum size of a cluster (number of cells) for it to be used
-during the classification step.  Any clusters containing fewer than \code{min.size} cells will be considered an outlier
-cluster and ignored in the classfication algorithm.  The default value is three.}
+\item{min.size}{a positive integer that specifies the minimum size of a 
+cluster (number of cells) for it to be used
+ during the classification step.  Any clusters containing fewer than 
+ \code{min.size} cells will be considered an outlier
+ cluster and ignored in the classfication algorithm.  The default value
+  is three.}
 }
 \value{
-List with four items: the first is a data frame with nine columns: gene name (matches rownames of SCdat), permutation p-value for testing of independence of 
- condition membership with clustering, Benjamini-Hochberg adjusted version of the previous column, p-value for test of difference in dropout rate (only for non-DD genes), 
+List with four items: the first is a data frame with nine columns: 
+gene name (matches rownames of SCdat), permutation p-value for testing of 
+independence of 
+ condition membership with clustering, Benjamini-Hochberg adjusted version 
+ of the previous column, p-value for test of difference in dropout rate
+  (only for non-DD genes), 
  Benjamini-Hochberg adjusted version of the previous column, name of the 
- DD (DE, DP, DM, DB) pattern or DZ (otherwise NS = not significant), the number of clusters identified overall, the number of clusters identified in 
- condition 1 alone, and the number of clusters identified in condition 2 alone. The remaining three elements are data frames (first for condition 1 and 2 combined, 
- then condition 1 alone, then condition 2 alone) that contains the cluster memberships for each sample (cluster 1,2,3,...) in columns and
- genes in rows.  Zeroes, which are not involved in the clustering, are labeled as zero.
+ DD (DE, DP, DM, DB) pattern or DZ (otherwise NS = not significant), the 
+ number of clusters identified overall, the number of clusters identified in 
+ condition 1 alone, and the number of clusters identified in condition 
+ 2 alone. The remaining three elements are data frames (first for condition
+  1 and 2 combined, 
+ then condition 1 alone, then condition 2 alone) that contains the cluster
+  memberships for each sample (cluster 1,2,3,...) in columns and
+ genes in rows.  Zeroes, which are not involved in the clustering, are
+  labeled as zero.
 }
 \description{
 Find genes with differential distributions (DD) across two conditions
 }
 \details{
-Find genes with differential distributions (DD) across two conditions.  Models each log-transformed gene as a Dirichlet 
-  Process Mixture of normals and uses a permutation test to determine whether condition membership is independent of sample clustering.
-  The FDR adjusted (Benjamini-Hochberg) permutation p-value is returned along with the classification of each significant gene 
-  (with p-value less than 0.05 (or 0.025 if also testing for a difference in the proportion of zeroes)) into one of four categories 
-  (DE, DP, DM, DB).  For genes that do not show significant influence, of condition on clustering, an optional test of whether the 
-  proportion of zeroes (dropout rate) is different across conditions is performed (DZ).
+Find genes with differential distributions (DD) across two 
+conditions.  Models each log-transformed gene as a Dirichlet 
+  Process Mixture of normals and uses a permutation test to determine 
+  whether condition membership is independent of sample clustering.
+  The FDR adjusted (Benjamini-Hochberg) permutation p-value is returned 
+  along with the classification of each significant gene 
+  (with p-value less than 0.05 (or 0.025 if also testing for a difference
+   in the proportion of zeroes)) into one of four categories 
+  (DE, DP, DM, DB).  For genes that do not show significant influence, 
+  of condition on clustering, an optional test of whether the 
+  proportion of zeroes (dropout rate) is different across conditions is 
+  performed (DZ).
 }
 \examples{
  
@@ -95,15 +140,22 @@ prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
 nperms <- 100
 
 
-# call the scDD function to perform permutations, classify DD genes, and return results
-# we won't perform the test for a difference in the proportion of zeroes since none 
-# exists in this simulated toy example data
-# this step will take significantly longer with more genes and/or more permutations
+# call the scDD function to perform permutations, classify DD genes, 
+# and return results
+# we won't perform the test for a difference in the proportion of zeroes  
+# since none exists in this simulated toy example data
+# this step will take significantly longer with more genes and/or 
+# more permutations
 
-RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
+RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, 
+            testZeroes=FALSE)
 }
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. A statistical approach for identifying differential 
+distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+\url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+1077-y}
 }
 

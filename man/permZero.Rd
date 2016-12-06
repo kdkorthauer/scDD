@@ -11,20 +11,27 @@ permZero(m, size, zmat)
 
 \item{size}{Number of samples present in the dataset}
 
-\item{zmat}{Matrix of indicators of whether the original data value is zero or not.  Should contain the 
-same number of rows and columns as original data matrix.}
+\item{zmat}{Matrix of indicators of whether the original data value is 
+zero or not.  Should contain the 
+  same number of rows and columns as original data matrix.}
 }
 \value{
-a list of length 'm' (nperms) where each item is a 'ngenes' by 'size' matrix
+a list of length 'm' (nperms) where each item is a 'ngenes' by 
+'size' matrix
 }
 \description{
 Function to generate random permutations of nonzero values.
 }
 \details{
-Generates random permutations for all genes, where the zeroes are kept fixed (i.e. only permute the nonzero condition labels).
+Generates random permutations for all genes, where the zeroes are 
+kept fixed (i.e. only permute the nonzero condition labels).
 }
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. A statistical approach for identifying differential 
+distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+\url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+1077-y}
 }
 

@@ -7,27 +7,40 @@
 mclustRestricted(y, restrict = TRUE)
 }
 \arguments{
-\item{y}{Numeric vector of values to fit to a normal mixture model with Mclust.}
+\item{y}{Numeric vector of values to fit to a normal mixture model with 
+Mclust.}
 
-\item{restrict}{Logical indicating whether or not to enforce the restriction on cluster separation based on bimodal index
-and ratio of largest to smallest variance (see details).  If False, then Mclust results as is are returned.}
+\item{restrict}{Logical indicating whether or not to enforce the restriction
+on cluster separation based on bimodal index
+ and ratio of largest to smallest variance (see details).  If False, 
+ then Mclust results as is are returned.}
 }
 \value{
-List object with (1) vector of cluster membership, (2) cluster means, (3) cluster variances, (4) number of model parameters,
- (5) sample size, (6) BIC of selected model, and (6) loglikelihood of selected model.
+List object with (1) vector of cluster membership, 
+(2) cluster means, (3) cluster variances, (4) number of model parameters,
+ (5) sample size, (6) BIC of selected model, and 
+ (6) loglikelihood of selected model.
 }
 \description{
 Function to determine how many normal mixture components are present.
 }
 \details{
-Robust to detecting multiple components that are close together by enforcing that the distance between two clusters 
- of appreciable size (at least 4 samples), have sufficiently high bimodal index (cluster mean difference standardized by average
- standard deviation and multiplied by a balance factor which is one when clusters are perfectly balanced) and not have variances
- that differ by more than a ratio of 20. Bimodal index threshold is dependent on sample size to ensure consistent performance
+Robust to detecting multiple components that are close together 
+by enforcing that the distance between two clusters 
+ of appreciable size (at least 4 samples), have sufficiently high bimodal 
+ index (cluster mean difference standardized by average
+ standard deviation and multiplied by a balance factor which is one when 
+ clusters are perfectly balanced) and not have variances
+ that differ by more than a ratio of 20. Bimodal index threshold is 
+ dependent on sample size to ensure consistent performance
  in power and type I error of detection of multiple components.
 }
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. A statistical approach for identifying differential 
+distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222.
+ \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+ 1077-y}
 }
 

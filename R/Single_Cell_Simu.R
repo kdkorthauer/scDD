@@ -6,11 +6,16 @@
 #'
 #' @param Evar Empirical variance
 #' 
-#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+#' Kendziorski C. A statistical approach for identifying differential 
+#' distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+#' \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+#' 1077-y}
 #' 
-#' @return RP Vector of two elements, first contains method of moments estimator for r and second contains 
-#'   method of moments estimator for p (parameters of NB distribution)
+#' @return RP Vector of two elements, first contains method of moments 
+#' estimator for r and second contains 
+#'  method of moments estimator for p (parameters of NB distribution)
 #'   
 
 calcRP <- function(Emean, Evar){
@@ -29,27 +34,37 @@ calcRP <- function(Emean, Evar){
 
 #' calcMV
 #'
-#'  Calculate empirical means and variances of selected genes in a given dataset.
+#'  Calculate empirical means and variances of selected genes in a given 
+#'  dataset.
 #'  
-#' @details Calculate empirical means and variances of selected genes in a given dataset. Optionally, multiply
-#'  the means and standard deviations by a fold change value, which can also vary by mean value.  If the mean is
-#'  below some specified threshold \code{threshold}, use one fold change value \code{FC}.  If above the threshold, use the alternate 
-#'  fold change value \code{FC.thresh}.  Estimates of mean and variance are robust to outliers.
+#' @details Calculate empirical means and variances of selected genes in a 
+#' given dataset. Optionally, multiply
+#'  the means and standard deviations by a fold change value, which can also 
+#'  vary by mean value.  If the mean is
+#'  below some specified threshold \code{threshold}, use one fold change value 
+#'  \code{FC}.  If above the threshold, use the alternate 
+#'  fold change value \code{FC.thresh}.  Estimates of mean and variance are 
+#'  robust to outliers.
 #'
 #' @param a Numeric vector of values to calculate empirical mean and variance.
 #'
-#' @param FC Fold change for the mean and standard deviation.  Default value is 1.
+#' @param FC Fold change for the mean and standard deviation.  Default value 
+#' is 1.
 #' 
-#' @param FC.thresh Alternate fold change for the mean and standard deviation when the (log nonzero) mean is above the value of \code{threshold}.  
+#' @param FC.thresh Alternate fold change for the mean and standard deviation 
+#' when the (log nonzero) mean is above the value of \code{threshold}.  
 #'  Default value is \code{FC}.
 #' 
-#' @param threshold Mean threshold value which dictates which fold change value to use for multiplying mean and standard deviation.
+#' @param threshold Mean threshold value which dictates which fold change value
+#'  to use for multiplying mean and standard deviation.
 #'  Default value is Inf (so \code{FC} is always used).
 #'  
-#' @param include.zeroes Logical value indicating whether the zero values should be included in the calculations of the empirical means 
+#' @param include.zeroes Logical value indicating whether the zero values 
+#' should be included in the calculations of the empirical means 
 #'    and variances.
 #' 
-#' @return MV Vector of two elements, first contains the empirical mean estimate, second contains the empirical variance estimate (optionally 
+#' @return MV Vector of two elements, first contains the empirical mean 
+#' estimate, second contains the empirical variance estimate (optionally 
 #'   multiplied by a fold change).
 #'   
 
@@ -67,7 +82,8 @@ calcMV <- function(a, FC=1, FC.thresh=NA, threshold=Inf, include.zeroes=FALSE){
     MV[1] <- mean(a)*FC
     MV[2] <- var(a)*FC^2
   }else{
-    if (is.na(FC.thresh)){stop("Please specify valid value for alternate fold change FC.thresh!")}
+    if (is.na(FC.thresh)){stop("Please specify valid value for alternate fold 
+                               change FC.thresh!")}
     MV[1] <- mean(a)*FC.thresh
     MV[2] <- var(a)*FC.thresh^2
   }
@@ -76,12 +92,14 @@ calcMV <- function(a, FC=1, FC.thresh=NA, threshold=Inf, include.zeroes=FALSE){
 
 #' singleCellSimu
 #'
-#' Called by \code{\link{simulateSet}} to simulate a specified number of genes from 
+#' Called by \code{\link{simulateSet}} to simulate a specified number of genes 
+#' from 
 #'   one DD category at a time.
 #' 
 #'
 #'
-#' @param Dataset1 Numeric matrix of expression values with genes in rows and samples in columns.
+#' @param Dataset1 Numeric matrix of expression values with genes in rows and 
+#' samples in columns.
 #'
 #' @param Method Type of simulation should choose from "DE" "DP" "DM" "DB"
 #'
@@ -91,44 +109,60 @@ calcMV <- function(a, FC=1, FC.thresh=NA, threshold=Inf, include.zeroes=FALSE){
 #'
 #' @param DP Differetial Proportion vector
 #' 
-#' @param modeFC Vector of values to use for fold changes between modes for DP, DM, and DB.
+#' @param modeFC Vector of values to use for fold changes between modes for DP,
+#'  DM, and DB.
 #'
 #' @param Validation Show Validation plots or not
 #' 
 #' @param numGenes numeric value for the number of genes to simulate
 #'
-#' @param numDE numeric value for the number of genes that will differ between two conditions
+#' @param numDE numeric value for the number of genes that will differ between
+#'  two conditions
 #'  
-#' @param generateZero Specification of how to generate the zero values.  If "\code{empirical}" (default), the
-#'  observed proportion of zeroes in each gene is used for the simuated data, and the nonzeroes are simulated from a 
-#'  truncated negative binomial distribution.  If "\code{simulated}", all values are simulated out of
-#'  a negative binomial distribution, includling the zeroes.  If "\code{constant}", then each gene has a fixed 
+#' @param generateZero Specification of how to generate the zero values.  
+#' If "\code{empirical}" (default), the
+#'  observed proportion of zeroes in each gene is used for the simuated data, 
+#'  and the nonzeroes are simulated from a 
+#'  truncated negative binomial distribution.  If "\code{simulated}", all 
+#'  values are simulated out of
+#'  a negative binomial distribution, includling the zeroes.  
+#'  If "\code{constant}", then each gene has a fixed 
 #'  proportion of zeroes equal to \code{constantZero}.
 #'  
-#' @param constantZero Numeric value between 0 and 1 that indicates the fixed proportion of zeroes for every gene.
+#' @param constantZero Numeric value between 0 and 1 that indicates the fixed 
+#' proportion of zeroes for every gene.
 #'  Ignored if \code{generateZero} method is not equal to "\code{constant}". 
 #' 
-#' @param numSamples numeric value for the number of samples in each condition to simulate
+#' @param numSamples numeric value for the number of samples in each condition 
+#' to simulate
 #' 
-#' @param varInflation Optional numeric vector with one element for each condition that corresponds to the multiplicative 
-#'  variance inflation factor to use when simulating data.  Useful for sensitivity studies to assess the impact of 
-#'  confounding effects on differential variance across conditions. Currently assumes all samples within a 
+#' @param varInflation Optional numeric vector with one element for each 
+#' condition that corresponds to the multiplicative 
+#'  variance inflation factor to use when simulating data.  Useful for 
+#'  sensitivity studies to assess the impact of 
+#'  confounding effects on differential variance across conditions. Currently 
+#'  assumes all samples within a 
 #'  condition are subject to the same variance inflation factor.
 #' 
 #' @importFrom outliers grubbs.test
 #'
-#' @return Simulated_Data A list object where the first element contains a matrix of 
-#' the simulated dataset, the second element contains the DEIndex, and the third 
-#' element contains the fold change (between two conditions for DE, between two modes 
+#' @return Simulated_Data A list object where the first element contains a 
+#' matrix of 
+#' the simulated dataset, the second element contains the DEIndex, and the 
+#' third 
+#' element contains the fold change (between two conditions for DE, between 
+#' two modes 
 #' for DP, DM, and DB).
 
-singleCellSimu <- function(Dataset1, Method, index, FC, modeFC, DP, Validation=FALSE, 
-                             numGenes=1000, numDE=100, numSamples=100, 
-                             generateZero=c("empirical", "simulated", "constant"),
-                             constantZero=NULL, varInflation=NULL){
+singleCellSimu <- function(Dataset1, Method, index, FC, modeFC, DP, 
+                          Validation=FALSE, 
+                          numGenes=1000, numDE=100, numSamples=100, 
+                          generateZero=c("empirical", "simulated", "constant"),
+                          constantZero=NULL, varInflation=NULL){
 if(!is.null(varInflation)){
   if(!length(varInflation)==2){
-    stop("Error: varInflation vector needs to contain one factor for each sample or one factor for each condition")
+    stop("Error: varInflation vector needs to contain one factor for each 
+         sample or one factor for each condition")
   }
 }
     
@@ -140,23 +174,30 @@ samplename <- sort(sample(index,numGenes,replace=TRUE))
 
 FC2 <- rep(1,nrow=numGenes)
 
-f <- sample(c(rep(modeFC, ceiling(numGenes/length(modeFC)))), numGenes, replace=FALSE)
+f <- sample(c(rep(modeFC, ceiling(numGenes/length(modeFC)))), numGenes, 
+            replace=FALSE)
 for(i in 1:numGenes){
   a <- as.numeric(Dataset1[samplename[i],])
   FC2[i] <- exp(f[i]*sqrt(log(1+var(a[a!=0])/mean(a[a!=0])^2)))
 }
 
 ### Calculate means and variances for these genes
-Zeropercent_Base <- as.matrix(apply(Dataset1[samplename,,drop=FALSE], 1, function(a) length(which(a == 0)) / length(a)))           
+Zeropercent_Base <- as.matrix(apply(Dataset1[samplename,,drop=FALSE], 1, 
+                                    function(a) length(which(a == 0)) / 
+                                      length(a)))           
 MV <- matrix(data = 0,nrow = numGenes,ncol = 4)
 if(Method %in%  c("DP", "DM")){
-  MV[,1:2] <- t(sapply(1:length(samplename), function(x) calcMV(Dataset1[samplename[x],], FC=1, FC.thresh=FC2[x]^(-1/2), 
-                                                              threshold = 3, include.zeroes=FALSE)))
-  MV[,3:4] <- t(sapply(1:length(samplename), function(x) calcMV(Dataset1[samplename[x],], FC=1, FC.thresh=FC2[x]^(-1/2), 
-                                                              threshold = 3, include.zeroes=TRUE)))
+  MV[,1:2] <- t(sapply(1:length(samplename), function(x) 
+    calcMV(Dataset1[samplename[x],], FC=1, FC.thresh=FC2[x]^(-1/2), 
+           threshold = 3, include.zeroes=FALSE)))
+  MV[,3:4] <- t(sapply(1:length(samplename), function(x) 
+    calcMV(Dataset1[samplename[x],], FC=1, FC.thresh=FC2[x]^(-1/2), 
+           threshold = 3, include.zeroes=TRUE)))
 }else{
-  MV[,1:2] <- t(sapply(1:length(samplename), function(x) calcMV(Dataset1[samplename[x],], FC=1, include.zeroes=FALSE)))
-  MV[,3:4] <- t(sapply(1:length(samplename), function(x) calcMV(Dataset1[samplename[x],], FC=1, include.zeroes=TRUE)))
+  MV[,1:2] <- t(sapply(1:length(samplename), function(x) 
+    calcMV(Dataset1[samplename[x],], FC=1, include.zeroes=FALSE)))
+  MV[,3:4] <- t(sapply(1:length(samplename), function(x) 
+    calcMV(Dataset1[samplename[x],], FC=1, include.zeroes=TRUE)))
 }
 
 ### Calculate parameter R and P in NB distribution
@@ -168,7 +209,8 @@ if(generateZero %in% c("empirical", "constant")){
   stop("Error: Please specify a valid generateZero method!")
 }
 
-# if inflating the variance factor with varInflation, apply condition 1's factor to this MV matrix
+# if inflating the variance factor with varInflation, apply condition 1's 
+#factor to this MV matrix
 # and calculate the corresponding RP values
 if(!is.null(varInflation)){
   MV.Infl1 <- MV
@@ -178,11 +220,15 @@ if(!is.null(varInflation)){
   MV.Infl2[,c(2,4)] <- MV[,c(2,4)]*varInflation[2] 
   
   if(generateZero %in% c("empirical", "constant")){
-    RP <- cbind(RP, t(apply(MV.Infl1[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
-    RP <- cbind(RP, t(apply(MV.Infl2[,1:2,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
+    RP <- cbind(RP, t(apply(MV.Infl1[,1:2,drop=FALSE], 1, 
+                            function(x) calcRP(x[1], x[2]))))
+    RP <- cbind(RP, t(apply(MV.Infl2[,1:2,drop=FALSE], 1, 
+                            function(x) calcRP(x[1], x[2]))))
   }else if (generateZero == "simulated"){
-    RP <- cbind(RP, t(apply(MV.Infl1[,3:4,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
-    RP <- cbind(RP, t(apply(MV.Infl2[,3:4,drop=FALSE], 1, function(x) calcRP(x[1], x[2]))))
+    RP <- cbind(RP, t(apply(MV.Infl1[,3:4,drop=FALSE], 1, 
+                            function(x) calcRP(x[1], x[2]))))
+    RP <- cbind(RP, t(apply(MV.Infl2[,3:4,drop=FALSE], 1, 
+                            function(x) calcRP(x[1], x[2]))))
   }
 }
 
@@ -205,25 +251,29 @@ EEIndex <- x[!(x%in%DEIndex)]
 
 if(Method=="DE")
 {
-	desim <- simuDE(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC, coeff, RP, modeFC,
-	                         generateZero, constantZero, varInflation)
+	desim <- simuDE(Dataset1, Simulated_Data, DEIndex, samplename, 
+	                Zeropercent_Base, f, FC, coeff, RP, modeFC,
+	                generateZero, constantZero, varInflation)
 	Simulated_Data <- desim[[1]]
   DE_FC <- desim[[2]]
 } else if(Method=="DP"){
-  dpsim <- simuDP(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC2, coeff, RP, modeFC, DP,
+  dpsim <- simuDP(Dataset1, Simulated_Data, DEIndex, samplename, 
+                  Zeropercent_Base, f, FC2, coeff, RP, modeFC, DP,
                   generateZero, constantZero, varInflation)
   Simulated_Data <- dpsim[[1]]
   DE_FC <- dpsim[[2]]
 }else if(Method=="DM"){
   
-  dmsim <- simuDM(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC2, coeff, RP, modeFC,
+  dmsim <- simuDM(Dataset1, Simulated_Data, DEIndex, samplename, 
+                  Zeropercent_Base, f, FC2, coeff, RP, modeFC,
                   generateZero, constantZero, varInflation)
   Simulated_Data <- dmsim[[1]]
   DE_FC <- dmsim[[2]]
 }else if(Method=="DB"){
   
-  DBsim <- simuDB(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC2, coeff, RP, modeFC, DP,
-                      generateZero, constantZero, varInflation)
+  DBsim <- simuDB(Dataset1, Simulated_Data, DEIndex, samplename, 
+                  Zeropercent_Base, f, FC2, coeff, RP, modeFC, DP,
+                  generateZero, constantZero, varInflation)
   Simulated_Data <- DBsim[[1]]
   DE_FC <- DBsim[[2]]
 }

@@ -8,16 +8,19 @@ simuDE(Dataset1, Simulated_Data, DEIndex, samplename, Zeropercent_Base, f, FC,
   coeff, RP, modeFC, generateZero, constantZero, varInflation)
 }
 \arguments{
-\item{Dataset1}{Numeric matrix of expression values with genes in rows and samples in columns.}
+\item{Dataset1}{Numeric matrix of expression values with genes in rows and 
+samples in columns.}
 
-\item{Simulated_Data}{Required input empty matrix to provide structure information of 
-output matrix with simulated data}
+\item{Simulated_Data}{Required input empty matrix to provide structure 
+information of 
+ output matrix with simulated data}
 
 \item{DEIndex}{Index for DE genes}
 
 \item{samplename}{The name for genes that chosen for simulation}
 
-\item{Zeropercent_Base}{Zero percentage for corresponding gene expression values}
+\item{Zeropercent_Base}{Zero percentage for corresponding gene 
+expression values}
 
 \item{f}{Fold change values (number of SDs) for each gene}
 
@@ -27,21 +30,30 @@ output matrix with simulated data}
 
 \item{RP}{matrix for NB parameters for genes in samplename}
 
-\item{modeFC}{Vector of values to use for fold changes between modes for DP, DM, and DB.}
+\item{modeFC}{Vector of values to use for fold changes between modes for DP,
+DM, and DB.}
 
-\item{generateZero}{Specification of how to generate the zero values.  If "\code{empirical}" (default), the
-observed proportion of zeroes in each gene is used for the simuated data, and the nonzeroes are simulated from a 
-truncated negative binomial distribution.  If "\code{simulated}", all values are simulated out of
-a negative binomial distribution, includling the zeroes.  If "\code{constant}", then each gene has a fixed 
-proportion of zeroes equal to \code{constantZero}.}
+\item{generateZero}{Specification of how to generate the zero values.
+If "\code{empirical}" (default), the
+ observed proportion of zeroes in each gene is used for the simuated data, 
+ and the nonzeroes are simulated from a 
+ truncated negative binomial distribution.  If "\code{simulated}", all 
+ values are simulated out of
+ a negative binomial distribution, includling the zeroes.  
+ If "\code{constant}", then each gene has a fixed 
+ proportion of zeroes equal to \code{constantZero}.}
 
-\item{constantZero}{Numeric value between 0 and 1 that indicates the fixed proportion of zeroes for every gene.
-Ignored if \code{generateZero} method is not equal to "\code{constant}".}
+\item{constantZero}{Numeric value between 0 and 1 that indicates the fixed 
+proportion of zeroes for every gene.
+ Ignored if \code{generateZero} method is not equal to "\code{constant}".}
 
-\item{varInflation}{Optional numeric vector with one element for each condition that corresponds to the multiplicative 
-variance inflation factor to use when simulating data.  Useful for sensitivity studies to assess the impact of 
-confounding effects on differential variance across conditions. Currently assumes all samples within a 
-condition are subject to the same variance inflation factor.}
+\item{varInflation}{Optional numeric vector with one element for each 
+condition that corresponds to the multiplicative 
+ variance inflation factor to use when simulating data.  Useful for 
+ sensitivity studies to assess the impact of 
+ confounding effects on differential variance across conditions. Currently 
+ assumes all samples within a 
+ condition are subject to the same variance inflation factor.}
 }
 \value{
 Simulated_Data Simulated dataset for DE
@@ -50,11 +62,17 @@ Simulated_Data Simulated dataset for DE
 Simulation for Classic Differentially Expressed Case.
 }
 \details{
-Method called by main function \code{\link{singleCellSimu}} to simulate genes 
- that have different means in each condition. Not intended to be called directly by user.
+Method called by main function \code{\link{singleCellSimu}} to 
+simulate genes 
+ that have different means in each condition. Not intended to be called 
+ directly by user.
 }
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. A statistical approach for identifying differential 
+distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+\url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+1077-y}
 }
 

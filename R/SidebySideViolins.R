@@ -7,23 +7,35 @@
 #'
 #' @param cond Vector of condition labels corresponding to elements of \code{x}.
 #' 
-#' @param MAP List of MAP partition estimates with conditions as list items and samples as elements 
-#'  (integer indicating which cluster each observation belongs to; zeroes belong to cluster 1)
+#' @param MAP List of MAP partition estimates with conditions as list items and
+#'  samples as elements 
+#'  (integer indicating which cluster each observation belongs to; zeroes 
+#'  belong to cluster 1)
 #'
-#' @param logT Logical that indicates whether to take the log(x+1) transformation.
+#' @param logT Logical that indicates whether to take the log(x+1)
+#'  transformation.
 #' 
-#' @param title.gene Character vector that contains the gene name that you are plotting.
+#' @param title.gene Character vector that contains the gene name
+#'  that you are plotting.
 #' 
-#' @param conditionLabels Character vector containing the names of the two conditions.
+#' @param conditionLabels Character vector containing the names of
+#'  the two conditions.
 #' 
-#' @param axes.titles Logical indicating whether or not to include axes labels on plots.  
+#' @param axes.titles Logical indicating whether or not to include
+#'  axes labels on plots.  
+#'  
+#' @return ggplot object
 #' 
 #' @export
 #' 
 #' @import ggplot2
 #'
-#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+#' Kendziorski C. A statistical approach for identifying differential 
+#' distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+#' \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+#' 1077-y}
 #'
 #' @examples 
 #' 
@@ -32,43 +44,51 @@
 #' data(scDatExSim)
 #' 
 #' 
-#' # load Biobase package to facilitate subset operations on ExpressionSet class objects
+#' # load Biobase package to facilitate subset operations on ExpressionSet
+#' # class objects
 #' 
 #' library(Biobase)
 #' 
 #' 
 #' # plot side by side violin plots for Gene 1 (DE)
 #' 
-#' sideViolin(exprs(scDatExSim)[1,], scDatExSim$condition, title.gene=featureNames(scDatExSim)[1])
+#' sideViolin(exprs(scDatExSim)[1,], scDatExSim$condition, 
+#'            title.gene=featureNames(scDatExSim)[1])
 #' 
 #' 
 #' # plot side by side violin plots for Gene 6 (DP)
 #' 
-#' sideViolin(exprs(scDatExSim)[6,], scDatExSim$condition, title.gene=featureNames(scDatExSim)[6])
+#' sideViolin(exprs(scDatExSim)[6,], scDatExSim$condition, 
+#'            title.gene=featureNames(scDatExSim)[6])
 #' 
 #' 
 #' # plot side by side violin plots for Gene 11 (DM)
 #' 
-#' sideViolin(exprs(scDatExSim)[11,], scDatExSim$condition, title.gene=featureNames(scDatExSim)[11])
+#' sideViolin(exprs(scDatExSim)[11,], scDatExSim$condition, 
+#'            title.gene=featureNames(scDatExSim)[11])
 #' 
 #' 
 #' # plot side by side violin plots for Gene 16 (DB)
 #' 
-#' sideViolin(exprs(scDatExSim)[16,], scDatExSim$condition, title.gene=featureNames(scDatExSim)[16])
+#' sideViolin(exprs(scDatExSim)[16,], scDatExSim$condition, 
+#'            title.gene=featureNames(scDatExSim)[16])
 #' 
 #' # plot side by side violin plots for Gene 21 (EP)
 #' 
-#' sideViolin(exprs(scDatExSim)[21,], scDatExSim$condition, title.gene=featureNames(scDatExSim)[21])
+#' sideViolin(exprs(scDatExSim)[21,], scDatExSim$condition, 
+#'            title.gene=featureNames(scDatExSim)[21])
 #' 
 #' 
 #' # plot side by side violin plots for Gene 26 (EE)
 #' 
-#' sideViolin(exprs(scDatExSim)[26,], scDatExSim$condition, title.gene=featureNames(scDatExSim)[26])
+#' sideViolin(exprs(scDatExSim)[26,], scDatExSim$condition, 
+#'            title.gene=featureNames(scDatExSim)[26])
 #' 
 #' 
 
 
-sideViolin <- function(y, cond, MAP=NULL, logT=TRUE, title.gene="", conditionLabels=unique(cond), axes.titles=TRUE){
+sideViolin <- function(y, cond, MAP=NULL, logT=TRUE, title.gene="", 
+                       conditionLabels=unique(cond), axes.titles=TRUE){
   ref <- unique(cond)[1]
   
   shps1 <- shps2 <- c("a", "c", "d", "e", "f")
@@ -102,9 +122,11 @@ sideViolin <- function(y, cond, MAP=NULL, logT=TRUE, title.gene="", conditionLab
   daty <- data.frame(y, cond, shps)
   
   g <- ggplot(daty, aes(factor(cond), y), aes(shape=shps))
-  g + geom_jitter(alpha=0.5, color="black", position = position_jitter(width = 0.15),
+  g + geom_jitter(alpha=0.5, color="black", 
+                  position = position_jitter(width = 0.15),
                       aes(shape=shps), show.legend=FALSE) +
-    geom_violin(data=daty[daty$y>0, ], alpha=0.5, aes(fill=factor(cond)), show.legend=FALSE, scale="count") + 
+    geom_violin(data=daty[daty$y>0, ], alpha=0.5, aes(fill=factor(cond)), 
+                show.legend=FALSE, scale="count") + 
     ggtitle(paste0(title.gene)) +
     theme(plot.title = element_text(size=20, face="bold", vjust=2)) + 
     labs(x="Condition", y="log(EC + 1)") +

@@ -17,15 +17,26 @@ getPosteriorParams(y, mcobj, alpha, m0, s0, a0, b0)
 
 \item{s0}{Prior precision value for generating distribution of cluster means}
 
-\item{a0}{Prior shape parameter value for the generating distribution of cluster precision}
+\item{a0}{Prior shape parameter value for the generating distribution of 
+cluster precision}
 
-\item{b0}{Prior scale parameter value for the generating distribution of cluster precision}
+\item{b0}{Prior scale parameter value for the generating distribution of 
+cluster precision}
+}
+\value{
+A list of posterior parameter values under the DP mixture model 
+framework, given the data and prior parameter values.
 }
 \description{
-Given the observations for a single gene and its clustering information, return the calculated posterior parameters
+Given the observations for a single gene and its clustering information, 
+return the calculated posterior parameters
 }
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. A statistical approach for identifying differential 
+distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+\url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+1077-y}
 }
 

@@ -4,22 +4,30 @@
 #'
 #' @inheritParams singleCellSimu 
 #' 
-#' @param dat Matrix of single-cell RNA-seq data with genes in rows and samples in columns.
+#' @param dat Matrix of single-cell RNA-seq data with genes in rows and samples 
+#' in columns.
 #'
-#' @param condition Vector containing the indicator of which condition each sample 
+#' @param condition Vector containing the indicator of which condition each 
+#' sample 
 #'  (in the columns of \code{dat}) belongs to.
 #' 
 #' @param DEIndex Vector containing the row numbers of the DE genes
 #'
-#' @param inclZero Logical indicating whether to include zero in the test of different distributions
+#' @param inclZero Logical indicating whether to include zero in the test of 
+#' different distributions
 #'
 #' @export 
 #' 
-#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+#' Kendziorski C. A statistical approach for identifying differential 
+#' distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+#' \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+#' 1077-y}
 #'
-#' @return List object containing the significant gene indices, their adjusted p-values, and (if DE genes are supplied)
-#'   the power and fdr.
+#' @return List object containing the significant gene indices, their adjusted 
+#' p-values, and (if DE genes are supplied)
+#' the power and fdr.
 #'   
 #' @examples 
 #' 
@@ -28,7 +36,8 @@
 #' data(scDatExSim)
 #' 
 #' 
-#' #' # load Biobase package to facilitate subset operations on ExpressionSet class objects
+#' # load Biobase package to facilitate subset operations on ExpressionSet 
+#' # class objects
 #' 
 #' library(Biobase)
 #' 
@@ -64,8 +73,10 @@ testKS <- function(dat, condition, inclZero=TRUE, numDE=NULL, DEIndex){
   
   if(!is.null(numDE)){
     power <- sum(sig_genes_ks %in% DEIndex) / numDE
-    fdr <- length(sig_genes_ks[!(sig_genes_ks %in% DEIndex)]) / length(sig_genes_ks)
-    return(list(genes=sig_genes_ks, p=ks.pval, p.unadj=ks.pval.unadj, power=power, fdr=fdr))
+    fdr <- length(sig_genes_ks[!(sig_genes_ks %in% DEIndex)]) / 
+      length(sig_genes_ks)
+    return(list(genes=sig_genes_ks, p=ks.pval, p.unadj=ks.pval.unadj, 
+                power=power, fdr=fdr))
   }
   return(list(genes=sig_genes_ks, p=ks.pval, p.unadj=ks.pval.unadj))
 }

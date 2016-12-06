@@ -7,20 +7,25 @@
 testKS(dat, condition, inclZero = TRUE, numDE = NULL, DEIndex)
 }
 \arguments{
-\item{dat}{Matrix of single-cell RNA-seq data with genes in rows and samples in columns.}
+\item{dat}{Matrix of single-cell RNA-seq data with genes in rows and samples 
+in columns.}
 
-\item{condition}{Vector containing the indicator of which condition each sample 
-(in the columns of \code{dat}) belongs to.}
+\item{condition}{Vector containing the indicator of which condition each 
+sample 
+ (in the columns of \code{dat}) belongs to.}
 
-\item{inclZero}{Logical indicating whether to include zero in the test of different distributions}
+\item{inclZero}{Logical indicating whether to include zero in the test of 
+different distributions}
 
-\item{numDE}{numeric value for the number of genes that will differ between two conditions}
+\item{numDE}{numeric value for the number of genes that will differ between
+two conditions}
 
 \item{DEIndex}{Vector containing the row numbers of the DE genes}
 }
 \value{
-List object containing the significant gene indices, their adjusted p-values, and (if DE genes are supplied)
-  the power and fdr.
+List object containing the significant gene indices, their adjusted 
+p-values, and (if DE genes are supplied)
+the power and fdr.
 }
 \description{
 Function to perform KS test
@@ -32,7 +37,8 @@ Function to perform KS test
 data(scDatExSim)
 
 
-#' # load Biobase package to facilitate subset operations on ExpressionSet class objects
+# load Biobase package to facilitate subset operations on ExpressionSet 
+# class objects
 
 library(Biobase)
 
@@ -48,7 +54,11 @@ RES_KS <- testKS(exprs(scDatExSim), scDatExSim$condition, inclZero=FALSE,
                  numDE=20, DEIndex=1:20)
 }
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. A statistical approach for identifying differential 
+distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+\url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+1077-y}
 }
 

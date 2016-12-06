@@ -8,43 +8,61 @@ findFC(SCdat, index, sd.range = c(1, 3), N = 4, overExpressionProb = 0.5,
   plot.FC = FALSE, condition = "condition")
 }
 \arguments{
-\item{SCdat}{An object of class \code{ExpressionSet} that contains normalized single-cell expression and metadata, where the \code{assayData} 
-slot contains one row for each gene and one sample for each column.  The \code{PhenoData} slot should contain a vector of numeric values
-(either 1 or 2) that indicates which 
-condition each sample belongs to (in the same order as the columns of \code{assayData}).  Optional additional metadata about the 
-experiment can be contained in the \code{experimentData} slot.}
+\item{SCdat}{An object of class \code{ExpressionSet} that contains 
+normalized single-cell expression and metadata, where the \code{assayData} 
+  slot contains one row for each gene and one sample for each column.  
+  The \code{PhenoData} slot should contain a vector of numeric values
+  (either 1 or 2) that indicates which 
+  condition each sample belongs to (in the same order as the columns of 
+  \code{assayData}).  Optional additional metadata about the 
+  experiment can be contained in the \code{experimentData} slot.}
 
 \item{index}{Reasonable set of genes for simulation}
 
-\item{sd.range}{Numeric vector of length two which describes the interval (lower, upper) of standard deviations
+\item{sd.range}{Numeric vector of length two which describes the interval
+(lower, upper) of standard deviations
 of fold changes to randomly select.}
 
-\item{N}{Integer value for the number of bins to divide range of fold changes for calculating standard deviations}
+\item{N}{Integer value for the number of bins to divide range of fold 
+changes for calculating standard deviations}
 
-\item{overExpressionProb}{Numeric value between 0 and 1 which describes the ratio of over to under expression 
-values to sample.}
+\item{overExpressionProb}{Numeric value between 0 and 1 which describes 
+the ratio of over to under expression 
+ values to sample.}
 
-\item{plot.FC}{Logical indicating whether or not to plot the observed and simulated log2 fold changes.}
+\item{plot.FC}{Logical indicating whether or not to plot the observed 
+and simulated log2 fold changes.}
 
-\item{condition}{A character object that contains the name of the column in \code{phenoData} that represents 
-the biological group or condition of interest (e.g. treatment versus control).  Note that this variable should only contain two 
-possible values since \code{scDD} can currently only handle two-group comparisons.  The default option assumes that there
-is a column named "condition" that contains this variable.}
+\item{condition}{A character object that contains the name of the column in 
+\code{phenoData} that represents 
+ the biological group or condition of interest (e.g. treatment versus 
+ control).  Note that this variable should only contain two 
+ possible values since \code{scDD} can currently only handle two-group 
+ comparisons.  The default option assumes that there
+ is a column named "condition" that contains this variable.}
 }
 \value{
 FC.vec Return Fold Change Vectors
 }
 \description{
-Find the appropriate Fold Change vectors for simulation that will be use in classic differential expression case.
+Find the appropriate Fold Change vectors for simulation that will be use in
+ classic differential expression case.
 }
 \details{
-This code is a modified version of Sam Younkin's simulate FC function.  Major things that were changed are 
-  (1) standard deviations are calculated only on the nonzeroes, (2) the sampling of FCs is uniform on the log scale 
-  instead of the raw scale, and (3) the binning is done by quantiles instead of evenly spaced along the average expression
+This code is a modified version of Sam Younkin's simulate FC 
+function.  Major things that were changed are 
+  (1) standard deviations are calculated only on the nonzeroes, (2) the
+   sampling of FCs is uniform on the log scale 
+  instead of the raw scale, and (3) the binning is done by quantiles 
+  instead of evenly spaced along the average expression
   values.
 }
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. A statistical approach for identifying differential 
+distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+\url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+1077-y}
 }
 

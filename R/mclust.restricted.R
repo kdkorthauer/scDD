@@ -2,25 +2,38 @@
 #'
 #' Function to determine how many normal mixture components are present.
 #' 
-#' @details Robust to detecting multiple components that are close together by enforcing that the distance between two clusters 
-#'  of appreciable size (at least 4 samples), have sufficiently high bimodal index (cluster mean difference standardized by average
-#'  standard deviation and multiplied by a balance factor which is one when clusters are perfectly balanced) and not have variances
-#'  that differ by more than a ratio of 20. Bimodal index threshold is dependent on sample size to ensure consistent performance
+#' @details Robust to detecting multiple components that are close together 
+#' by enforcing that the distance between two clusters 
+#'  of appreciable size (at least 4 samples), have sufficiently high bimodal 
+#'  index (cluster mean difference standardized by average
+#'  standard deviation and multiplied by a balance factor which is one when 
+#'  clusters are perfectly balanced) and not have variances
+#'  that differ by more than a ratio of 20. Bimodal index threshold is 
+#'  dependent on sample size to ensure consistent performance
 #'  in power and type I error of detection of multiple components. 
 #' 
-#' @param y Numeric vector of values to fit to a normal mixture model with Mclust.
+#' @param y Numeric vector of values to fit to a normal mixture model with 
+#' Mclust.
 #' 
-#' @param restrict Logical indicating whether or not to enforce the restriction on cluster separation based on bimodal index
-#'   and ratio of largest to smallest variance (see details).  If False, then Mclust results as is are returned.
+#' @param restrict Logical indicating whether or not to enforce the restriction
+#'  on cluster separation based on bimodal index
+#'   and ratio of largest to smallest variance (see details).  If False, 
+#'   then Mclust results as is are returned.
 #'   
 #' @importFrom mclust Mclust
 #' 
-#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+#' Kendziorski C. A statistical approach for identifying differential 
+#' distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222.
+#'  \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+#'  1077-y}
 #' 
-#' @return List object with (1) vector of cluster membership, (2) cluster means, (3) cluster variances, (4) number of model parameters,
-#'  (5) sample size, (6) BIC of selected model, and (6) loglikelihood of selected model. 
-#' @export
+#' @return List object with (1) vector of cluster membership, 
+#' (2) cluster means, (3) cluster variances, (4) number of model parameters,
+#'  (5) sample size, (6) BIC of selected model, and 
+#'  (6) loglikelihood of selected model. 
+#' 
 
 
 
@@ -35,7 +48,8 @@ mclustRestricted <- function(y, restrict=TRUE){
   comps <- mc$G
   
   if(comps > length(unique(cl))){
-    mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=1:(comps-1)))
+    mc <- suppressWarnings(Mclust(y, warn=FALSE, 
+                                  modelNames=c("V"), G=1:(comps-1)))
     cl <- mc$classification
     comps <- mc$G
   }
@@ -56,7 +70,8 @@ mclustRestricted <- function(y, restrict=TRUE){
       
       max.cl <- which.max(mc$parameters$variance$sigmasq)
       min.cl <- which.min(mc$parameters$variance$sigmasq)
-      vardiff <- mc$parameters$variance$sigmasq[max.cl] / mc$parameters$variance$sigmasq[min.cl]
+      vardiff <- mc$parameters$variance$sigmasq[max.cl] / 
+        mc$parameters$variance$sigmasq[min.cl]
       nmin <- table(cl)[min.cl]
       mincat <- min(table(cl))
       tries <- 0	
@@ -87,13 +102,15 @@ mclustRestricted <- function(y, restrict=TRUE){
       }
       
       err <- 0
-      # enforce that clusters have to be have sufficient bimodal index - if not, decrease possible components by 1 and refit
+      # enforce that clusters have to be have sufficient bimodal index -
+      # if not, decrease possible components by 1 and refit
       while( (min(meandiff) < remThresh | (vardiff > 20)) & mincat>2 
              & tries <=4 & sum(is.na(mc$class))==0 & err==0){
          err <- 0
         comps_old <- comps
         comps <- comps-1 
-        mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=1:comps))
+        mc <- suppressWarnings(Mclust(y, warn=FALSE, 
+                                      modelNames=c("V"), G=1:comps))
         cl <- mc$classification
         comps <- mc$G
         mincat <- min(table(cl))
@@ -107,7 +124,8 @@ mclustRestricted <- function(y, restrict=TRUE){
           
           max.cl <- which.max(mc$parameters$variance$sigmasq)
           min.cl <- which.min(mc$parameters$variance$sigmasq)
-          vardiff <- mc$parameters$variance$sigmasq[max.cl] / mc$parameters$variance$sigmasq[min.cl]
+          vardiff <- mc$parameters$variance$sigmasq[max.cl] / 
+            mc$parameters$variance$sigmasq[min.cl]
           nmin <- table(cl)[min.cl]
         }else{
           meandiff <- 10
@@ -148,7 +166,8 @@ mclustRestricted <- function(y, restrict=TRUE){
         # if fit resulted in any errors, revert to previous fit
         if (err == 1){
           comps <- comps+1 
-          mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=1:comps))
+          mc <- suppressWarnings(Mclust(y, warn=FALSE, 
+                                        modelNames=c("V"), G=1:comps))
           cl <- mc$classification
           comps <- mc$G
         }
@@ -167,7 +186,8 @@ mclustRestricted <- function(y, restrict=TRUE){
         
         max.cl <- which.max(mc$parameters$variance$sigmasq)
         min.cl <- which.min(mc$parameters$variance$sigmasq)
-        vardiff <- mc$parameters$variance$sigmasq[max.cl] / mc$parameters$variance$sigmasq[min.cl]
+        vardiff <- mc$parameters$variance$sigmasq[max.cl] / 
+          mc$parameters$variance$sigmasq[min.cl]
         nmin <- table(cl)[min.cl]
         mincat <- min(table(cl))
         tries <- 0	
@@ -176,12 +196,14 @@ mclustRestricted <- function(y, restrict=TRUE){
         meandiff <- meandiff*balance
         
         if(!((min(meandiff) > addThresh & (vardiff < 10)) & mincat>2)){
-          mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=comps_old))
+          mc <- suppressWarnings(Mclust(y, warn=FALSE, 
+                                        modelNames=c("V"), G=comps_old))
           cl <- mc$classification
           comps <- mc$G
         }
       }else{ # couldn't fit requested model; revert to previous fit
-        mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=comps_old))
+        mc <- suppressWarnings(Mclust(y, warn=FALSE, 
+                                      modelNames=c("V"), G=comps_old))
         cl <- mc$classification
         comps <- mc$G
       }
@@ -198,6 +220,8 @@ mclustRestricted <- function(y, restrict=TRUE){
       cl2[cl==i] <- as.numeric(nms.clust[i])
     }
   }
-  return(list(class=cl2, mean=mc$parameters$mean[clust.order], var=mc$parameters$variance$sigmasq[clust.order], 
-              df=mc$df, n=mc$n, bic=mc$bic, loglik=mc$loglik, model=mc$modelName))
+  return(list(class=cl2, mean=mc$parameters$mean[clust.order], 
+              var=mc$parameters$variance$sigmasq[clust.order], 
+              df=mc$df, n=mc$n, bic=mc$bic, loglik=mc$loglik, 
+              model=mc$modelName))
 }

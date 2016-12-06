@@ -2,7 +2,8 @@
 #'
 #' Function to obtain the normalized joint posterior of the data and partition. 
 #' 
-#' @details Calculates the normalized joint posterior of the data and partition under the Product Partition Model formulation
+#' @details Calculates the normalized joint posterior of the data and partition
+#'  under the Product Partition Model formulation
 #'   of the Dirichlet Process Mixture model.
 #' 
 #' @param y Numeric data vector for one gene (log-transformed non-zeroes)
@@ -15,12 +16,18 @@
 #' 
 #' @param s0 Prior precision value for generating distribution of cluster means
 #' 
-#' @param a0 Prior shape parameter value for the generating distribution of cluster precision
+#' @param a0 Prior shape parameter value for the generating distribution of 
+#' cluster precision
 #' 
-#' @param b0 Prior scale parameter value for the generating distribution of cluster precision
+#' @param b0 Prior scale parameter value for the generating distribution of 
+#' cluster precision
 #' 
-#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+#' Kendziorski C. A statistical approach for identifying differential 
+#' distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+#' \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+#' 1077-y}
 #'
 #' @return log joint posterior value
 
@@ -47,9 +54,11 @@ jointPosterior <- function(y, mcobj, alpha, m0, s0, a0, b0){
   # including prior for partition	
   logpost <- 0
   for (k in 1:r){ 
-    logpost <- logpost + lgamma(nk[k]) + lgamma(ak[k]/2) - (ak[k]/2)*log(bk[k]/2) - 0.5*log(sk[k]) 
+    logpost <- logpost + lgamma(nk[k]) + lgamma(ak[k]/2) - 
+      (ak[k]/2)*log(bk[k]/2) - 0.5*log(sk[k]) 
   }
-  logpost <- logpost + r*log(alpha) + lgamma(alpha) - J*lgamma(a0/2) + (J*a0/2)*log(b0/2) + J*0.5*log(s0) - (J/2)*log(2*pi)- lgamma(alpha + J)
+  logpost <- logpost + r*log(alpha) + lgamma(alpha) - J*lgamma(a0/2) + 
+    (J*a0/2)*log(b0/2) + J*0.5*log(s0) - (J/2)*log(2*pi)- lgamma(alpha + J)
   
   return(logpost)
 }

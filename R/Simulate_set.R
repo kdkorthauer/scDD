@@ -1,6 +1,7 @@
 #' simulateSet
 #'
-#' Simulation of a complete dataset, where the number of each type of differential distributions and equivalent distributions is specified.
+#' Simulation of a complete dataset, where the number of each type of 
+#' differential distributions and equivalent distributions is specified.
 #'
 #' @inheritParams singleCellSimu
 #' 
@@ -20,11 +21,14 @@
 #' 
 #' @param nEP Number of EP genes to simulate
 #' 
-#' @param plots Logical indicating whether or not to generate fold change and validation plots
+#' @param plots Logical indicating whether or not to generate fold change and 
+#' validation plots
 #' 
-#' @param random.seed Numeric value for a call to \code{set.seed} for reproducibility.
+#' @param random.seed Numeric value for a call to \code{set.seed} for 
+#' reproducibility.
 #' 
-#' @param plot.file Character containing the file string if the plots are to be sent to a pdf instead of to the standard output.
+#' @param plot.file Character containing the file string if the plots are to be
+#'  sent to a pdf instead of to the standard output.
 #' 
 #' @inheritParams singleCellSimu
 #' 
@@ -34,14 +38,23 @@
 #' 
 #' @import Biobase 
 #'
-#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+#' Kendziorski C. A statistical approach for identifying differential 
+#' distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+#' \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+#' 1077-y}
 #'
-#' @return A named list of two items: the first (labeled 'Simulated_Data') is a matrix of simulated 
-#'   data with \code{numSamples} columns and \code{nDE + nDP + nDM + nDB + nEE + nEP} rows 
-#'   (total number of genes).  The second item (named 'FC') is a vector of the number of standard 
-#'   deviations used for fold changes. For DE genes, this value is computed from the sampled fold
-#'   changes obtained from \code{\link{findFC}}.  For DP, DM, DB, and EP genes, this is one of the 
+#' @return A named list of two items: the first (labeled 'Simulated_Data') is a
+#'  matrix of simulated 
+#'   data with \code{numSamples} columns and \code{nDE + nDP + nDM + nDB + nEE
+#'    + nEP} rows 
+#'   (total number of genes).  The second item (named 'FC') is a vector of the
+#'    number of standard 
+#'   deviations used for fold changes. For DE genes, this value is computed 
+#'   from the sampled fold
+#'   changes obtained from \code{\link{findFC}}.  For DP, DM, DB, and EP genes,
+#'    this is one of the 
 #'   values in \code{modeFC}.  For EE genes, this value is \code{NA}.
 #' 
 #' @examples 
@@ -72,27 +85,34 @@
 #' seed <- 816
 #' 
 #' 
-#' # create simulated set with specified numbers of DE, DP, DM, DM, EE, and EP genes,
+#' # create simulated set with specified numbers of DE, DP, DM, DM, EE, and 
+#' # EP genes,
 #' # specified number of samples, DE genes are 2 standard deviations apart, and 
 #' # multimodal genes have modal distance of 4 standard deviations
 #' 
-#' SD <- simulateSet(scDatEx, numSamples=numSamples, nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB, 
-#'                   nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE, 
+#' SD <- simulateSet(scDatEx, numSamples=numSamples, nDE=nDE, nDP=nDP, nDM=nDM,
+#'                   nDB=nDB, nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, 
+#'                   plots=FALSE, 
 #'                   random.seed=seed)
 #'                   
 #'                   
-#' # convert the simulated data object returned by simulateSet into an ExpressionSet object
+#' # convert the simulated data object returned by simulateSet into an 
+#' # ExpressionSet object
 #' 
-#' library(Biobase)   # needed to create and instance of the ExpressionSet class
+#' library(Biobase)   # needed to create an instance of the ExpressionSet class
 #' condition <- c(rep(1, numSamples), rep(2, numSamples))
 #' rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
-#' colnames(SD[[1]]) <- names(condition) <- paste0("Sample", 1:ncol(SD[[1]]), sep="")
+#' colnames(SD[[1]]) <- names(condition) <- paste0("Sample", 
+#'                                                 1:ncol(SD[[1]]), sep="")
 #' SDExpressionSet <- ExpressionSet(assayData=SD[[1]], 
-#'                      phenoData=as(data.frame(condition), "AnnotatedDataFrame"))
+#'                      phenoData=as(data.frame(condition), 
+#'                      "AnnotatedDataFrame"))
 
 
-simulateSet <- function(SCdat, numSamples=100, nDE=250, nDP=250, nDM=250, nDB=250, 
-                         nEE=5000, nEP=4000, sd.range=c(1,3), modeFC=c(2,3,4), plots=TRUE, plot.file=NULL, random.seed=284,
+simulateSet <- function(SCdat, numSamples=100, 
+                         nDE=250, nDP=250, nDM=250, nDB=250, 
+                         nEE=5000, nEP=4000, sd.range=c(1,3), modeFC=c(2,3,4), 
+                         plots=TRUE, plot.file=NULL, random.seed=284,
                          varInflation=NULL, condition="condition"){
 if(!is.null(plot.file)){
   pdf(file=paste0(plot.file))
@@ -104,7 +124,8 @@ ref <- unique(phenoData(SCdat)[[condition]])[1]
 message("Identifying a set of genes to simulate from...")  
 index <- findIndex(SCdat, condition)
 message("Simulating DE fold changes...")  
-FC <- findFC(SCdat, index, sd.range=sd.range, N=6, overExpressionProb = 0.5, plot.FC=plots, condition)
+FC <- findFC(SCdat, index, sd.range=sd.range, N=6, overExpressionProb = 0.5, 
+             plot.FC=plots, condition)
 
 constantZero <- NULL
 generateZero <- "empirical"
@@ -122,7 +143,8 @@ fcs <- NULL
 
 ### DE
 if (nDE > 0){
-  SD1 <- singleCellSimu(Dataset1, Method = "DE", index, FC, modeFC, Validation = FALSE, numGenes=nDE, numDE=nDE,
+  SD1 <- singleCellSimu(Dataset1, Method = "DE", index, FC, modeFC, 
+                        Validation = FALSE, numGenes=nDE, numDE=nDE,
                         numSamples=numSamples, generateZero=generateZero,
                         constantZero=constantZero, varInflation)
   Simulated_Data <- SD1[[1]]
@@ -135,9 +157,11 @@ if (nDE > 0){
 
 ### DP
 if (nDP > 0){
-  SD2 <- singleCellSimu(Dataset1, Method = "DP", index, FC, modeFC, DP = c(0.33,0.66), Validation = FALSE,
+  SD2 <- singleCellSimu(Dataset1, Method = "DP", index, FC, modeFC, 
+                        DP = c(0.33,0.66), Validation = FALSE,
                         numGenes=nDP, numDE=nDP, numSamples=numSamples,
-                        generateZero=generateZero, constantZero=constantZero, varInflation=varInflation)
+                        generateZero=generateZero, constantZero=constantZero, 
+                        varInflation=varInflation)
   Simulated_Data_DP <- SD2[[1]]
   rnms <- rep("EE", nrow(Simulated_Data_DP))
   rnms[SD2[[2]]] <- "DP"
@@ -148,9 +172,11 @@ if (nDP > 0){
 
 ### DM
 if (nDM > 0){
-  SD3 <- singleCellSimu(Dataset1, Method = "DM", index, FC, modeFC, Validation = FALSE,
+  SD3 <- singleCellSimu(Dataset1, Method = "DM", index, FC, modeFC, 
+                        Validation = FALSE,
                         numGenes=nDM, numDE=nDM, numSamples=numSamples, 
-                        generateZero=generateZero, constantZero=constantZero, varInflation)
+                        generateZero=generateZero, constantZero=constantZero, 
+                        varInflation)
   Simulated_Data_DM <- SD3[[1]]
   rnms <- rep("EE", nrow(Simulated_Data_DM))
   rnms[SD3[[2]]] <- "DM"
@@ -161,9 +187,11 @@ if (nDM > 0){
 
 ### DB
 if (nDB > 0){
-  SD4 <- singleCellSimu(Dataset1, Method = "DB", index, FC, modeFC, DP = c(0.5,0.5), Validation = FALSE,
+  SD4 <- singleCellSimu(Dataset1, Method = "DB", index, FC, modeFC, 
+                        DP = c(0.5,0.5), Validation = FALSE,
                         numGenes=nDB, numDE=nDB, numSamples=numSamples, 
-                        generateZero=generateZero, constantZero=constantZero, varInflation)
+                        generateZero=generateZero, constantZero=constantZero, 
+                        varInflation)
   Simulated_Data_DB <- SD4[[1]]
   rnms <- rep("EE", nrow(Simulated_Data_DB))
   rnms[SD4[[2]]] <- "DB"
@@ -174,9 +202,11 @@ if (nDB > 0){
 
 ### EP
 if (nEP > 0){
-  SD5 <- singleCellSimu(Dataset1, Method = "DP", index, FC, modeFC, DP = c(0.50,0.50), Validation = FALSE,
+  SD5 <- singleCellSimu(Dataset1, Method = "DP", index, FC, modeFC, 
+                        DP = c(0.50,0.50), Validation = FALSE,
                         numGenes=nEP, numDE=0, numSamples=numSamples, 
-                        generateZero=generateZero, constantZero=constantZero, varInflation)
+                        generateZero=generateZero, constantZero=constantZero, 
+                        varInflation)
   Simulated_Data_EP <- SD5[[1]]
   rnms <- rep("EP", nrow(Simulated_Data_EP))
   rnms[SD5[[2]]] <- "DP"
@@ -187,9 +217,11 @@ if (nEP > 0){
 
 ### EE
 if (nEE > 0){
-  SD6<- singleCellSimu(Dataset1, Method = "DE", index, FC, modeFC, Validation = plots, 
+  SD6<- singleCellSimu(Dataset1, Method = "DE", index, FC, modeFC, 
+                       Validation = plots, 
                        numGenes=nEE, numDE=0, numSamples=numSamples, 
-                       generateZero=generateZero, constantZero=constantZero, varInflation=varInflation)
+                       generateZero=generateZero, constantZero=constantZero, 
+                       varInflation=varInflation)
   Simulated_Data_EE <- SD6[[1]]
   rnms <- rep("EE", nrow(Simulated_Data_EE))
   rnms[SD6[[2]]] <- "DE"
@@ -200,7 +232,9 @@ if (nEE > 0){
 }
 
 if (nDE + nDP + nDM + nDB + nEE + nEP == 0){
-  stop("Error: This function simulates gene expression data, but the number of genes to simulate was set to zero.  Please specify a nonzero number of either DE, DP, DM, DB, EE, or EP genes.")
+  stop("Error: This function simulates gene expression data, but the number of
+       genes to simulate was set to zero.  Please specify a nonzero number of 
+       either DE, DP, DM, DB, EE, or EP genes.")
 }
 
 if (!is.null(plot.file)){
@@ -208,12 +242,14 @@ if (!is.null(plot.file)){
 }
 
 # continuity correction
-unifmat <- matrix(runif(nrow(pe_mat)*ncol(pe_mat)), nrow=nrow(pe_mat), ncol=ncol(pe_mat))
+unifmat <- matrix(runif(nrow(pe_mat)*ncol(pe_mat)), nrow=nrow(pe_mat), 
+                  ncol=ncol(pe_mat))
 pe_mat2 <- pe_mat + unifmat
 pe_mat2[pe_mat==0] <- 0
 
 SD <- list(Simulated_Data=pe_mat2, FC=fcs)
-message(paste0("Done! Simulated ", nDE, " DE, ", nDP, " DP, ", nDM, " DM, ", nDB, " DB, ", nEE, " EE, and ", nEP, " EP genes "))
+message(paste0("Done! Simulated ", nDE, " DE, ", nDP, " DP, ", nDM, " DM, ",
+               nDB, " DB, ", nEE, " EE, and ", nEP, " EP genes "))
 return(SD)
 }
 

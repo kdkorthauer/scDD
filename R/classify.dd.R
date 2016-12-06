@@ -1,11 +1,19 @@
 #' getPosteriorParams
 #' 
-#' Given the observations for a single gene and its clustering information, return the calculated posterior parameters
+#' Given the observations for a single gene and its clustering information, 
+#' return the calculated posterior parameters
 #' 
 #' @inheritParams jointPosterior
 #' 
-#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' @return A list of posterior parameter values under the DP mixture model 
+#' framework, given the data and prior parameter values.
+#' 
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+#' Kendziorski C. A statistical approach for identifying differential 
+#' distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+#' \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+#' 1077-y}
 #' 
 
 getPosteriorParams <- function(y, mcobj, alpha, m0, s0, a0, b0){
@@ -30,41 +38,53 @@ getPosteriorParams <- function(y, mcobj, alpha, m0, s0, a0, b0){
 
 #' classifyDD
 #'
-#' Classify significantly DD genes into the four categories (DE, DP, DM or DB) based on posterior distributions of cluster mean parameters
+#' Classify significantly DD genes into the four categories (DE, DP, DM or DB)
+#'  based on posterior distributions of cluster mean parameters
 #'
 #' @inheritParams jointPosterior
 #' 
 #' @inheritParams scDD
 #' 
-#' @param pe_mat Matrix with genes in rows and samples in columns.  Column names 
-#'  indicate condition.
+#' @param pe_mat Matrix with genes in rows and samples in columns.  
+#' Column names indicate condition.
 #'
 #' @param condition Vector of condition indicators (with two possible values).
 #' 
-#' @param sig_genes Vector of the indices of significantly DD genes (indicating the row
-#'  number of \code{pe_mat})
+#' @param sig_genes Vector of the indices of significantly DD genes 
+#' (indicating the row number of \code{pe_mat})
 #'  
-#' @param oa List item with one item for each gene where the first element contains the cluster membership for 
+#' @param oa List item with one item for each gene where the first element 
+#' contains the cluster membership for 
 #'  each nonzero sample in the overall (pooled) fit.
 #'
-#' @param c1 List item with one item for each gene where the first element contains the cluster membership for 
+#' @param c1 List item with one item for each gene where the first element 
+#' contains the cluster membership for 
 #'  each nonzero sample in condition 1 only fit
 #'  
-#' @param c2 List item with one item for each gene where the first element contains the cluster membership for 
+#' @param c2 List item with one item for each gene where the first element 
+#' contains the cluster membership for 
 #'  each nonzero sample in condition 2 only fit
 #'  
-#' @param log.nonzero Logical indicating whether to perform log transformation of nonzero values.
+#' @param log.nonzero Logical indicating whether to perform log 
+#' transformation of nonzero values.
 #'
-#' @param ref one of two possible values in condition; represents the referent category.
+#' @param ref one of two possible values in condition; 
+#' represents the referent category.
 #' 
-#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+#' Kendziorski C. A statistical approach for identifying differential 
+#' distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+#' \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+#' 1077-y}
 #'
-#' @return cat Character vector of the same length as \code{sig_genes} that indicates which category of 
+#' @return cat Character vector of the same length as \code{sig_genes} that 
+#' indicates which category of 
 #'  DD each significant gene belongs to (DE, DP, DM, DB, or NC (no call))
 #' 
 
-classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, a0, b0, log.nonzero=TRUE, 
+classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, 
+                       alpha, m0, s0, a0, b0, log.nonzero=TRUE, 
                       adjust.perms=FALSE, ref, min.size=3){
     ms <- min.size
     mc.oa <- oa
@@ -123,9 +143,9 @@ classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, 
       if(length(unique(oa[[g]])) != max(oa[[g]])){
         missing.label <- which(! ((1:max(oa[[g]]) %in% unique(oa[[g]])) ))
         new.labels <- oa[[g]]
-        for (l in (missing.label+1):max(oa[[g]])){
+      for (l in (missing.label+1):max(oa[[g]])){
           new.labels[new.labels==l] <- l-1
-        }		
+      }		
         oa[[g]] <- new.labels
         mc.oa[[g]]$class <- oa[[g]]
         mc.oa[[g]]$mean <- mc.oa[[g]]$mean[-missing.label]
@@ -134,8 +154,10 @@ classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, 
       
       
       
-      params.c1 <- getPosteriorParams(y[cond==ref], mc.c1[[g]], alpha, m0, s0, a0, b0)
-      params.c2 <- getPosteriorParams(y[cond!=ref], mc.c2[[g]], alpha, m0, s0, a0, b0)
+      params.c1 <- getPosteriorParams(y[cond==ref], mc.c1[[g]], 
+                                      alpha, m0, s0, a0, b0)
+      params.c2 <- getPosteriorParams(y[cond!=ref], mc.c2[[g]], 
+                                      alpha, m0, s0, a0, b0)
       
       c.c1.no <- findOutliers(c1[[g]], min.size=ms)
       c.c2.no <- findOutliers(c2[[g]], min.size=ms)
@@ -148,10 +170,17 @@ classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, 
       for (a in c.c1.no){
         for (b in c.c2.no){
           
-            samp.diff <- quantile(rt(10000, df=round(params.c1$ak[a]))*sqrt(params.c1$bk[a]/(params.c1$ak[a]*params.c1$sk[a])) + params.c1$mk[a] - 
-                                    rt(10000, df=round(params.c2$ak[b]))*sqrt(params.c2$bk[b]/(params.c2$ak[b]*params.c2$sk[b])) - params.c2$mk[b],
+            samp.diff <- quantile(rt(10000, df=round(params.c1$ak[a]))*
+                                    sqrt(params.c1$bk[a]/
+                                        (params.c1$ak[a]*params.c1$sk[a])) +
+                                    params.c1$mk[a] - 
+                                    rt(10000, df=round(params.c2$ak[b]))*
+                                    sqrt(params.c2$bk[b]/(params.c2$ak[b]*
+                                                        params.c2$sk[b])) 
+                                  - params.c2$mk[b],
                                   c(0, 1))
-            comparisons[t] <- 1*(  (0 < min(samp.diff) & 0 < max(samp.diff)) | (-0 > min(samp.diff) & -0 > max(samp.diff)) )
+            comparisons[t] <- 1*(  (0 < min(samp.diff) & 0 < max(samp.diff)) | 
+                                  (-0 > min(samp.diff) & -0 > max(samp.diff)) )
           
           t <- t+1
         }
@@ -165,15 +194,18 @@ classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, 
               cat[s] <- "NC"
             }
         }else{
-          if (c.oa[s]==c.c1[s]){ # at least two clusters overall, same number within each condition as overall
+          if (c.oa[s]==c.c1[s]){ # at least two clusters overall, same number 
+                                 # within each condition as overall
             if (sum(comparisons)<=c.c1[s]){
               cat[s] <- "DP"
             }else{
               cat[s] <- "NC"
             }
-          }else if(c.oa[s]>c.c1[s]){ # equal number of clusters within each conditon (at least 2) and more than that overall
+          }else if(c.oa[s]>c.c1[s]){ # equal number of clusters within each 
+                              #conditon (at least 2) and more than that overall
             if (sum(comparisons)> c.c1[s]*(c.c1[s]-1)){
-              # Require that the multimodal DE genes show evidence of an overall shift in mean
+              # Require that the multimodal DE genes show 
+              # evidence of an overall shift in mean
               # in addition to having at most one pair of component overlaps
               if(adjust.perms){
                 comparison <- summary(lm(y ~ cdr0 + factor(cond)))$coef[3,4]
@@ -207,16 +239,20 @@ classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2, alpha, m0, s0, 
 
 #' testZeroes
 #' 
-#' Test for a difference in the proportion of zeroes between conditions for a specified set of genes
+#' Test for a difference in the proportion of zeroes between conditions 
+#' for a specified set of genes
 #' 
-#' @details Test for a difference in the proportion of zeroes between conditions that is not explained by the 
+#' @details Test for a difference in the proportion of zeroes between 
+#' conditions that is not explained by the 
 #'   detection rate.  Utilizes Bayesian logistic regression.
 #' 
-#' @param dat Matrix of single cell expression data with genes in rows and samples in columns.  
+#' @param dat Matrix of single cell expression data with genes in rows and 
+#' samples in columns.  
 #' 
 #' @param cond Vector of condition labels
 #' 
-#' @param these vector of row numbers (gene numbers) to test for a difference in the proportion of zeroes.
+#' @param these vector of row numbers (gene numbers) to test for a difference
+#'  in the proportion of zeroes.
 #' 
 #' @return Vector of FDR adjusted p-values
 #' 
@@ -230,7 +266,8 @@ testZeroes <- function(dat, cond, these=1:nrow(dat)){
     y <- dat[these[j],]
     if (sum(y==0) > 0){
       M0 <- arm::bayesglm(y>0 ~ detection, family=binomial(link="logit"))
-      M1 <- arm::bayesglm(y>0 ~ detection + factor(cond), family=binomial(link="logit"))
+      M1 <- arm::bayesglm(y>0 ~ detection + factor(cond), 
+                          family=binomial(link="logit"))
       pval[j] <- anova(M1, M0, test="Chisq")[2,5]
     }
   }
@@ -239,21 +276,28 @@ testZeroes <- function(dat, cond, these=1:nrow(dat)){
 
 #' feDP
 #'
-#' Function to identify additional DP genes, since clustering process can be consistent within each condition 
-#'   and still have differential proportion within each mode.  The Bayes factor score also tends to be small when
-#'   the correct number of clusters is not correctly detected; in that case differential proportion will manifest
+#' Function to identify additional DP genes, since clustering process can be 
+#' consistent within each condition 
+#'   and still have differential proportion within each mode.  
+#'   The Bayes factor score also tends to be small when
+#'   the correct number of clusters is not correctly detected; 
+#'   in that case differential proportion will manifest
 #'   as a mean shift.
 #'   
-#' @details The Fisher's Exact test is used to test for independence of condition membership and clustering when 
-#'   the clustering is the same across conditions as it is overall (and is multimodal). When clustering within 
-#'   condition is not multimodal or is different across conditions (most often the case), an FDR-adjusted t-test
+#' @details The Fisher's Exact test is used to test for independence of 
+#' condition membership and clustering when 
+#'   the clustering is the same across conditions as it is overall 
+#'   (and is multimodal). When clustering within 
+#'   condition is not multimodal or is different across conditions 
+#'   (most often the case), an FDR-adjusted t-test
 #'   is performed to detect overall mean shifts.
 #'
 #' @inheritParams classifyDD
 #' 
 #' @inheritParams scDD
 #'
-#' @return cat Character vector of the same length as \code{sig_genes} that indicates which nonsignificant genes by
+#' @return cat Character vector of the same length as \code{sig_genes} 
+#' that indicates which nonsignificant genes by
 #'  the permutation test belong to the DP category
 #' 
 feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE, 
@@ -298,14 +342,16 @@ feDP <- function(pe_mat, condition, sig_genes, oa, c1, c2, log.nonzero=TRUE,
       pval.ns[s] <- t.test(y~factor(cond))$p.value	
     }
   
-    # check whether clustering process is consistent within each condition as overall
+    # check whether clustering process is consistent within each
+    # condition as overall
     if (c.c1[s]==c.c2[s] & c.c1[s]==c.oa[s] & c.oa[s]>1){
       # non-outlying cluster names
       c.oa.no <- findOutliers(oa[[g]], min.size)
       c.c1.no <- findOutliers(c1[[g]], min.size)
       c.c2.no <- findOutliers(c2[[g]], min.size)
       
-      test <- 1*(fisher.test(table(oa[[g]][oa[[g]] %in% c.oa.no], cond[oa[[g]] %in% c.oa.no]))$p.value < 0.05)
+      test <- 1*(fisher.test(table(oa[[g]][oa[[g]] %in% c.oa.no], 
+                                   cond[oa[[g]] %in% c.oa.no]))$p.value < 0.05)
       if (test==1){
         cat[s] <- "DP"
       }else{

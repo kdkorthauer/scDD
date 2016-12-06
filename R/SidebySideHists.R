@@ -7,12 +7,20 @@
 #'
 #' @param y Second numeric vector of data to plot.
 #'
-#' @param logT Logical that indicates whether to take the log(x+1) transformation.
+#' @param logT Logical that indicates whether to take the log(x+1) 
+#' transformation.
 #' 
-#' @param title.gene Character vector that contains the gene name that you are plotting
+#' @param title.gene Character vector that contains the gene name that you 
+#' are plotting
+#' 
+#' @return NULL (creates a baseR plot)
 #'
-#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+#' Kendziorski C. A statistical approach for identifying differential 
+#' distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+#' \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+#' 1077-y}
 
 sideHist <- function(x, y, logT=TRUE, title.gene=""){
 
@@ -31,7 +39,8 @@ if (logT){
 }
 
 binwidth <- 0.35
-bin.points <- seq(range(c(valsA,valsB))[1]-0.5, range(c(valsA,valsB))[2]+0.5, by=binwidth)
+bin.points <- seq(range(c(valsA,valsB))[1]-0.5, 
+                  range(c(valsA,valsB))[2]+0.5, by=binwidth)
 
 A <- hist(valsA, breaks=bin.points, plot=FALSE)
 B <- hist(valsB, breaks=bin.points, plot=FALSE)
@@ -41,12 +50,17 @@ gcol <- ggplotColours(2)
 densrange <-  c(-max(c(B$density, A$density)), max(c(A$density, B$density)))
 
 plot(NULL, type = "n", xlim = densrange,
-     ylim = c(range(c(A$breaks, B$breaks))), ylab="log(EC + 1)", xlab="density", xaxt="n",
+     ylim = c(range(c(A$breaks, B$breaks))), ylab="log(EC + 1)", 
+     xlab="density", xaxt="n",
      main = paste0("Gene ", title.gene))
 axis(1, at=seq(-2,2,by=0.1), labels=abs(seq(-2,2,by=0.1)))
-rect(0, A$breaks[1:(length(A$breaks) - 1)], A$density, A$breaks[2:length(A$breaks)], col=gcol[1])
-rect(0, B$breaks[1:(length(B$breaks) - 1)], -B$density, B$breaks[2:length(B$breaks)], col=gcol[2])
-lines(density(valsA, adjust=1.25)$y, density(valsA, adjust=1.25)$x, col="darkgrey", lwd=2)
-lines(-density(valsB, adjust=1.25)$y, density(valsB, adjust=1.25)$x, col="darkgrey", lwd=2)
+rect(0, A$breaks[1:(length(A$breaks) - 1)], A$density, 
+     A$breaks[2:length(A$breaks)], col=gcol[1])
+rect(0, B$breaks[1:(length(B$breaks) - 1)], -B$density, 
+     B$breaks[2:length(B$breaks)], col=gcol[2])
+lines(density(valsA, adjust=1.25)$y, 
+      density(valsA, adjust=1.25)$x, col="darkgrey", lwd=2)
+lines(-density(valsB, adjust=1.25)$y, 
+      density(valsB, adjust=1.25)$x, col="darkgrey", lwd=2)
 
 }

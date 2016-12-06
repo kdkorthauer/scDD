@@ -12,16 +12,25 @@ sideViolin(y, cond, MAP = NULL, logT = TRUE, title.gene = "",
 
 \item{cond}{Vector of condition labels corresponding to elements of \code{x}.}
 
-\item{MAP}{List of MAP partition estimates with conditions as list items and samples as elements 
-(integer indicating which cluster each observation belongs to; zeroes belong to cluster 1)}
+\item{MAP}{List of MAP partition estimates with conditions as list items and
+samples as elements 
+(integer indicating which cluster each observation belongs to; zeroes 
+belong to cluster 1)}
 
-\item{logT}{Logical that indicates whether to take the log(x+1) transformation.}
+\item{logT}{Logical that indicates whether to take the log(x+1)
+transformation.}
 
-\item{title.gene}{Character vector that contains the gene name that you are plotting.}
+\item{title.gene}{Character vector that contains the gene name
+that you are plotting.}
 
-\item{conditionLabels}{Character vector containing the names of the two conditions.}
+\item{conditionLabels}{Character vector containing the names of
+the two conditions.}
 
-\item{axes.titles}{Logical indicating whether or not to include axes labels on plots.}
+\item{axes.titles}{Logical indicating whether or not to include
+axes labels on plots.}
+}
+\value{
+ggplot object
 }
 \description{
 Plots two histograms side by side with smoothed density overlay
@@ -33,43 +42,54 @@ Plots two histograms side by side with smoothed density overlay
 data(scDatExSim)
 
 
-# load Biobase package to facilitate subset operations on ExpressionSet class objects
+# load Biobase package to facilitate subset operations on ExpressionSet
+# class objects
 
 library(Biobase)
 
 
 # plot side by side violin plots for Gene 1 (DE)
 
-sideViolin(exprs(scDatExSim)[1,], scDatExSim$condition, title.gene=featureNames(scDatExSim)[1])
+sideViolin(exprs(scDatExSim)[1,], scDatExSim$condition, 
+           title.gene=featureNames(scDatExSim)[1])
 
 
 # plot side by side violin plots for Gene 6 (DP)
 
-sideViolin(exprs(scDatExSim)[6,], scDatExSim$condition, title.gene=featureNames(scDatExSim)[6])
+sideViolin(exprs(scDatExSim)[6,], scDatExSim$condition, 
+           title.gene=featureNames(scDatExSim)[6])
 
 
 # plot side by side violin plots for Gene 11 (DM)
 
-sideViolin(exprs(scDatExSim)[11,], scDatExSim$condition, title.gene=featureNames(scDatExSim)[11])
+sideViolin(exprs(scDatExSim)[11,], scDatExSim$condition, 
+           title.gene=featureNames(scDatExSim)[11])
 
 
 # plot side by side violin plots for Gene 16 (DB)
 
-sideViolin(exprs(scDatExSim)[16,], scDatExSim$condition, title.gene=featureNames(scDatExSim)[16])
+sideViolin(exprs(scDatExSim)[16,], scDatExSim$condition, 
+           title.gene=featureNames(scDatExSim)[16])
 
 # plot side by side violin plots for Gene 21 (EP)
 
-sideViolin(exprs(scDatExSim)[21,], scDatExSim$condition, title.gene=featureNames(scDatExSim)[21])
+sideViolin(exprs(scDatExSim)[21,], scDatExSim$condition, 
+           title.gene=featureNames(scDatExSim)[21])
 
 
 # plot side by side violin plots for Gene 26 (EE)
 
-sideViolin(exprs(scDatExSim)[26,], scDatExSim$condition, title.gene=featureNames(scDatExSim)[26])
+sideViolin(exprs(scDatExSim)[26,], scDatExSim$condition, 
+           title.gene=featureNames(scDatExSim)[26])
 
 
 }
 \references{
-Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
-in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. A statistical approach for identifying differential 
+distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
+\url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
+1077-y}
 }
 
