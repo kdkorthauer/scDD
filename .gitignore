@@ -2,9 +2,6 @@
 .Rhistory
 .RData
 scDD.Rproj
-*.Rproj
-.gitignore
-.Rbuildignore
 vignettes/DD.pdf
 vignettes/plotGrid-1.pdf
 vignettes/*.bbl
