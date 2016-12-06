@@ -1,8 +1,8 @@
 Package: scDD
-Version: 1.2.0
+Version: 1.3.0
 Date: 2016-09-30
-Title: Mixture modeling of single-cell RNA-seq data to indentify genes with
-    differential distributions
+Title: Mixture modeling of single-cell RNA-seq data to indentify genes
+        with differential distributions
 Description: This package implements a method to analyze single-cell RNA-
     seq Data utilizing flexible Dirichlet Process mixture models. Genes with
     differential distributions of expression are classified into several interesting
@@ -12,18 +12,10 @@ Description: This package implements a method to analyze single-cell RNA-
 Author: Keegan Korthauer
 Maintainer: Keegan Korthauer <keegan@jimmy.harvard.edu>
 NeedsCompilation: yes
-Imports:
-    fields,
-    mclust,
-    BiocParallel,
-    outliers,
-    ggplot2,
-    EBSeq,
-    arm,
-    Biobase
-Suggests:
-    BiocStyle,
-    knitr,
-    gridExtra
+Imports: fields, mclust, BiocParallel, outliers, ggplot2, EBSeq, arm,
+        Biobase
+Suggests: BiocStyle, knitr, gridExtra
 License: GPL-2
 RoxygenNote: 5.0.1
+Packaged: 2016-12-06 17:26:49 UTC; keegankorthauer
+biocViews: Bayesian, Clustering, RNASeq, SingleCell, MultipleComparison, Visualization
