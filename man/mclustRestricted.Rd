@@ -26,4 +26,8 @@ Robust to detecting multiple components that are close together by enforcing tha
  that differ by more than a ratio of 20. Bimodal index threshold is dependent on sample size to ensure consistent performance
  in power and type I error of detection of multiple components.
 }
+\references{
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+}
 

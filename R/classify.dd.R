@@ -4,6 +4,9 @@
 #' 
 #' @inheritParams jointPosterior
 #' 
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' 
 
 getPosteriorParams <- function(y, mcobj, alpha, m0, s0, a0, b0){
   
@@ -53,6 +56,9 @@ getPosteriorParams <- function(y, mcobj, alpha, m0, s0, a0, b0){
 #' @param log.nonzero Logical indicating whether to perform log transformation of nonzero values.
 #'
 #' @param ref one of two possible values in condition; represents the referent category.
+#' 
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
 #'
 #' @return cat Character vector of the same length as \code{sig_genes} that indicates which category of 
 #'  DD each significant gene belongs to (DE, DP, DM, DB, or NC (no call))

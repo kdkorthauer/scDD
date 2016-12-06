@@ -21,4 +21,8 @@ Find the clusters that are considered outliers
 Function to obtain a count of the number of clusters that is robust to outliers.  Requires at least \code{min.size} samples to be considered
  in the robust count.
 }
+\references{
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+}
 

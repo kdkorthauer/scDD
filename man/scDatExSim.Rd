@@ -16,7 +16,8 @@ Toy example data in \code{\link[Biobase]{ExpressionSet}} format for 500 genes to
  using \code{\link{simulateSet}}.  Contains 5 genes from each category (DE, DP, DM, DB, EE, and EP).
 }
 \references{
-Simulated from a subset of data from the H1 and DEC comparison in the Korthauer et al. (2015) paper (In preparation).
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
 }
 \keyword{datasets}
 

@@ -15,6 +15,9 @@
 #'   
 #' @importFrom mclust Mclust
 #' 
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#' 
 #' @return List object with (1) vector of cluster membership, (2) cluster means, (3) cluster variances, (4) number of model parameters,
 #'  (5) sample size, (6) BIC of selected model, and (6) loglikelihood of selected model. 
 #' @export

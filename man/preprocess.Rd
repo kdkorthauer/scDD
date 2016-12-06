@@ -63,4 +63,8 @@ pe_mat Processed matrix with genes in rows and samples in columns.  Column names
 Function to preprocess a list of data matrices to (1) combine into one matrix and (2)
  only keep genes with a certain number of nonzero entries.
 }
+\references{
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+}
 

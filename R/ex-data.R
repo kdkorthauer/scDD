@@ -11,10 +11,12 @@
 #'
 #' @format A list of two matrices (one for each of two conditions) labeled "C1" and "C2".  Each matrix contains data for 100 genes
 #'   and a variable number of samples (78 in C1 and 64 in C2).
+#'   
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
 #'
 #' @keywords datasets
 #'
-#' @references Subset of data from the H1 and DEC comparison in the Korthauer et al. (2015) paper (In preparation).
 #'
 NULL
 
@@ -31,12 +33,13 @@ NULL
 #' @usage data(scDatEx)
 #'
 #' @format An object of class \code{\link[Biobase]{ExpressionSet}} containing data for 500 genes for 142 samples
-#'  (78 from condition 1 and 64 from condition 2).  Condition labels (1 or 2) are stored in the phenoData slot.  
+#'  (78 from condition 1 and 64 from condition 2).  Condition labels (1 or 2) are stored in the phenoData slot. 
 #'   
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}   
 #'
 #' @keywords datasets
 #'
-#' @references Subset of data from the H1 and DEC comparison in the Korthauer et al. (2015) paper (In preparation).
 #'
 NULL
 
@@ -57,9 +60,10 @@ NULL
 #'  Row names of the assayData slot contain the two letter category label that the gene was simulated from (e.g.  'EE', 'DB', ...)
 #'  along with the row number (1-30).
 #'   
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
 #'
 #' @keywords datasets
 #'
-#' @references Simulated from a subset of data from the H1 and DEC comparison in the Korthauer et al. (2015) paper (In preparation).
 #'
 NULL

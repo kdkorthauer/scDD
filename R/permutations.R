@@ -25,6 +25,9 @@
 #' @param ref one of two possible values in condition; represents the referent category.
 #' 
 #' @importFrom BiocParallel bplapply
+#' 
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
 #'
 #' @return Bayes factor numerator for the current permutation
 
@@ -112,6 +115,8 @@ permMclustCov <- function(y, nperms, C, condition, remove.zeroes=TRUE, log.trans
 #' 
 #' @importFrom BiocParallel bplapply
 #' 
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
 #'
 #' @return Bayes factor numerator for the current permutation
 
@@ -165,6 +170,9 @@ permMclust <- function(y, nperms, condition, remove.zeroes=TRUE, log.transf=TRUE
 #' @inheritParams permMclustCov
 #' 
 #' @importFrom BiocParallel bplapply
+#' 
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
 #'
 #' @return Bayes factor numerator for the current permutation
 permMclustGene <- function(y, adjust.perms, nperms, condition, remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
@@ -254,6 +262,8 @@ permMclustGene <- function(y, adjust.perms, nperms, condition, remove.zeroes=TRU
 #' @param zmat Matrix of indicators of whether the original data value is zero or not.  Should contain the 
 #'   same number of rows and columns as original data matrix.
 #' 
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
 #'
 #' @return a list of length 'm' (nperms) where each item is a 'ngenes' by 'size' matrix
 

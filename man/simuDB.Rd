@@ -51,4 +51,8 @@ Simulated_Data Simulated dataset for DB
 \description{
 Simulation for Differential "Both" Case - both Differential Modality and Differential Mean
 }
+\references{
+Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+}
 

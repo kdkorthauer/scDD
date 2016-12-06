@@ -34,6 +34,9 @@
 #' 
 #' @import Biobase 
 #'
+#' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, Kendziorski C. A statistical approach for identifying differential distributions
+#' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y}
+#'
 #' @return A named list of two items: the first (labeled 'Simulated_Data') is a matrix of simulated 
 #'   data with \code{numSamples} columns and \code{nDE + nDP + nDM + nDB + nEE + nEP} rows 
 #'   (total number of genes).  The second item (named 'FC') is a vector of the number of standard 
