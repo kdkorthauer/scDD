@@ -62,7 +62,8 @@ $\chi^2$ test of whether the proportion of zero values differs by condition
 
 After the detection step is carried out, the significantly DD genes are 
 classified into four informative patterns based on the number of clusters 
-detected and whether they overlap.  These patterns, depicted in Figure~\ref{DD.pdf},
+detected and whether they overlap.  These patterns, depicted in 
+Figure~\ref{figure/patternPlot-1},
 include (a) DE (differential expression of unimodal genes), (b) DP 
 (differential proportion for multimodal genes), (c) DM (differential modality),
 and (d) DB (both differential modality and different component means).  
@@ -74,7 +75,79 @@ components with similar component means, but differential variance.
 For reasons detailed in \cite{korthauer2016}, we do not aim to interpret this
 type of pattern.
 
-\incfig{DD.pdf}{0.4\textwidth}{Illustration of informative DD patterns}
+
+<<patternPlot, echo=FALSE, fig.show="hide", fig.width=7, fig.height=5>>=
+### Note that the following code can be ignored for the purposes of
+# analysis with scDD; it is simply used to generate the cartoon of 
+# interesting DD patterns (illustration purposes only)
+par(mfrow=c(2,2), tcl=-0.5, mai=c(0.4,0.4,0.5,0.3))
+x <- seq(0, 6, by=0.05)
+
+## traditional de 
+# mu1 is 2 
+# mu2 is 4
+cord.x <- c(0,x,6) 
+cord.y <- c(0,dnorm(x, 2, 0.75),0) 
+curve(dnorm(x, 2 , 0.75),xlim=c(0,6),main="Traditional DE",
+      xaxt="n", xlab="", ylab="", yaxt="n") 
+polygon(cord.x,cord.y,col=rgb(0,0,1,1/4))
+cord.x <- c(0,x,6) 
+cord.y <- c(0,dnorm(x, 4, 0.75),0) 
+lines(x, dnorm(x, 4 , 0.75))
+polygon(cord.x,cord.y,col=rgb(1,0,0,1/4))
+axis(side=1, at=c(2,4), labels=c(expression(mu[1]), expression(mu[2])),
+     pos=0, cex.axis=1.5)
+mtext("(A)", side = 3, line=0.5, adj=-0.1, cex=1.2, font=2)
+
+x <- seq(0, 10, by=0.05)
+## differential proportion
+cord.x <- c(0,x,10) 
+cord.y <- c(0,0.3*dnorm(x, 7, 1) + 0.7*dnorm(x, 3, 1),0) 
+curve(0.3*dnorm(x, 7, 1) + 0.7*dnorm(x, 3, 1),xlim=c(0,10),main="DP",
+      xaxt="n", xlab="", ylab="", yaxt="n") 
+polygon(cord.x,cord.y,col=rgb(0,0,1,1/4))
+cord.x <- c(0,x,10) 
+cord.y <- c(0,0.3*dnorm(x, 3, 1) + 0.7*dnorm(x, 7, 1),0) 
+lines(x, 0.3*dnorm(x, 3, 1) + 0.7*dnorm(x, 7, 1))
+polygon(cord.x,cord.y,col=rgb(1,0,0,1/4))
+axis(side=1, at=c(3,7), labels=c(expression(mu[1]), 
+                                 expression(mu[2])), pos=0, cex.axis=1.5)
+mtext("(B)", side = 3, line=0.5, adj=-0.1, cex=1.2, font=2)
+
+## differential modes (DM)
+cord.x <- c(0,x,6) 
+cord.y <- c(0,dnorm(x, 2, 0.75),0) 
+curve(dnorm(x, 2 , 0.75),xlim=c(0,6),main="DM", xaxt="n", 
+      xlab="", ylab="", yaxt="n") 
+polygon(cord.x,cord.y,col=rgb(0,0,1,1/4))
+cord.x <- c(0,x,6) 
+cord.y <- c(0,0.3*dnorm(x, 2, 0.6) + 0.7*dnorm(x, 4, 0.6),0) 
+lines(x, 0.3*dnorm(x, 2, 0.6) + 0.7*dnorm(x, 4, 0.6))
+polygon(cord.x,cord.y,col=rgb(1,0,0,1/4))
+axis(side=1, at=c(2,4), labels=c(expression(mu[1]), 
+                                 expression(mu[2])), pos=0, cex.axis=1.5)
+mtext("(C)", side = 3, line=0.5, adj=-0.1, cex=1.2, font=2)
+
+## Both DM and DP
+cord.x <- c(0,x,10) 
+cord.y <- c(0,0.5*dnorm(x, 2.5, 1) + 0.5*dnorm(x, 7.5, 1),0) 
+curve(0.5*dnorm(x, 2.5, 1) + 0.5*dnorm(x, 7.5, 1),
+      xlim=c(0,10),main="DB", xaxt="n", xlab="", ylab="", yaxt="n",
+      ylim=c(0,max(0.5*dnorm(x, 2.5, 1) + 0.5*dnorm(x, 7.5, 1)))) 
+polygon(cord.x,cord.y,col=rgb(0,0,1,1/4))
+cord.x <- c(0,x,10) 
+cord.y <- c(0,0.8*dnorm(x, 5, 2),0) 
+lines(x, 0.8*dnorm(x, 5, 2))
+polygon(cord.x,cord.y,col=rgb(1,0,0,1/4))
+axis(side=1, at=c(2.5, 5, 7.5), labels=c(expression(mu[1]), 
+                                         expression(mu[3]), 
+                                         expression(mu[2])), 
+     pos=0, cex.axis=1.5)
+mtext("(D)", side = 3, line=0.5, adj=-0.1, cex=1.2, font=2)
+@
+
+\incfig{figure/patternPlot-1}{0.65\textwidth}
+{Illustration of informative DD patterns}{}
 
 The rest of this vignette outlines the main functionality of the 
 \Rpackage{scDD} package.  This includes:
@@ -457,7 +530,8 @@ The plot objects returned by \Rfunction{sideViolin} are standard
 \Rpackage{ggplot2} objects, and thus can be manipulated into multipanel
 figures with the help of the \Rpackage{gridExtra} or \Rpackage{cowplot} 
 packages. Here we use \Rfunction{grid.arrange} from the \Rpackage{gridExtra}
-package to visualize all the plots generated above.
+package to visualize all the plots generated above. The end result is shown 
+in Figure~\ref{figure/plotGrid-1}.
 
 
 <<plotGrid, fig.show='hide', fig.width=8.5, fig.height=11, message=FALSE>>=
