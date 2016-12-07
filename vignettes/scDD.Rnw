@@ -418,71 +418,54 @@ library(Biobase)
 The following lines will produce the figures in Figure~\ref{figure/plotGrid-1}.
 
 Plot side by side violin plots for Gene 1 (DE):
-<<plot DE, eval=FALSE>>=
-sideViolin(exprs(scDatExSim)[1,], scDatExSim$condition, 
+<<plot DE, eval=TRUE, message=FALSE>>=
+de <- sideViolin(exprs(scDatExSim)[1,], scDatExSim$condition, 
            title.gene=featureNames(scDatExSim)[1])
 @
 
 Plot side by side violin plots for Gene 6 (DP):
-<<plot DP, eval=FALSE>>=
-sideViolin(exprs(scDatExSim)[6,], scDatExSim$condition, 
+<<plot DP, eval=TRUE, message=FALSE>>=
+dp <- sideViolin(exprs(scDatExSim)[6,], scDatExSim$condition, 
            title.gene=featureNames(scDatExSim)[6])
 @
 
 Plot side by side violin plots for Gene 11 (DM):
-<<plot DM, eval=FALSE>>=
-sideViolin(exprs(scDatExSim)[11,], scDatExSim$condition, 
+<<plot DM, eval=TRUE, message=FALSE>>=
+dm <- sideViolin(exprs(scDatExSim)[11,], scDatExSim$condition, 
            title.gene=featureNames(scDatExSim)[11])
 @
 
 Plot side by side violin plots for Gene 16 (DB):
-<<plot DB, eval=FALSE>>=
-sideViolin(exprs(scDatExSim)[16,], scDatExSim$condition, 
+<<plot DB, eval=TRUE, message=FALSE>>=
+db <- sideViolin(exprs(scDatExSim)[16,], scDatExSim$condition, 
            title.gene=featureNames(scDatExSim)[16])
 @
 
 Plot side by side violin plots for Gene 21 (EP):
-<<plot EP, eval=FALSE>>=
-sideViolin(exprs(scDatExSim)[21,], scDatExSim$condition, 
+<<plot EP, eval=TRUE, message=FALSE>>=
+ep <- sideViolin(exprs(scDatExSim)[21,], scDatExSim$condition, 
            title.gene=featureNames(scDatExSim)[21])
 @
 
 Plot side by side violin plots for Gene 26 (EE):
-<<plot EE, eval=FALSE>>=
-sideViolin(exprs(scDatExSim)[26,], scDatExSim$condition, 
-           title.gene=featureNames(scDatExSim)[26])
-@
-
-<<plotGrid, fig.show='hide', echo=FALSE, fig.width=8.5, fig.height=11, message=FALSE, fig.cap="grid">>=
-library(gridExtra)
-# plot side by side violin plots for Gene 1 (DE)
-de <- sideViolin(exprs(scDatExSim)[1,], scDatExSim$condition, 
-                 title.gene=featureNames(scDatExSim)[1])
-# plot side by side violin plots for Gene 6 (DP)
-dp <- sideViolin(exprs(scDatExSim)[6,], scDatExSim$condition, 
-                 title.gene=featureNames(scDatExSim)[6])
-# plot side by side violin plots for Gene 11 (DM)
-dm <- sideViolin(exprs(scDatExSim)[11,], scDatExSim$condition, 
-                 title.gene=featureNames(scDatExSim)[11])
-# plot side by side violin plots for Gene 16 (DB)
-db <- sideViolin(exprs(scDatExSim)[16,], scDatExSim$condition, 
-                 title.gene=featureNames(scDatExSim)[16])
-# plot side by side violin plots for Gene 21 (EP)
-ep <- sideViolin(exprs(scDatExSim)[21,], scDatExSim$condition, 
-                 title.gene=featureNames(scDatExSim)[21])
-# plot side by side violin plots for Gene 26 (EE)
+<<plot EE, eval=TRUE, message=FALSE>>=
 ee <- sideViolin(exprs(scDatExSim)[26,], scDatExSim$condition, 
-                 title.gene=featureNames(scDatExSim)[26])
-
-grid.arrange(de, dp, dm, db, ep, ee, ncol=2)
+           title.gene=featureNames(scDatExSim)[26])
 @
 
 The plot objects returned by \Rfunction{sideViolin} are standard 
 \Rpackage{ggplot2} objects, and thus can be manipulated into multipanel
 figures with the help of the \Rpackage{gridExtra} or \Rpackage{cowplot} 
-packages.
+packages. Here we use \Rfunction{grid.arrange} from the \Rpackage{gridExtra}
+package to visualize all the plots generated above.
 
-\incfig{figure/plotGrid-1}{0.92\textwidth}{Example Simulated DD genes}{grid} 
+
+<<plotGrid, fig.show='hide', fig.width=8.5, fig.height=11, message=FALSE>>=
+library(gridExtra)
+grid.arrange(de, dp, dm, db, ep, ee, ncol=2)
+@
+
+\incfig{figure/plotGrid-1}{0.92\textwidth}{Example Simulated DD genes}{} 
 
 \section{Session Info}
 Here is the output of \Rfunction{sessionInfo} on the system where 
