@@ -19,4 +19,5 @@ text and code in the vignette (without the results it produces) in the raw
 .Rnw file without first installing scDD by clicking [here](https://github.com/kdkorthauer/scDD/blob/master/vignettes/scDD.Rnw).
 
 
-Note: The package was built using R version 3.3.1
+Note: The package was built using the development version of R (3.4.0,
+2016-10-26 r71594)
