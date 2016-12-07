@@ -25,6 +25,9 @@ after installing and loading the package into R.  You can also preview the
 text and code in the vignette (without the results it produces) in the raw
 .Rnw file without first installing scDD by clicking [here](https://github.com/kdkorthauer/scDD/blob/master/vignettes/scDD.Rnw).
 
+Please send bug reports and feature requests by opening a new issue on 
+[this page](https://github.com/kdkorthauer/scDD/issues). 
+
 Please cite the following publication if you use scDD in your work:
 > Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
 Kendziorski C. A statistical approach for identifying differential 
