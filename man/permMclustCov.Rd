@@ -5,7 +5,7 @@
 \title{permMclustCov}
 \usage{
 permMclustCov(y, nperms, C, condition, remove.zeroes = TRUE,
-  log.transf = TRUE, restrict = FALSE, alpha, m0, s0, a0, b0, ref)
+  log.transf = TRUE, restrict = FALSE, alpha, m0, s0, a0, b0, ref, min.size)
 }
 \arguments{
 \item{y}{Numeric data vector for one gene}
@@ -40,6 +40,13 @@ cluster precision}
 
 \item{ref}{one of two possible values in condition; represents the 
 referent category.}
+
+\item{min.size}{a positive integer that specifies the minimum size of a 
+cluster (number of cells) for it to be used
+ during the classification step.  Any clusters containing fewer than 
+ \code{min.size} cells will be considered an outlier
+ cluster and ignored in the classfication algorithm.  The default value
+  is three.}
 }
 \value{
 Bayes factor numerator for the current permutation

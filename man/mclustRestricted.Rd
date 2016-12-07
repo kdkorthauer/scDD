@@ -4,7 +4,7 @@
 \alias{mclustRestricted}
 \title{mclustRestricted}
 \usage{
-mclustRestricted(y, restrict = TRUE)
+mclustRestricted(y, restrict = TRUE, min.size)
 }
 \arguments{
 \item{y}{Numeric vector of values to fit to a normal mixture model with 

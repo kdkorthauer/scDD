@@ -43,7 +43,7 @@
 
 permMclustCov <- function(y, nperms, C, condition, remove.zeroes=TRUE, 
                           log.transf=TRUE, restrict=FALSE, 
-                          alpha, m0, s0, a0, b0, ref){
+                          alpha, m0, s0, a0, b0, ref, min.size){
   orig.y <- y
   
   if(remove.zeroes & log.transf){
@@ -86,9 +86,9 @@ permMclustCov <- function(y, nperms, C, condition, remove.zeroes=TRUE,
       y2 <- y2[y2>0]
     }
     
-    oa <- mclustRestricted(c(y1,y2), restrict=restrict)
-    c1 <- mclustRestricted(y1, restrict=restrict)
-    c2 <- mclustRestricted(y2, restrict=restrict)
+    oa <- mclustRestricted(c(y1,y2), restrict=restrict, min.size=min.size)
+    c1 <- mclustRestricted(y1, restrict=restrict, min.size=min.size)
+    c2 <- mclustRestricted(y2, restrict=restrict, min.size=min.size)
     
     bf.p <- jointPosterior(y1, c1, alpha, m0, s0, a0, b0) + 
       jointPosterior(y2, c2, alpha, m0, s0, a0, b0) -
@@ -146,7 +146,7 @@ permMclustCov <- function(y, nperms, C, condition, remove.zeroes=TRUE,
 
 permMclust <- function(y, nperms, condition, remove.zeroes=TRUE, 
                        log.transf=TRUE, restrict=FALSE, 
-                       alpha, m0, s0, a0, b0, ref){
+                       alpha, m0, s0, a0, b0, ref, min.size){
   
   y.orig <- y
   
@@ -166,8 +166,8 @@ permMclust <- function(y, nperms, condition, remove.zeroes=TRUE,
     y1 <- new.y[cond==ref]
     y2 <- new.y[cond!=ref]
     
-    c1 <- mclustRestricted(y1, restrict=restrict)
-    c2 <- mclustRestricted(y2, restrict=restrict)
+    c1 <- mclustRestricted(y1, restrict=restrict, min.size=min.size)
+    c2 <- mclustRestricted(y2, restrict=restrict, min.size=min.size)
     
     bf.p <- jointPosterior(y1, c1, alpha, m0, s0, a0, b0) + 
       jointPosterior(y2, c2, alpha, m0, s0, a0, b0) 
@@ -210,7 +210,7 @@ permMclust <- function(y, nperms, condition, remove.zeroes=TRUE,
 #' @return Bayes factor numerator for the current permutation
 permMclustGene <- function(y, adjust.perms, nperms, condition, 
                            remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE, 
-                           alpha, m0, s0, a0, b0, C, ref){
+                           alpha, m0, s0, a0, b0, C, ref, min.size){
   orig.y <- y
   
   if(remove.zeroes & log.transf){
@@ -258,9 +258,9 @@ permMclustGene <- function(y, adjust.perms, nperms, condition,
         y2 <- y2[y2>0]
       }
       
-      oa <- mclustRestricted(c(y1,y2), restrict=restrict)
-      c1 <- mclustRestricted(y1, restrict=restrict)
-      c2 <- mclustRestricted(y2, restrict=restrict)
+      oa <- mclustRestricted(c(y1,y2), restrict=restrict, min.size=min.size)
+      c1 <- mclustRestricted(y1, restrict=restrict, min.size=min.size)
+      c2 <- mclustRestricted(y2, restrict=restrict, min.size=min.size)
       
       bf.p[b] <- jointPosterior(y1, c1, alpha, m0, s0, a0, b0) + 
                  jointPosterior(y2, c2, alpha, m0, s0, a0, b0) -
@@ -275,8 +275,8 @@ permMclustGene <- function(y, adjust.perms, nperms, condition,
       y1 <- new.y[cond==ref]
       y2 <- new.y[cond!=ref]
       
-      c1 <- mclustRestricted(y1, restrict=restrict)
-      c2 <- mclustRestricted(y2, restrict=restrict)
+      c1 <- mclustRestricted(y1, restrict=restrict, min.size=min.size)
+      c2 <- mclustRestricted(y2, restrict=restrict, min.size=min.size)
       
       bf.p[b] <- jointPosterior(y1, c1, alpha, m0, s0, a0, b0) + 
                  jointPosterior(y2, c2, alpha, m0, s0, a0, b0) 

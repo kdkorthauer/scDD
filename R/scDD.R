@@ -240,9 +240,9 @@ scDD <- function(SCdat,
       cond0 <- phenoData(SCdat)[[condition]][y>0]
       y <- log(y[y>0])
       
-      oa <- mclustRestricted(y, restrict=TRUE)
-      c1 <- mclustRestricted(y[cond0==ref], restrict=TRUE)
-      c2 <- mclustRestricted(y[cond0!=ref], restrict=TRUE)
+      oa <- mclustRestricted(y, restrict=TRUE, min.size=min.size)
+      c1 <- mclustRestricted(y[cond0==ref], restrict=TRUE, min.size=min.size)
+      c2 <- mclustRestricted(y[cond0!=ref], restrict=TRUE, min.size=min.size)
     
       return(list(
         oa=oa,
@@ -284,9 +284,9 @@ scDD <- function(SCdat,
       cond0 <- phenoData(SCdat)[[condition]][y>0]
       y <- log(y[y>0])
       
-      oa <- mclustRestricted(y, restrict=TRUE)
-      c1 <- mclustRestricted(y[cond0==ref], restrict=TRUE)
-      c2 <- mclustRestricted(y[cond0!=ref], restrict=TRUE)
+      oa <- mclustRestricted(y, restrict=TRUE, min.size=min.size)
+      c1 <- mclustRestricted(y[cond0==ref], restrict=TRUE, min.size=min.size)
+      c2 <- mclustRestricted(y[cond0!=ref], restrict=TRUE, min.size=min.size)
       
       bf <- jointPosterior(y[cond0==ref], c1, alpha, m0, s0, a0, b0) + 
         jointPosterior(y[cond0!=ref], c2, alpha, m0, s0, a0, b0) 
@@ -331,7 +331,8 @@ scDD <- function(SCdat,
                                           permutations, C, 
                                           phenoData(SCdat)[[condition]], 
                                           remove.zeroes=TRUE, 
-                                          log.transf=TRUE, restrict=TRUE, 
+                                          log.transf=TRUE, restrict=TRUE,
+                                          min.size=min.size,
                                           alpha, m0, s0, a0, b0, ref)
             
             if (g%%1000 == 0){
@@ -348,7 +349,8 @@ scDD <- function(SCdat,
             bf.perm[[g]] <- permMclust(exprs(SCdat[tofit[g],]), permutations, 
                                        phenoData(SCdat)[[condition]], 
                                        remove.zeroes=TRUE, log.transf=TRUE, 
-                                       restrict=TRUE, 
+                                       restrict=TRUE,
+                                       min.size=min.size, 
                                        alpha, m0, s0, a0, b0, ref)
             
             if (g%%1000 == 0){
@@ -365,6 +367,7 @@ scDD <- function(SCdat,
               permMclustGene(exprs(SCdat)[tofit[x],], adjust.perms, 
                              permutations, phenoData(SCdat)[[condition]], 
                              remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE,
+                             min.size=min.size,
                              alpha, m0, s0, a0, b0, C, ref))
       }else{stop("Please specify either 'Permutations' or 'Genes' to 
                  parallelize by using the parallelizeBy argument")}

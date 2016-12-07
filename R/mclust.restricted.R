@@ -20,6 +20,12 @@
 #'   and ratio of largest to smallest variance (see details).  If False, 
 #'   then Mclust results as is are returned.
 #'   
+#' @min.size a positive integer that specifies the minimum size of a 
+#' cluster (number of cells) for it to be used
+#'  during the classification step. A clustering with all clusters of 
+#'  size less than \code{min.size} is not valid and clusters will be merged if 
+#'  this happens.
+#'   
 #' @importFrom mclust Mclust
 #' 
 #' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
@@ -37,7 +43,7 @@
 
 
 
-mclustRestricted <- function(y, restrict=TRUE){
+mclustRestricted <- function(y, restrict=TRUE, min.size){
   # add runif(-0.1,0.1) jitter if all y vals are identical
   if (length(unique(y))==1){
     y <- y + runif(length(y), -0.1, 0.1)
@@ -208,6 +214,16 @@ mclustRestricted <- function(y, restrict=TRUE){
         comps <- mc$G
       }
     }
+  }
+  
+  # if more than one cluster, and all clusters have less than min.size,
+  # merge clusters together
+  if (comps > 1 & max(table(cl)) < min.size){
+    comps <- comps-1 
+    mc <- suppressWarnings(Mclust(y, warn=FALSE, 
+                                  modelNames=c("V"), G=1:comps))
+    cl <- mc$classification
+    comps <- mc$G
   }
   
   # enforce clusters to have increasing means
