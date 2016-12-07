@@ -4,7 +4,7 @@ previous versions of the package (including 1.1.0 as used in the [Genome
 Biology publication]
 (https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y), 
 see the 
-[Releases page](https://github.com/kdkorthauer/scDD/releases_)).
+[Releases page](https://github.com/kdkorthauer/scDD/releases)).
 
 To Install:
 
@@ -30,7 +30,6 @@ Please cite the following publication if you use scDD in your work:
 Kendziorski C. A statistical approach for identifying differential 
 distributions in single-cell RNA-seq experiments. Genome Biology. 
 2016 Oct 25;17(1):222. 
-
 [https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y]
 (https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y)
 
