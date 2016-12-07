@@ -15,7 +15,7 @@ citEntry(entry = "Article",
   volume       = "17",
   number       = "1",
   pages        = "222",
-  url          = https://genomebiology.biomedcentral.com/
+  url          = "https://genomebiology.biomedcentral.com/
         articles/10.1186/s13059-016-1077-y.",
 
   textVersion  =
