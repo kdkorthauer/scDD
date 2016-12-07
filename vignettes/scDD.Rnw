@@ -62,7 +62,7 @@ $\chi^2$ test of whether the proportion of zero values differs by condition
 
 After the detection step is carried out, the significantly DD genes are 
 classified into four informative patterns based on the number of clusters 
-detected and whether they overlap.  These patterns, depicted in Figure~\ref{DD},
+detected and whether they overlap.  These patterns, depicted in Figure~\ref{DD.pdf},
 include (a) DE (differential expression of unimodal genes), (b) DP 
 (differential proportion for multimodal genes), (c) DM (differential modality),
 and (d) DB (both differential modality and different component means).  
@@ -74,7 +74,7 @@ components with similar component means, but differential variance.
 For reasons detailed in \cite{korthauer2016}, we do not aim to interpret this
 type of pattern.
 
-\incfig{DD}{0.4\textwidth}{Illustration of informative DD patterns}
+\incfig{DD.pdf}{0.4\textwidth}{Illustration of informative DD patterns}
 
 The rest of this vignette outlines the main functionality of the 
 \Rpackage{scDD} package.  This includes:
