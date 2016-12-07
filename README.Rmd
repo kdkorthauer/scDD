@@ -8,16 +8,16 @@ see the
 
 To Install:
 
-```
+```R
 install.packages("devtools")
 
-devtools::install_github("kdkorthauer/scDD")
+devtools::install_github("kdkorthauer/scDD", build_vignettes = TRUE)
 ```
 
 For examples and tips on using the package, please see the vignette PDF, 
 which you can bring up by typing 
 
-```
+```R
 vignette("scDD"")
 ```
 
