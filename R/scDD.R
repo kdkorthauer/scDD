@@ -188,9 +188,11 @@ scDD <- function(SCdat,
   ref <- unique(phenoData(SCdat)[[condition]])[1]
   
   # check for genes that are all (or almost all) zeroes 
-  tofit <- which((
-           rowSums(exprs(SCdat)[,phenoData(SCdat)[[condition]]==ref]>0) > 1) &
-           (rowSums(exprs(SCdat)[,phenoData(SCdat)[[condition]]!=ref]>0) > 1))
+  tofit <- which(
+           (rowSums(exprs(SCdat)[,phenoData(SCdat)[[condition]]==ref]>0) >= 
+             max(min.size,2)) &
+           (rowSums(exprs(SCdat)[,phenoData(SCdat)[[condition]]!=ref]>0) >= 
+              max(min.size,2)))
   
   if (length(tofit) < nrow(exprs(SCdat))){
     if(testZeroes){
