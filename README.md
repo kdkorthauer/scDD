@@ -1,11 +1,15 @@
 # scDD
-Version 1.2.0 of R Package 'scDD' (Release 2)
+Version 0.99.0 of R Package 'scDD' (for submission to Bioconductor).  To access 
+previous versions of the package, see the 
+[Releases page](https://github.com/kdkorthauer/scDD/releases_).
 
 To Install:
 
+```
 install.packages("devtools")
 
 devtools::install_github("kdkorthauer/scDD")
+```
 
 For examples and tips on using the package, please see the vignette PDF, 
 which you can bring up by typing 
