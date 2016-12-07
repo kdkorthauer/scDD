@@ -20,7 +20,7 @@
 #'   and ratio of largest to smallest variance (see details).  If False, 
 #'   then Mclust results as is are returned.
 #'   
-#' @min.size a positive integer that specifies the minimum size of a 
+#' @param min.size a positive integer that specifies the minimum size of a 
 #' cluster (number of cells) for it to be used
 #'  during the classification step. A clustering with all clusters of 
 #'  size less than \code{min.size} is not valid and clusters will be merged if 

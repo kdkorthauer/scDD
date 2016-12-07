@@ -14,6 +14,12 @@ Mclust.}
 on cluster separation based on bimodal index
  and ratio of largest to smallest variance (see details).  If False, 
  then Mclust results as is are returned.}
+
+\item{min.size}{a positive integer that specifies the minimum size of a 
+cluster (number of cells) for it to be used
+ during the classification step. A clustering with all clusters of 
+ size less than \code{min.size} is not valid and clusters will be merged if 
+ this happens.}
 }
 \value{
 List object with (1) vector of cluster membership, 
