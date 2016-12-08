@@ -1,5 +1,6 @@
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Using scDD}
+%\VignettePackage{scDD}
 
 \documentclass{article}
 \usepackage{underscore}
