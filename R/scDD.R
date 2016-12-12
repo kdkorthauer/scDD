@@ -15,14 +15,19 @@
 #'   proportion of zeroes (dropout rate) is different across conditions is 
 #'   performed (DZ).
 #'   
-#' @param SCdat An object of class \code{ExpressionSet} that contains 
-#' normalized single-cell expression and metadata, where the \code{assayData} 
-#'   slot contains one row for each gene and one sample for each column.  
-#'   The \code{PhenoData} slot should contain a vector of numeric values
-#'   (either 1 or 2) that indicates which 
+#' @param SCdat An object of class \code{SummarizedExperiment} that contains 
+#' normalized single-cell expression and metadata. The \code{assays} 
+#'   slot contains a named list of matrices, where the normalized counts are 
+#'   housed in the one named \code{"NormCounts"}.  This matrix should have one
+#'    row for each gene and one sample for each column.  
+#'   The \code{colData} slot should contain a data.frame with one row per 
+#'   sample and columns that contain metadata for each sample.  This data.frame
+#'   should contain a variable that represents biological condition, which is 
+#'   in the form of numeric values (either 1 or 2) that indicates which 
 #'   condition each sample belongs to (in the same order as the columns of 
-#'   \code{assayData}).  Optional additional metadata about the 
-#'   experiment can be contained in the \code{experimentData} slot.
+#'   \code{NormCounts}).  Optional additional metadata about each cell can also
+#'   be contained in this data.frame, and additional information about the 
+#'   experiment can be contained in the \code{metadata} slot as a list.
 #' 
 #' @param prior_param A list of prior parameter values to be used when modeling
 #'  each gene as a mixture of DP normals.  Default 
@@ -80,7 +85,7 @@
 #'   of permutations.
 #' 
 #' @param condition A character object that contains the name of the column in 
-#' \code{phenoData} that represents 
+#' \code{colData} that represents 
 #'  the biological group or condition of interest (e.g. treatment versus 
 #'  control).  Note that this variable should only contain two 
 #'  possible values since \code{scDD} can currently only handle two-group 
@@ -94,7 +99,11 @@
 #'  cluster and ignored in the classfication algorithm.  The default value
 #'   is three.  
 #' 
-#' @return List with four items: the first is a data frame with nine columns: 
+#' @return A \code{SummarizedExperiment} object that contains the data and 
+#' sample information from the input object, but where the results objects
+#' are now added to the \code{metadata} slot.  The metadata slot is now a
+#' list with four items: the first (main results object) is a data.frame 
+#' with nine columns: 
 #' gene name (matches rownames of SCdat), permutation p-value for testing of 
 #' independence of 
 #'  condition membership with clustering, Benjamini-Hochberg adjusted version 
@@ -104,12 +113,13 @@
 #'  DD (DE, DP, DM, DB) pattern or DZ (otherwise NS = not significant), the 
 #'  number of clusters identified overall, the number of clusters identified in 
 #'  condition 1 alone, and the number of clusters identified in condition 
-#'  2 alone. The remaining three elements are data frames (first for condition
+#'  2 alone. The remaining three elements are matrices (first for condition
 #'   1 and 2 combined, 
 #'  then condition 1 alone, then condition 2 alone) that contains the cluster
 #'   memberships for each sample (cluster 1,2,3,...) in columns and
 #'  genes in rows.  Zeroes, which are not involved in the clustering, are
-#'   labeled as zero.  
+#'   labeled as zero.  See the \code{results} function for a convenient
+#'   way to extract these results objects.
 #'  
 #' @export
 #'
@@ -121,7 +131,7 @@
 #' 
 #' @importFrom parallel detectCores
 #' 
-#' @import Biobase 
+#' @import SummarizedExperiment 
 #' 
 #' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
 #' Kendziorski C. A statistical approach for identifying differential 
@@ -132,12 +142,12 @@
 #'  
 #' @examples 
 #'  
-#' # load toy simulated example ExpressionSet to find DD genes
+#' # load toy simulated example SummarizedExperiment to find DD genes
 #' 
 #' data(scDatExSim)
 #' 
 #' 
-#' # check that this object is a member of the ExpressionSet class
+#' # check that this object is a member of the SummarizedExperiment class
 #' # and that it contains 200 samples and 30 genes
 #' 
 #' class(scDatExSim)
@@ -158,7 +168,7 @@
 #' # this step will take significantly longer with more genes and/or 
 #' # more permutations
 #' 
-#' RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, 
+#' scDatExSim <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, 
 #'             testZeroes=FALSE)
 
 scDD <- function(SCdat, 
@@ -169,9 +179,14 @@ scDD <- function(SCdat,
                  parallelBy=c("Genes", "Permutations"),
                  condition="condition", min.size=3){
   
-  # check whether SCdat is a member of the ExpressionSet class
-  if(!("ExpressionSet" %in% class(SCdat))){
-    stop("Please provide a valid 'ExpressionSet' object.")
+  # check whether SCdat is a member of the SummarizedExperiment class
+  if(!("SummarizedExperiment" %in% class(SCdat))){
+    stop("Please provide a valid 'SummarizedExperiment' object.")
+  }
+  
+  if (is.null(assayNames(SCdat)) || assayNames(SCdat)[1] != "NormCounts") {
+    message("renaming the first element in assays(SCdat) to 'NormCounts'")
+    assayNames(SCdat)[1] <- "NormCounts"
   }
   
   parallelBy <- match.arg(parallelBy)
@@ -184,22 +199,22 @@ scDD <- function(SCdat,
   b0 = prior_param$b0
   
   # check that condition inputs are valid
-  if (length(unique(phenoData(SCdat)[[condition]])) != 2 | 
-      length(phenoData(SCdat)[[condition]]) != ncol(exprs(SCdat))){
+  if (length(unique(colData(SCdat)[[condition]])) != 2 | 
+      length(colData(SCdat)[[condition]]) != ncol(normExprs(SCdat))){
     stop("Error: Please specify valid condition labels.")
   }
   
   # reference category/condition - the first listed one
-  ref <- unique(phenoData(SCdat)[[condition]])[1]
+  ref <- unique(colData(SCdat)[[condition]])[1]
   
   # check for genes that are all (or almost all) zeroes 
   tofit <- which(
-           (rowSums(exprs(SCdat)[,phenoData(SCdat)[[condition]]==ref]>0) >= 
+           (rowSums(normExprs(SCdat)[,colData(SCdat)[[condition]]==ref]>0) >= 
              max(min.size,2)) &
-           (rowSums(exprs(SCdat)[,phenoData(SCdat)[[condition]]!=ref]>0) >= 
+           (rowSums(normExprs(SCdat)[,colData(SCdat)[[condition]]!=ref]>0) >= 
               max(min.size,2)))
   
-  if (length(tofit) < nrow(exprs(SCdat))){
+  if (length(tofit) < nrow(normExprs(SCdat))){
     if(testZeroes){
       message("Notice: There exist genes that are all (or almost all) zero. 
               For genes with 0 or 1 nonzero measurements per condition, 
@@ -213,9 +228,11 @@ scDD <- function(SCdat,
   # check for genes for which all nonzero values are identical within at least 
   # one of the conditions. These will cause problems in model fitting
   skipConstant <- which( 
-                apply(exprs(SCdat)[tofit,phenoData(SCdat)[[condition]]==ref], 1,
+                apply(normExprs(SCdat)[tofit,
+                                       colData(SCdat)[[condition]]==ref], 1,
                                 function(x) length(unique(x[x>0])) == 1) |
-                apply(exprs(SCdat)[tofit,phenoData(SCdat)[[condition]]!=ref], 1,
+                apply(normExprs(SCdat)[tofit,
+                                       colData(SCdat)[[condition]]!=ref], 1,
                                 function(x) length(unique(x[x>0])) == 1) )
   if (length(skipConstant) > 0){
     if(testZeroes){
@@ -235,15 +252,15 @@ scDD <- function(SCdat,
                  param$workers, " cores" ))
   BiocParallel::register(BPPARAM = param)
   
-  oa <- c1 <- c2 <- vector("list", nrow(exprs(SCdat)[tofit,]))
+  oa <- c1 <- c2 <- vector("list", nrow(normExprs(SCdat)[tofit,]))
   bf <- den <- comps.all <- 
-    comps.c1 <- comps.c2 <- rep(NA, nrow(exprs(SCdat)[tofit,]))
+    comps.c1 <- comps.c2 <- rep(NA, nrow(normExprs(SCdat)[tofit,]))
   
   if (permutations == 0){
 
     # function to fit one gene 
     genefit <- function(y){
-      cond0 <- phenoData(SCdat)[[condition]][y>0]
+      cond0 <- colData(SCdat)[[condition]][y>0]
       y <- log(y[y>0])
       
       oa <- mclustRestricted(y, restrict=TRUE, min.size=min.size)
@@ -257,8 +274,8 @@ scDD <- function(SCdat,
       ))
     }
     
-    out <- bplapply(1:nrow(exprs(SCdat)[tofit,]), function(x) 
-      genefit(exprs(SCdat)[tofit[x],]))
+    out <- bplapply(1:nrow(normExprs(SCdat)[tofit,]), function(x) 
+      genefit(normExprs(SCdat)[tofit[x],]))
     oa <- lapply(out, function(x) x[["oa"]])
     c1 <- lapply(out, function(x) x[["c1"]])
     c2 <- lapply(out, function(x) x[["c2"]])
@@ -272,8 +289,8 @@ scDD <- function(SCdat,
             Kolmogorov-Smirnov to test for differences in distributions
             instead of the Bayes Factor permutation test")
     
-    res_ks <- testKS(exprs(SCdat)[tofit,], 
-                     phenoData(SCdat)[[condition]], inclZero=FALSE)
+    res_ks <- testKS(normExprs(SCdat)[tofit,], 
+                     colData(SCdat)[[condition]], inclZero=FALSE)
     
     if (testZeroes){
       sig <- which(res_ks$p < 0.025)
@@ -287,7 +304,7 @@ scDD <- function(SCdat,
 
     # function to fit one gene 
     genefit <- function(y){
-      cond0 <- phenoData(SCdat)[[condition]][y>0]
+      cond0 <- colData(SCdat)[[condition]][y>0]
       y <- log(y[y>0])
       
       oa <- mclustRestricted(y, restrict=TRUE, min.size=min.size)
@@ -306,8 +323,8 @@ scDD <- function(SCdat,
       ))
     }
     
-    out <- bplapply(1:nrow(exprs(SCdat)[tofit,]), function(x) 
-      genefit(exprs(SCdat)[tofit[x],]))
+    out <- bplapply(1:nrow(normExprs(SCdat)[tofit,]), function(x) 
+      genefit(normExprs(SCdat)[tofit[x],]))
     oa <- lapply(out, function(x) x[["oa"]])
     c1 <- lapply(out, function(x) x[["c1"]])
     c2 <- lapply(out, function(x) x[["c2"]])
@@ -324,18 +341,19 @@ scDD <- function(SCdat,
       message("Performing permutations to evaluate independence of clustering
               and condition for each gene")
       message(paste0("Parallelizing by ", parallelBy))
-      bf.perm <- vector("list", nrow(exprs(SCdat)[tofit,]))
-      names(bf.perm) <- rownames(exprs(SCdat)[tofit,])
+      bf.perm <- vector("list", nrow(normExprs(SCdat)[tofit,]))
+      names(bf.perm) <- rownames(normExprs(SCdat)[tofit,])
       
       if(parallelBy=="Permutations"){
         if(adjust.perms){
-          C <- apply(exprs(SCdat)[tofit,], 2, function(x) sum(x>0)/length(x))
+          C <- apply(normExprs(SCdat)[tofit,], 2, 
+                     function(x) sum(x>0)/length(x))
           
           t1 <- proc.time()
-          for (g in 1:nrow(exprs(SCdat)[tofit,])){
-            bf.perm[[g]] <- permMclustCov(exprs(SCdat)[tofit[g],], 
+          for (g in 1:nrow(normExprs(SCdat)[tofit,])){
+            bf.perm[[g]] <- permMclustCov(normExprs(SCdat)[tofit[g],], 
                                           permutations, C, 
-                                          phenoData(SCdat)[[condition]], 
+                                          colData(SCdat)[[condition]], 
                                           remove.zeroes=TRUE, 
                                           log.transf=TRUE, restrict=TRUE,
                                           min.size=min.size,
@@ -351,9 +369,10 @@ scDD <- function(SCdat,
           
         }else{
           t1 <- proc.time()
-          for (g in 1:nrow(exprs(SCdat)[tofit,])){
-            bf.perm[[g]] <- permMclust(exprs(SCdat[tofit[g],]), permutations, 
-                                       phenoData(SCdat)[[condition]], 
+          for (g in 1:nrow(normExprs(SCdat)[tofit,])){
+            bf.perm[[g]] <- permMclust(normExprs(SCdat[tofit[g],]), 
+                                       permutations,
+                                       colData(SCdat)[[condition]], 
                                        remove.zeroes=TRUE, log.transf=TRUE, 
                                        restrict=TRUE,
                                        min.size=min.size, 
@@ -368,10 +387,10 @@ scDD <- function(SCdat,
           }
       }
       }else if(parallelBy=="Genes"){
-        C <- apply(exprs(SCdat)[tofit,], 2, function(x) sum(x>0)/length(x))
-        bf.perm <- bplapply(1:nrow(exprs(SCdat)[tofit,]), function(x) 
-              permMclustGene(exprs(SCdat)[tofit[x],], adjust.perms, 
-                             permutations, phenoData(SCdat)[[condition]], 
+        C <- apply(normExprs(SCdat)[tofit,], 2, function(x) sum(x>0)/length(x))
+        bf.perm <- bplapply(1:nrow(normExprs(SCdat)[tofit,]), function(x) 
+              permMclustGene(normExprs(SCdat)[tofit[x],], adjust.perms, 
+                             permutations, colData(SCdat)[[condition]], 
                              remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE,
                              min.size=min.size,
                              alpha, m0, s0, a0, b0, C, ref))
@@ -379,10 +398,10 @@ scDD <- function(SCdat,
                  parallelize by using the parallelizeBy argument")}
       
       if (adjust.perms){
-        pvals <- sapply(1:nrow(exprs(SCdat)[tofit,]), function(x) 
+        pvals <- sapply(1:nrow(normExprs(SCdat)[tofit,]), function(x) 
           sum( bf.perm[[x]] > bf[x] - den[x] ) )/(permutations)
       }else{
-        pvals <- sapply(1:nrow(exprs(SCdat)[tofit,]), function(x) 
+        pvals <- sapply(1:nrow(normExprs(SCdat)[tofit,]), function(x) 
           sum( bf.perm[[x]] > bf[x]) ) / (permutations)
       }
       
@@ -394,15 +413,15 @@ scDD <- function(SCdat,
   }
   
   message("Classifying significant genes into patterns")
-  dd.cats <- classifyDD(exprs(SCdat)[tofit,], phenoData(SCdat)[[condition]],
+  dd.cats <- classifyDD(normExprs(SCdat)[tofit,], colData(SCdat)[[condition]],
                         sig, oa, c1, c2, alpha=alpha, 
                         m0=m0, s0=s0, a0=a0, b0=b0, 
                         log.nonzero=TRUE, ref=ref, min.size=min.size)
   
-  cats <- rep("NS", nrow(exprs(SCdat)[tofit,]))
+  cats <- rep("NS", nrow(normExprs(SCdat)[tofit,]))
   cats[sig] <- dd.cats
   
-  extraDP <- feDP(exprs(SCdat)[tofit,], phenoData(SCdat)[[condition]], 
+  extraDP <- feDP(normExprs(SCdat)[tofit,], colData(SCdat)[[condition]], 
                   sig, oa, c1, c2, log.nonzero=TRUE,
                   testZeroes=testZeroes, adjust.perms=adjust.perms, 
                   min.size=min.size)
@@ -415,65 +434,75 @@ scDD <- function(SCdat,
   }else{
     NCs <- which(p.adjust(pvals, method="BH") > 0.05 & cats == "NC")
   }
-  NC.cats <- classifyDD(exprs(SCdat)[tofit,], phenoData(SCdat)[[condition]], 
+  NC.cats <- classifyDD(normExprs(SCdat)[tofit,], colData(SCdat)[[condition]],
                         NCs, oa, c1, c2, alpha=alpha, 
                         m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE, 
                         ref=ref, min.size=min.size)
   cats[NCs] <- NC.cats
   
-  cats.all <- pvals.all <- rep(NA, nrow(exprs(SCdat)))
+  cats.all <- pvals.all <- rep(NA, nrow(normExprs(SCdat)))
   cats.all[tofit] <- cats
   pvals.all[tofit] <- pvals
    
   # zero test
   ns <- which(!(cats.all %in% c("DE", "DP", "DM", "DB")))
-  pvals.z <- rep(NA, nrow(exprs(SCdat)))
+  pvals.z <- rep(NA, nrow(normExprs(SCdat)))
   if (testZeroes){
-    ztest <- testZeroes(exprs(SCdat), phenoData(SCdat)[[condition]], ns)
+    ztest <- testZeroes(normExprs(SCdat), colData(SCdat)[[condition]], ns)
     pvals.z[ns] <- ztest
     cats.all[p.adjust(pvals.z, method="BH") < 0.025] <- "DZ"
     cats.all[p.adjust(pvals.z, method="BH") >= 0.025] <- "NS"
   }
   
   # build MAP objects
-  MAP1 <- matrix(1, nrow=nrow(exprs(SCdat)), 
-                 ncol=sum(phenoData(SCdat)[[condition]]==ref))
-  MAP2 <- matrix(1, nrow=nrow(exprs(SCdat)), 
-                 ncol=sum(phenoData(SCdat)[[condition]]!=ref))
-  MAP <- matrix(1, nrow=nrow(exprs(SCdat)), 
-                ncol=ncol(exprs(SCdat)))
-  rownames(MAP1) <- rownames(MAP2) <- rownames(MAP) <- featureNames(SCdat)
-  colnames(MAP1) <- sampleNames(SCdat[,phenoData(SCdat)[[condition]]==ref])
-  colnames(MAP2) <- sampleNames(SCdat[,phenoData(SCdat)[[condition]]!=ref])
-  colnames(MAP) <- sampleNames(SCdat)
-  MAP1[exprs(SCdat)[, phenoData(SCdat)[[condition]]==ref]==0] <- 0
-  MAP2[exprs(SCdat)[, phenoData(SCdat)[[condition]]!=ref]==0] <- 0
-  MAP[exprs(SCdat)==0] <- 0
+  MAP1 <- matrix(1, nrow=nrow(normExprs(SCdat)), 
+                 ncol=sum(colData(SCdat)[[condition]]==ref))
+  MAP2 <- matrix(1, nrow=nrow(normExprs(SCdat)), 
+                 ncol=sum(colData(SCdat)[[condition]]!=ref))
+  MAP <- matrix(1, nrow=nrow(normExprs(SCdat)), 
+                ncol=ncol(normExprs(SCdat)))
+  rownames(MAP1) <- rownames(MAP2) <- rownames(MAP) <- rownames(SCdat)
+  colnames(MAP1) <- colnames(SCdat[,colData(SCdat)[[condition]]==ref])
+  colnames(MAP2) <- colnames(SCdat[,colData(SCdat)[[condition]]!=ref])
+  colnames(MAP) <- colnames(SCdat)
+  MAP1[normExprs(SCdat)[, colData(SCdat)[[condition]]==ref]==0] <- 0
+  MAP2[normExprs(SCdat)[, colData(SCdat)[[condition]]!=ref]==0] <- 0
+  MAP[normExprs(SCdat)==0] <- 0
   
-  for (g in 1:nrow(exprs(SCdat)[tofit,])){
-    MAP1[tofit[g],][exprs(SCdat[tofit[g], 
-                phenoData(SCdat)[[condition]]==ref])!=0] <- c1[[g]]$class + 1 
-    MAP2[tofit[g],][exprs(SCdat[tofit[g], 
-                phenoData(SCdat)[[condition]]!=ref])!=0] <- c2[[g]]$class + 1 
-    MAP[tofit[g],][exprs(SCdat[tofit[g], ])!=0] <- oa[[g]]$class + 1 
+  for (g in 1:nrow(normExprs(SCdat)[tofit,])){
+    MAP1[tofit[g],][normExprs(SCdat[tofit[g], 
+                colData(SCdat)[[condition]]==ref])!=0] <- c1[[g]]$class + 1 
+    MAP2[tofit[g],][normExprs(SCdat[tofit[g], 
+                colData(SCdat)[[condition]]!=ref])!=0] <- c2[[g]]$class + 1 
+    MAP[tofit[g],][normExprs(SCdat[tofit[g], ])!=0] <- oa[[g]]$class + 1 
   }
   
-  comps.all.ALL <- comps.c1.ALL <- comps.c2.ALL <- rep(NA, nrow(exprs(SCdat)))
+  comps.all.ALL <- comps.c1.ALL <- comps.c2.ALL <- rep(NA, 
+                                                       nrow(normExprs(SCdat)))
   comps.all.ALL[tofit] <- comps.all
   comps.c1.ALL[tofit] <- comps.c1
   comps.c2.ALL[tofit] <- comps.c2
   
+  Genes = data.frame(gene=rownames(SCdat), 
+                   nonzero.pvalue=pvals.all,
+                   nonzero.pvalue.adj=p.adjust(pvals.all, method="BH"), 
+                   zero.pvalue=pvals.z, 
+                   zero.pvalue.adj=p.adjust(pvals.z, method="BH"), 
+                   DDcategory=cats.all, 
+                   Clusters.combined=comps.all.ALL, 
+                   Clusters.c1=comps.c1.ALL, 
+                   Clusters.c2=comps.c2.ALL)
+  rownames(Genes) <- rownames(SCdat)
+  
+  # place these results objects in the appropriately named assays()
+  # slots of the SummarizedExperiment object
+  metadata(SCdat)[["Genes"]] <- Genes
+  metadata(SCdat)[["Zhat.combined"]] <- MAP
+  metadata(SCdat)[["Zhat.c1"]] <- MAP1
+  metadata(SCdat)[["Zhat.c2"]] <- MAP2
+  
   # return...
-  return(list(Genes=data.frame(gene=rownames(SCdat), 
-                    nonzero.pvalue=pvals.all,
-                    nonzero.pvalue.adj=p.adjust(pvals.all, method="BH"), 
-                    zero.pvalue=pvals.z, 
-                    zero.pvalue.adj=p.adjust(pvals.z, method="BH"), 
-                    DDcategory=cats.all, 
-                    Clusters.combined=comps.all.ALL, 
-                    Clusters.c1=comps.c1.ALL, 
-                    Clusters.c2=comps.c2.ALL), 
-          Zhat.combined=MAP, Zhat.c1=MAP1, Zhat.c2=MAP2))
+  return(SCdat)
 }
 
 

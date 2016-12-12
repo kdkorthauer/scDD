@@ -10,14 +10,19 @@ scDD(SCdat, prior_param = list(alpha = 0.1, mu0 = 0, s0 = 0.01, a0 = 0.01, b0
   condition = "condition", min.size = 3)
 }
 \arguments{
-\item{SCdat}{An object of class \code{ExpressionSet} that contains 
-normalized single-cell expression and metadata, where the \code{assayData} 
-  slot contains one row for each gene and one sample for each column.  
-  The \code{PhenoData} slot should contain a vector of numeric values
-  (either 1 or 2) that indicates which 
+\item{SCdat}{An object of class \code{SummarizedExperiment} that contains 
+normalized single-cell expression and metadata. The \code{assays} 
+  slot contains a named list of matrices, where the normalized counts are 
+  housed in the one named \code{"NormCounts"}.  This matrix should have one
+   row for each gene and one sample for each column.  
+  The \code{colData} slot should contain a data.frame with one row per 
+  sample and columns that contain metadata for each sample.  This data.frame
+  should contain a variable that represents biological condition, which is 
+  in the form of numeric values (either 1 or 2) that indicates which 
   condition each sample belongs to (in the same order as the columns of 
-  \code{assayData}).  Optional additional metadata about the 
-  experiment can be contained in the \code{experimentData} slot.}
+  \code{NormCounts}).  Optional additional metadata about each cell can also
+  be contained in this data.frame, and additional information about the 
+  experiment can be contained in the \code{metadata} slot as a list.}
 
 \item{prior_param}{A list of prior parameter values to be used when modeling
 each gene as a mixture of DP normals.  Default 
@@ -75,7 +80,7 @@ which to parallelize.  The default option
   of permutations.}
 
 \item{condition}{A character object that contains the name of the column in 
-\code{phenoData} that represents 
+\code{colData} that represents 
  the biological group or condition of interest (e.g. treatment versus 
  control).  Note that this variable should only contain two 
  possible values since \code{scDD} can currently only handle two-group 
@@ -90,7 +95,11 @@ cluster (number of cells) for it to be used
   is three.}
 }
 \value{
-List with four items: the first is a data frame with nine columns: 
+A \code{SummarizedExperiment} object that contains the data and 
+sample information from the input object, but where the results objects
+are now added to the \code{metadata} slot.  The metadata slot is now a
+list with four items: the first (main results object) is a data.frame 
+with nine columns: 
 gene name (matches rownames of SCdat), permutation p-value for testing of 
 independence of 
  condition membership with clustering, Benjamini-Hochberg adjusted version 
@@ -100,12 +109,13 @@ independence of
  DD (DE, DP, DM, DB) pattern or DZ (otherwise NS = not significant), the 
  number of clusters identified overall, the number of clusters identified in 
  condition 1 alone, and the number of clusters identified in condition 
- 2 alone. The remaining three elements are data frames (first for condition
+ 2 alone. The remaining three elements are matrices (first for condition
   1 and 2 combined, 
  then condition 1 alone, then condition 2 alone) that contains the cluster
   memberships for each sample (cluster 1,2,3,...) in columns and
  genes in rows.  Zeroes, which are not involved in the clustering, are
-  labeled as zero.
+  labeled as zero.  See the \code{results} function for a convenient
+  way to extract these results objects.
 }
 \description{
 Find genes with differential distributions (DD) across two conditions
@@ -126,12 +136,12 @@ conditions.  Models each log-transformed gene as a Dirichlet
 }
 \examples{
  
-# load toy simulated example ExpressionSet to find DD genes
+# load toy simulated example SummarizedExperiment to find DD genes
 
 data(scDatExSim)
 
 
-# check that this object is a member of the ExpressionSet class
+# check that this object is a member of the SummarizedExperiment class
 # and that it contains 200 samples and 30 genes
 
 class(scDatExSim)
@@ -152,7 +162,7 @@ nperms <- 100
 # this step will take significantly longer with more genes and/or 
 # more permutations
 
-RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, 
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, 
             testZeroes=FALSE)
 }
 \references{

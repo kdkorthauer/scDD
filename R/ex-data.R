@@ -35,7 +35,7 @@ NULL
 
 #' Data: Toy example data
 #'
-#' Toy example data in \code{\link[Biobase]{ExpressionSet}} format for 500 
+#' Toy example data in \code{SummarizedExperiment} format for 500 
 #' genes to illustrate how to generate simulated data from example data
 #'  using \code{\link{simulateSet}}.  
 #'
@@ -45,10 +45,10 @@ NULL
 #'
 #' @usage data(scDatEx)
 #'
-#' @format An object of class \code{\link[Biobase]{ExpressionSet}} containing
+#' @format An object of class \code{SummarizedExperiment} containing
 #'  data for 500 genes for 142 samples
 #'  (78 from condition 1 and 64 from condition 2).  Condition labels (1 or 2)
-#'   are stored in the phenoData slot. 
+#'   are stored in the colData slot. 
 #' 
 #' @return An RData object, see Format section for details
 #'   
@@ -70,7 +70,7 @@ NULL
 
 #' Data: Toy example of simulated data
 #'
-#' Toy example data in \code{\link[Biobase]{ExpressionSet}} format for 500 
+#' Toy example data in \code{SummarizedExperiment} format for 500 
 #' genes to illustrate how to generate simulated data from example data
 #'  using \code{\link{simulateSet}}.  Contains 5 genes from each category 
 #'  (DE, DP, DM, DB, EE, and EP).
@@ -81,10 +81,10 @@ NULL
 #'
 #' @usage data(scDatExSim)
 #'
-#' @format An object of class \code{\link[Biobase]{ExpressionSet}} containing 
+#' @format An object of class \code{SummarizedExperiment} containing 
 #' data for 30 genes for 200 samples
 #'  (100 from condition 1 and 100 from condition 2).  Condition labels (1 or 2)
-#'   are stored in the phenoData slot.  
+#'   are stored in the colData slot.  
 #'  Row names of the assayData slot contain the two letter category label that
 #'   the gene was simulated from (e.g.  'EE', 'DB', ...)
 #'  along with the row number (1-30).

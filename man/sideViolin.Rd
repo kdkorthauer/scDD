@@ -42,45 +42,44 @@ Plots two histograms side by side with smoothed density overlay
 data(scDatExSim)
 
 
-# load Biobase package to facilitate subset operations on ExpressionSet
-# class objects
+# load SummarizedExperiment package to facilitate subset operations 
 
-library(Biobase)
+library(SummarizedExperiment)
 
 
 # plot side by side violin plots for Gene 1 (DE)
 
-sideViolin(exprs(scDatExSim)[1,], scDatExSim$condition, 
-           title.gene=featureNames(scDatExSim)[1])
+sideViolin(normExprs(scDatExSim)[1,], scDatExSim$condition, 
+           title.gene=rownames(scDatExSim)[1])
 
 
 # plot side by side violin plots for Gene 6 (DP)
 
-sideViolin(exprs(scDatExSim)[6,], scDatExSim$condition, 
-           title.gene=featureNames(scDatExSim)[6])
+sideViolin(normExprs(scDatExSim)[6,], scDatExSim$condition, 
+           title.gene=rownames(scDatExSim)[6])
 
 
 # plot side by side violin plots for Gene 11 (DM)
 
-sideViolin(exprs(scDatExSim)[11,], scDatExSim$condition, 
-           title.gene=featureNames(scDatExSim)[11])
+sideViolin(normExprs(scDatExSim)[11,], scDatExSim$condition, 
+           title.gene=rownames(scDatExSim)[11])
 
 
 # plot side by side violin plots for Gene 16 (DB)
 
-sideViolin(exprs(scDatExSim)[16,], scDatExSim$condition, 
-           title.gene=featureNames(scDatExSim)[16])
+sideViolin(normExprs(scDatExSim)[16,], scDatExSim$condition, 
+           title.gene=rownames(scDatExSim)[16])
 
 # plot side by side violin plots for Gene 21 (EP)
 
-sideViolin(exprs(scDatExSim)[21,], scDatExSim$condition, 
-           title.gene=featureNames(scDatExSim)[21])
+sideViolin(normExprs(scDatExSim)[21,], scDatExSim$condition, 
+           title.gene=rownames(scDatExSim)[21])
 
 
 # plot side by side violin plots for Gene 26 (EE)
 
-sideViolin(exprs(scDatExSim)[26,], scDatExSim$condition, 
-           title.gene=featureNames(scDatExSim)[26])
+sideViolin(normExprs(scDatExSim)[26,], scDatExSim$condition, 
+           title.gene=rownames(scDatExSim)[26])
 
 
 }

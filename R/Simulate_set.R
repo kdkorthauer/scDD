@@ -34,9 +34,10 @@
 #' 
 #' @inheritParams findIndex
 #' 
+#' @import SummarizedExperiment
+#' 
 #' @export
 #' 
-#' @import Biobase 
 #'
 #' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
 #' Kendziorski C. A statistical approach for identifying differential 
@@ -96,17 +97,16 @@
 #'                   random.seed=seed)
 #'                   
 #'                   
-#' # convert the simulated data object returned by simulateSet into an 
-#' # ExpressionSet object
+#' # convert the simulated data object returned by simulateSet into a
+#' # SummarizedExperiment object
 #' 
-#' library(Biobase)   # needed to create an instance of the ExpressionSet class
+#' library(SummarizedExperiment)  
 #' condition <- c(rep(1, numSamples), rep(2, numSamples))
 #' rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
-#' colnames(SD[[1]]) <- names(condition) <- paste0("Sample", 
-#'                                                 1:ncol(SD[[1]]), sep="")
-#' SDExpressionSet <- ExpressionSet(assayData=SD[[1]], 
-#'                      phenoData=as(data.frame(condition), 
-#'                      "AnnotatedDataFrame"))
+#' colnames(SD[[1]]) <- names(condition) <- paste0("Sample",
+#'     1:ncol(SD[[1]]), sep="")
+#' SDSumExp <- SummarizedExperiment(assays=list("NormCounts"=SD[[1]]), 
+#'     colData=data.frame(condition))
 
 
 simulateSet <- function(SCdat, numSamples=100, 
@@ -119,7 +119,7 @@ if(!is.null(plot.file)){
 }
 
 # reference category/condition - the first listed one
-ref <- unique(phenoData(SCdat)[[condition]])[1]  
+ref <- unique(colData(SCdat)[[condition]])[1]  
   
 message("Identifying a set of genes to simulate from...")  
 index <- findIndex(SCdat, condition)
@@ -133,7 +133,7 @@ generateZero <- "empirical"
 message("Simulating individual genes...")
 
 # pull off matrix of expression values for condition 1
-Dataset1 <- exprs(SCdat[,phenoData(SCdat)[[condition]]==ref])
+Dataset1 <- normExprs(SCdat[,colData(SCdat)[[condition]]==ref])
 
 set.seed(random.seed)
 

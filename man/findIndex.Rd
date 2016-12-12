@@ -17,7 +17,7 @@ normalized single-cell expression and metadata, where the \code{assayData}
   experiment can be contained in the \code{experimentData} slot.}
 
 \item{condition}{A character object that contains the name of the column in 
-\code{phenoData} that represents 
+\code{colData} that represents 
  the biological group or condition of interest (e.g. treatment versus 
  control).  Note that this variable should only contain two 
  possible values since \code{scDD} can currently only handle two-group 

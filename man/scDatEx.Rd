@@ -4,10 +4,10 @@
 \name{scDatEx}
 \alias{scDatEx}
 \title{Data: Toy example data}
-\format{An object of class \code{\link[Biobase]{ExpressionSet}} containing
+\format{An object of class \code{SummarizedExperiment} containing
  data for 500 genes for 142 samples
  (78 from condition 1 and 64 from condition 2).  Condition labels (1 or 2)
-  are stored in the phenoData slot.}
+  are stored in the colData slot.}
 \usage{
 data(scDatEx)
 }
@@ -15,7 +15,7 @@ data(scDatEx)
 An RData object, see Format section for details
 }
 \description{
-Toy example data in \code{\link[Biobase]{ExpressionSet}} format for 500 
+Toy example data in \code{SummarizedExperiment} format for 500 
 genes to illustrate how to generate simulated data from example data
  using \code{\link{simulateSet}}.
 }

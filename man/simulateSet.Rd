@@ -10,14 +10,19 @@ simulateSet(SCdat, numSamples = 100, nDE = 250, nDP = 250, nDM = 250,
   varInflation = NULL, condition = "condition")
 }
 \arguments{
-\item{SCdat}{An object of class \code{ExpressionSet} that contains 
-normalized single-cell expression and metadata, where the \code{assayData} 
-  slot contains one row for each gene and one sample for each column.  
-  The \code{PhenoData} slot should contain a vector of numeric values
-  (either 1 or 2) that indicates which 
+\item{SCdat}{An object of class \code{SummarizedExperiment} that contains 
+normalized single-cell expression and metadata. The \code{assays} 
+  slot contains a named list of matrices, where the normalized counts are 
+  housed in the one named \code{"NormCounts"}.  This matrix should have one
+   row for each gene and one sample for each column.  
+  The \code{colData} slot should contain a data.frame with one row per 
+  sample and columns that contain metadata for each sample.  This data.frame
+  should contain a variable that represents biological condition, which is 
+  in the form of numeric values (either 1 or 2) that indicates which 
   condition each sample belongs to (in the same order as the columns of 
-  \code{assayData}).  Optional additional metadata about the 
-  experiment can be contained in the \code{experimentData} slot.}
+  \code{NormCounts}).  Optional additional metadata about each cell can also
+  be contained in this data.frame, and additional information about the 
+  experiment can be contained in the \code{metadata} slot as a list.}
 
 \item{numSamples}{numeric value for the number of samples in each condition 
 to simulate}
@@ -59,7 +64,7 @@ condition that corresponds to the multiplicative
  condition are subject to the same variance inflation factor.}
 
 \item{condition}{A character object that contains the name of the column in 
-\code{phenoData} that represents 
+\code{colData} that represents 
  the biological group or condition of interest (e.g. treatment versus 
  control).  Note that this variable should only contain two 
  possible values since \code{scDD} can currently only handle two-group 
@@ -122,17 +127,16 @@ SD <- simulateSet(scDatEx, numSamples=numSamples, nDE=nDE, nDP=nDP, nDM=nDM,
                   random.seed=seed)
                   
                   
-# convert the simulated data object returned by simulateSet into an 
-# ExpressionSet object
+# convert the simulated data object returned by simulateSet into a
+# SummarizedExperiment object
 
-library(Biobase)   # needed to create an instance of the ExpressionSet class
+library(SummarizedExperiment)  
 condition <- c(rep(1, numSamples), rep(2, numSamples))
 rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
-colnames(SD[[1]]) <- names(condition) <- paste0("Sample", 
-                                                1:ncol(SD[[1]]), sep="")
-SDExpressionSet <- ExpressionSet(assayData=SD[[1]], 
-                     phenoData=as(data.frame(condition), 
-                     "AnnotatedDataFrame"))
+colnames(SD[[1]]) <- names(condition) <- paste0("Sample",
+    1:ncol(SD[[1]]), sep="")
+SDSumExp <- SummarizedExperiment(assays=list("NormCounts"=SD[[1]]), 
+    colData=data.frame(condition))
 }
 \references{
 Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 

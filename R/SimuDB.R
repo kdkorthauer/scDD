@@ -1,4 +1,4 @@
- #' simuDB
+#' simuDB
 #'
 #' Simulation for Differential "Both" Case - both Differential
 #'  Modality and Differential Mean

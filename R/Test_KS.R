@@ -36,10 +36,9 @@
 #' data(scDatExSim)
 #' 
 #' 
-#' # load Biobase package to facilitate subset operations on ExpressionSet 
-#' # class objects
+#' # load SummarizedExperiment package to facilitate subset operations
 #' 
-#' library(Biobase)
+#' library(SummarizedExperiment)
 #' 
 #' 
 #' # check that this object is a member of the ExpressionSet class
@@ -49,7 +48,7 @@
 #' show(scDatExSim)
 #' 
 #' # perform KS test and obtain adjusted p-values
-#' RES_KS <- testKS(exprs(scDatExSim), scDatExSim$condition, inclZero=FALSE,
+#' RES_KS <- testKS(normExprs(scDatExSim), scDatExSim$condition, inclZero=FALSE,
 #'                  numDE=20, DEIndex=1:20)
 
 
