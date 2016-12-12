@@ -12,6 +12,7 @@ Description: This package implements a method to analyze single-cell RNA-
     distributions.
 Author: Keegan Korthauer
 Maintainer: Keegan Korthauer <keegan@jimmy.harvard.edu>
+Depends: R (>= 3.3)
 NeedsCompilation: yes
 Imports: fields, mclust, BiocParallel, outliers, ggplot2, EBSeq, arm,
         Biobase, parallel, grDevices, graphics, stats
