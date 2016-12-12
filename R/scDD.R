@@ -57,20 +57,25 @@
 #'   residuals of a linear model adjusted for 
 #'   detection rate are permuted, and new fitted values are 
 #'   obtained using these residuals.
-#'   
-#' @param n.cores integer number of cores to use when computing the Bayes 
-#' Factor estimates for the full permutation testing 
-#'  framework.  Defaults to the number of cores returned by 
-#'  \code{parallel::detectCores()}.  To use fewer cores, specify a number
-#'  less than the number of cores on your machine.
+#'  
+#' @param param a \code{MulticoreParam} object of the \code{BiocParallel}
+#' package that defines a parallel backend.  The default option is 
+#' \code{BiocParallel::bpparam()} which will automatically create a cluster 
+#' appropriate for 
+#' the operating system.  Alternatively, the user can specify the number
+#' of cores they wish to use by first creating the corresponding 
+#' \code{MulticoreParam} object, and then passing it into the \code{scDD}
+#' function. This could be done to specify a parallel backend with, say 12 
+#' cores by setting \code{param=BiocParallel::MulticoreParam(workers=12)}
 #'  
 #' @param parallelBy For the permutation test (if invoked), the manner in 
 #' which to parallelize.  The default option
 #'  is \code{"Genes"} which will spawn processes that divide up the genes 
-#'  across \code{n.cores} cores, and then loop through the permutations. 
+#'  across all cores defined in \code{param} cores, and then loop through the 
+#'  permutations. 
 #'  The alternate option is \code{"Permutations"} which
 #'  loop through each gene and spawn processes that divide up the permutations 
-#'  across \code{n.cores} cores.  
+#'  across all cores defined in \code{param}.  
 #'  The default option is recommended when analyzing more genes than the number
 #'   of permutations.
 #' 
@@ -160,7 +165,7 @@ scDD <- function(SCdat,
                  prior_param=list(alpha=0.10, mu0=0, s0=0.01, a0=0.01, b0=0.01),
                  permutations=0,
                  testZeroes=TRUE, adjust.perms=FALSE, 
-                 n.cores=parallel::detectCores(), 
+                 param=bpparam(), 
                  parallelBy=c("Genes", "Permutations"),
                  condition="condition", min.size=3){
   
@@ -225,9 +230,10 @@ scDD <- function(SCdat,
   
   # cluster each gene in SCdat
   message("Clustering observed expression data for each gene")
-  message(paste0("Setting up parallel back-end using ", n.cores, " cores" ))
-  BiocParallel::register(BPPARAM = 
-                           BiocParallel::MulticoreParam(workers=n.cores))
+
+  message(paste0("Setting up parallel back-end using ", 
+                 param$workers, " cores" ))
+  BiocParallel::register(BPPARAM = param)
   
   oa <- c1 <- c2 <- vector("list", nrow(exprs(SCdat)[tofit,]))
   bf <- den <- comps.all <- 

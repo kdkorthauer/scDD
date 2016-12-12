@@ -300,8 +300,11 @@ time will increase with more genes and/or more permutations, but multiple
 cores will automatically be utilized (if available) via the 
 \Rpackage{BiocParallel} package.  By default, \Rpackage{BiocParallel} will 
 use all cores on the machine, but you can optionally specificy the number of 
-cores to use by changing the \Rcode{n.cores} argument in the \Rcode{scDD} 
-function call.
+cores to use by changing the \Rcode{param} argument in the \Rcode{scDD} 
+function call (the \Rcode{param} argument is an object of class 
+\Rcode{MulticoreParm} of the \Rpackage{BiocParallel} package).  
+For example, to use 12 cores, specify 
+\Rcode{param=MulticoreParam(workers=12)}.
 
 The results object returned by \Rfunction{scDD} remains exactly as described 
 in the previous section, with the exception that the \Rcode{nonzero.pvalue} 

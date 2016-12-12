@@ -6,8 +6,8 @@
 \usage{
 scDD(SCdat, prior_param = list(alpha = 0.1, mu0 = 0, s0 = 0.01, a0 = 0.01, b0
   = 0.01), permutations = 0, testZeroes = TRUE, adjust.perms = FALSE,
-  n.cores = parallel::detectCores(), parallelBy = c("Genes",
-  "Permutations"), condition = "condition", min.size = 3)
+  param = bpparam(), parallelBy = c("Genes", "Permutations"),
+  condition = "condition", min.size = 3)
 }
 \arguments{
 \item{SCdat}{An object of class \code{ExpressionSet} that contains 
@@ -53,19 +53,24 @@ permutation tests for the sample
   detection rate are permuted, and new fitted values are 
   obtained using these residuals.}
 
-\item{n.cores}{integer number of cores to use when computing the Bayes 
-Factor estimates for the full permutation testing 
- framework.  Defaults to the number of cores returned by 
- \code{parallel::detectCores()}.  To use fewer cores, specify a number
- less than the number of cores on your machine.}
+\item{param}{a \code{MulticoreParam} object of the \code{BiocParallel}
+package that defines a parallel backend.  The default option is 
+\code{BiocParallel::bpparam()} which will automatically create a cluster 
+appropriate for 
+the operating system.  Alternatively, the user can specify the number
+of cores they wish to use by first creating the corresponding 
+\code{MulticoreParam} object, and then passing it into the \code{scDD}
+function. This could be done to specify a parallel backend with, say 12 
+cores by setting \code{param=BiocParallel::MulticoreParam(workers=12)}}
 
 \item{parallelBy}{For the permutation test (if invoked), the manner in 
 which to parallelize.  The default option
  is \code{"Genes"} which will spawn processes that divide up the genes 
- across \code{n.cores} cores, and then loop through the permutations. 
+ across all cores defined in \code{param} cores, and then loop through the 
+ permutations. 
  The alternate option is \code{"Permutations"} which
  loop through each gene and spawn processes that divide up the permutations 
- across \code{n.cores} cores.  
+ across all cores defined in \code{param}.  
  The default option is recommended when analyzing more genes than the number
   of permutations.}
 
