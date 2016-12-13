@@ -182,7 +182,9 @@ mclustRestricted <- function(y, restrict=TRUE, min.size){
     }else{  # check whether to add a component if only identified one
       comps_old <- comps
       comps <- comps+1 
-      mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=comps))
+      mc <- tryCatch({Mclust(y, warn=FALSE, modelNames=c("V"), G=comps)},
+                      warning = function(w) {return(NULL)},
+                      error = function(e) {return(NULL)})
       cl <- mc$classification
       
       if(!is.null(mc) & length(unique(cl))==comps){ 
