@@ -63,14 +63,17 @@
 #'   detection rate are permuted, and new fitted values are 
 #'   obtained using these residuals.
 #'  
-#' @param param a \code{MulticoreParam} object of the \code{BiocParallel}
+#' @param param a \code{MulticoreParam} or \code{SnowParam} object of 
+#' the \code{BiocParallel}
 #' package that defines a parallel backend.  The default option is 
-#' \code{BiocParallel::bpparam()} which will automatically create a cluster 
+#' \code{BiocParallel::bpparam()} which will automatically creates a cluster 
 #' appropriate for 
 #' the operating system.  Alternatively, the user can specify the number
 #' of cores they wish to use by first creating the corresponding 
-#' \code{MulticoreParam} object, and then passing it into the \code{scDD}
-#' function. This could be done to specify a parallel backend with, say 12 
+#' \code{MulticoreParam} (for Linux-like OS) or \code{SnowParam} (for Windows)
+#' object, and then passing it into the \code{scDD}
+#' function. This could be done to specify a parallel backend on a Linux-like
+#' OS with, say 12 
 #' cores by setting \code{param=BiocParallel::MulticoreParam(workers=12)}
 #'  
 #' @param parallelBy For the permutation test (if invoked), the manner in 

@@ -1,6 +1,6 @@
-%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Using scDD}
 %\VignettePackage{scDD}
+%\VignetteEngine{knitr::knitr}
 
 \documentclass{article}
 \usepackage{underscore}
@@ -318,12 +318,13 @@ permutation testing option.  Note that this option will take significantly
 longer than the default option to use the alternate KS test, and computation
 time will increase with more genes and/or more permutations, but multiple 
 cores will automatically be utilized (if available) via the 
-\Rpackage{BiocParallel} package.  By default, \Rpackage{BiocParallel} will 
-use all cores on the machine, but you can optionally specificy the number of 
-cores to use by changing the \Rcode{param} argument in the \Rcode{scDD} 
-function call (the \Rcode{param} argument is an object of class 
-\Rcode{MulticoreParm} of the \Rpackage{BiocParallel} package).  
-For example, to use 12 cores, specify 
+\Rpackage{BiocParallel} package.  By default, an OS appropriate back-end 
+using the number of cores on the machine minus 2 is chosen automatically. 
+Alternatively, you can specificy the number of 
+cores to use by passing in a \Rcode{param} argument in the \Rcode{scDD} 
+function call (where the \Rcode{param} argument is an object of class 
+\Rcode{MulticoreParm} for Linux-like OS or \Rcode{SnowParam} for Windows).  
+For example, to use 12 cores on a Linux-like OS, specify 
 \Rcode{param=MulticoreParam(workers=12)}.
 
 The results returned by \Rfunction{scDD} remain exactly as described 
