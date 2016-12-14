@@ -1,12 +1,12 @@
 # scDD: An R package to identify differentially distributed genes in scRNA-seq 
-Version 0.99.0 of R Package 'scDD' (for submission to Bioconductor).  To access 
+Version 0.99.3 of R Package 'scDD' (accepted to Bioconductor).  To access 
 previous versions of the package (including 1.1.0 as used in the [Genome 
 Biology publication]
 (https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y), 
 see the 
 [Releases page](https://github.com/kdkorthauer/scDD/releases)).
 
-To Install:
+Until it appears in Bioconductor, you can install through GitHub:
 
 ```R
 install.packages("devtools")
