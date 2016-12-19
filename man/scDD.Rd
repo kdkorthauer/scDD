@@ -7,7 +7,7 @@
 scDD(SCdat, prior_param = list(alpha = 0.1, mu0 = 0, s0 = 0.01, a0 = 0.01, b0
   = 0.01), permutations = 0, testZeroes = TRUE, adjust.perms = FALSE,
   param = bpparam(), parallelBy = c("Genes", "Permutations"),
-  condition = "condition", min.size = 3)
+  condition = "condition", min.size = 3, min.nonzero = NULL)
 }
 \arguments{
 \item{SCdat}{An object of class \code{SummarizedExperiment} that contains 
@@ -96,6 +96,12 @@ cluster (number of cells) for it to be used
  \code{min.size} cells will be considered an outlier
  cluster and ignored in the classfication algorithm.  The default value
   is three.}
+
+\item{min.nonzero}{a positive integer that specifies the minimum number of
+nonzero cells in each condition required for the test of differential 
+distributions.  If a gene has fewer nonzero cells per condition, it will
+still be tested for DZ (if \code{testZeroes} is TRUE). Default value is
+NULL (no minimum value is enforced).}
 }
 \value{
 A \code{SummarizedExperiment} object that contains the data and 
