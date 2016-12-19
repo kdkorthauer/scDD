@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : ".Rproj.user\n.Rhistory\n.RData\nscDD.Rproj\nvignettes/DD.pdf\n.bbl\n.log\nvignettes/scDD.pdf\n.synctex.gz\n.toc\nvignettes/scDD-concordance.tex\n",
+    "created" : 1482157881670.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1359336573",
+    "id" : "8A5EDF6F",
+    "lastKnownWriteTime" : 1482164140,
+    "last_content_update" : 1482164140,
+    "path" : "~/Desktop/scDD/.gitignore",
+    "project_path" : ".gitignore",
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "gitignore"
+}

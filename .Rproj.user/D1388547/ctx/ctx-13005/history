@@ -1,0 +1,512 @@
+dim(Dataset1[samplename,])
+class(Dataset1)
+class(Dataset1[samplename,])
+class(Dataset1[samplename,,drop=FALSE])
+Zeropercent_Base <- as.matrix(apply(Dataset1[samplename,,drop=FALSE], 1, function(a) length(which(a == 0)) / length(a)))
+str(Zeropercent_Base)
+if(Method %in%  c("DP", "DM")){
+MV[,1:2] <- t(sapply(1:length(samplename), function(x) scDD:::calcMV(Dataset1[samplename[x],], FC=1, FC.thresh=FC2[x]^(-1/2),
+threshold = 3, include.zeroes=FALSE)))
+MV[,3:4] <- t(sapply(1:length(samplename), function(x) scDD:::calcMV(Dataset1[samplename[x],], FC=1, FC.thresh=FC2[x]^(-1/2),
+threshold = 3, include.zeroes=TRUE)))
+}else{
+MV[,1:2] <- t(sapply(1:length(samplename), function(x) scDD:::calcMV(Dataset1[samplename[x],], FC=1, include.zeroes=FALSE)))
+MV[,3:4] <- t(sapply(1:length(samplename), function(x) scDD:::calcMV(Dataset1[samplename[x],], FC=1, include.zeroes=TRUE)))
+}
+mV
+MV
+MV[,1:2]
+class(MV)
+class(MV[,1:2])
+library(scDD)
+SD <- simulateSet(scDatEx, numSamples=numSamples, nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB, nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE,  random.seed=seed)
+nDE
+library(scDD)
+library(scDD)
+SD <- simulateSet(scDatEx, numSamples=numSamples, nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB, nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE,  random.seed=seed)
+str(SD)
+str(SD[[1]])
+str(SD[[2]])
+SD[[2]]
+nDP <- 1
+nDM <- 1
+nDB <- 1
+nEE <- 1
+nEP <- 1
+nDE + nDP + nDM + nDB + nEE + nEP
+SD <- simulateSet(scDatEx, numSamples=numSamples, nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB, nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE,  random.seed=seed)
+str(SD)
+nDE <- nDP <- nDM <- nDB <- nEE <- nEP
+nDE <- nDP <- nDM <- nDB <- nEE <- nEP <- 0
+SD <- simulateSet(scDatEx, numSamples=numSamples, nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB, nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE,  random.seed=seed)
+nDE <- nDP <- nDM <- nDB <- nEE <- nEP <- 10
+nDP <- 0
+nDM <- 1
+nDB <- 2
+SD <- simulateSet(scDatEx, numSamples=numSamples, nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB, nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE,  random.seed=seed)
+str(SD)
+library(scDD)
+library(BiocParallel)
+BPPARAMS()
+bpnworkers()
+?`BiocParallel-package`
+bpparam
+bpparam()
+MulticoreParam()
+registered(bpparamClass )
+bpparamClass()
+bpparamClass
+registered()
+MulticoreParam()
+MulticoreParam()$bpparam
+str(MulticoreParam)
+str(MulticoreParam())
+MulticoreParam()$workers
+DoparParam()
+bpparam()
+bpparam()$workers
+library(scDD)
+# need internet access to check package
+library(scDD)
+library(scDD)
+library(scDD)
+bpparams9)
+bpparams()
+library(BiocParallel)
+bpparams()
+bpparam()
+bpparam()@bpworkers
+bpparam()$bpworkers
+MulticoreParam()
+parallel::detectCores()
+sessionInfo()
+parallel::detectCores()
+detectCores()
+parallel:::detectCores()
+library(scDD)
+message(paste0("Setting up parallel back-end using ", n.cores, " cores" ))
+n.cores <- parallel::detectCores()
+n.cores
+detectCores()
+bpparm()
+bpparms()
+message("Performing permutations to evaluate independence of clustering and condition for each gene")
+message(paste0("Setting up parallel back-end using ", n.cores, " cores" ))
+register(BPPARAM = MulticoreParam(workers=n.cores))
+BiocParallel::register(BPPARAM = MulticoreParam(workers=n.cores))
+BiocParallel::register(BPPARAM = MulticoreParam(BiocParallel::workers=n.cores))
+BiocParallel::register(BPPARAM = BiocParallel::MulticoreParam(workers=n.cores))
+BiocParallel::MulticoreParam(workers=n.cores)
+BiocParallel::MulticoreParam(workers=2)
+library(scDD)
+library(scDD)
+knit_theme$get("acid")
+library(knitr)
+knit_theme$get("acid")
+opts_knit$set( out.format="latex" )
+knit_theme$get()
+library(scDD)
+library(scDD)
+library(scDD)
+remove.packages("scDD")
+devtools::install_github("kdkorthauer/scDD")
+sessionInfo()
+library(scDD)
+remove.packages(scDD)
+sessionInfo()
+library(scDD)
+?remove.packages
+.libPaths()
+library(scDD)
+remove.packages("scDD")
+library(scDD)
+remove.packages("scDD")
+remove.packages(scDD)
+remove.packages("scDD)
+library(scDD)
+data(scDatExSim)
+class(scDatExSim)
+show(scDatExSim)
+prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+nperms <- 100
+?proc.time
+system.time(scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE))
+scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
+library(scDD)
+data(scDatExSim)
+class(scDatExSim)
+show(scDatExSim)
+prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+nperms <- 100
+RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
+system.time(scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE))
+1.245/30
+1.245/30*10000
+415/60
+3.679+1.245
+4.924/30
+4.924/30*10000
+1641/60
+SCdat <- scDatExSim
+permutations
+permutations=0
+testZeroes = FALSE
+adjust.perms=FALSE
+n.cores = 2
+n.cores = 4
+alpha = prior_param$alpha
+m0 = prior_param$mu0
+s0 = prior_param$s0
+a0 = prior_param$a0
+b0 = prior_param$b0
+oa <- c1 <- c2 <- vector("list", nrow(exprs(SCdat)))
+bf <- den <- comps.all <- comps.c1 <- comps.c2 <- rep(NA, nrow(exprs(SCdat)))
+library(Biobase)
+oa <- c1 <- c2 <- vector("list", nrow(exprs(SCdat)))
+bf <- den <- comps.all <- comps.c1 <- comps.c2 <- rep(NA, nrow(exprs(SCdat)))
+genefit <- function(y){
+cond0 <- SCdat$condition[y>0]
+y <- log(y[y>0])
+oa[[i]] <- mclustRestricted(y, restrict=TRUE)
+c1[[i]] <- mclustRestricted(y[cond0==1], restrict=TRUE)
+c2[[i]] <- mclustRestricted(y[cond0==2], restrict=TRUE)
+bf[i] <- jointPosterior(y[cond0==1], c1[[i]], alpha, m0, s0, a0, b0) +
+jointPosterior(y[cond0==2], c2[[i]], alpha, m0, s0, a0, b0)
+den[i] <- jointPosterior(y, oa[[i]], alpha, m0, s0, a0, b0)
+return(list(
+oa=oa,
+c1=c1,
+c2=c2,
+bf=bf,
+den=den
+))
+}
+test <- genefit(exprs(SCdat[1,]))
+genefit <- function(y){
+cond0 <- SCdat$condition[y>0]
+y <- log(y[y>0])
+oa <- mclustRestricted(y, restrict=TRUE)
+c1 <- mclustRestricted(y[cond0==1], restrict=TRUE)
+c2 <- mclustRestricted(y[cond0==2], restrict=TRUE)
+bf <- jointPosterior(y[cond0==1], c1, alpha, m0, s0, a0, b0) +
+jointPosterior(y[cond0==2], c2, alpha, m0, s0, a0, b0)
+den <- jointPosterior(y, oa, alpha, m0, s0, a0, b0)
+return(list(
+oa=oa,
+c1=c1,
+c2=c2,
+bf=bf,
+den=den
+))
+}
+str(c1)
+test <- genefit(exprs(SCdat[1,]))
+source("~/Desktop/scDD/R/joint.posterior.R")
+test <- genefit(exprs(SCdat[1,]))
+str(test)
+out <- bplapply(1:nrow(exprs(SCdat)), function(x) genefit(x))
+library(BiocParallel)
+out <- bplapply(1:nrow(exprs(SCdat)), function(x) genefit(x))
+out <- bplapply(1:nrow(exprs(SCdat)), function(x) genefit(exprs(SCdat)[x,]))
+str(out)
+length(out)
+oa <- sapply(out, function(x) x[["oa"]])
+str(oa)
+length(out)
+length(oa)
+oa <- lapply(out, function(x) x[["oa"]])
+length(oa)
+str(oa)
+oa <- lapply(out, function(x) x[["oa"]])
+c1 <- lapply(out, function(x) x[["c1"]])
+c2 <- lapply(out, function(x) x[["c2"]])
+bf <- lapply(out, function(x) x[["bf"]])
+den<- lapply(out, function(x) x[["den"]])
+rm(out); gc()
+length(c1)
+length(c2)
+length(bf)
+str(bf)
+out <- bplapply(1:nrow(exprs(SCdat)), function(x) genefit(exprs(SCdat)[x,]))
+oa <- lapply(out, function(x) x[["oa"]])
+c1 <- lapply(out, function(x) x[["c1"]])
+c2 <- lapply(out, function(x) x[["c2"]])
+bf <- unlist(lapply(out, function(x) x[["bf"]]))
+den<- unlist(lapply(out, function(x) x[["den"]]))
+rm(out); gc()
+str(bf)
+str(den)
+comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class)))
+comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class)))
+comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class)))
+comps.all <- unlist(lapply(oa, function(x) scDD:::luOutlier(x$class)))
+str(comps.all)
+# function to fit one gene
+genefit <- function(y){
+cond0 <- SCdat$condition[y>0]
+y <- log(y[y>0])
+oa <- mclustRestricted(y, restrict=TRUE)
+c1 <- mclustRestricted(y[cond0==1], restrict=TRUE)
+c2 <- mclustRestricted(y[cond0==2], restrict=TRUE)
+return(list(
+oa=oa,
+c1=c1,
+c2=c2
+))
+}
+out <- bplapply(1:nrow(exprs(SCdat)), function(x) genefit(exprs(SCdat)[x,]))
+oa <- lapply(out, function(x) x[["oa"]])
+c1 <- lapply(out, function(x) x[["c1"]])
+c2 <- lapply(out, function(x) x[["c2"]])
+rm(out); gc()
+comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class)))
+comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class)))
+comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class)))
+luOutlier <- function(x, min.size=3){
+return(sum(table(x)>=min.size))
+}
+comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class)))
+comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class)))
+comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class)))
+library(scDD)
+data(scDatExSim)
+class(scDatExSim)
+show(scDatExSim)
+nperms <- 100
+nperms <- 0
+prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
+str(RES)
+head(RES$Genes)
+RES$Genes
+library(scDD)
+library(scDD)
+data(scDatExSim)
+class(scDatExSim)
+show(scDatExSim)
+prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+nperms <- 100
+RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
+parallelBy="Genes"
+message(paste0("Parallelizing by ", parallelBy))
+library(scDD)
+class(scDatExSim)
+show(scDatExSim)
+prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+nperms <- 100
+RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
+RES2 <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE, parallelBy= "Permutations")
+RES$Genes
+RES2$Genes
+system.time(scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE, parallelBy = "Gene"))
+system.time(scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE, parallelBy= "Permutations"))
+87.996/46.04
+46.04/87.996
+?scDD
+library(scDD)
+library(scDD)
+library(Biobase)
+condition <- c(rep(1, numSamples), rep(2, numSamples))
+numSamples <- 100
+condition <- c(rep(1, numSamples), rep(2, numSamples))
+data("scDatEx")
+ls()
+show(scDatEx)
+nDE <- 5
+nDP <- 5
+nDM <- 5
+nDB <- 5
+nEE <- 5
+nEP <- 5
+numSamples <- 100
+seed <- 816
+SD <- simulateSet(scDatEx, numSamples=numSamples, nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB,
+nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE,
+random.seed=seed)
+rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
+colnames(SD[[1]]) <- names(condition) <- paste0("Sample", 1:ncol(SD[[1]]), sep="")
+SDExpressionSet <- ExpressionSet(assayData=SD[[1]], phenoData=as(data.frame(condition=condition, cellSize=runif(length(condition))), "AnnotatedDataFrame"))
+show(SDExpressionSet)
+str(SDExpressionSet$cellSize)
+str(phenoData(SDExpressionSet))
+phenoData(SDExpressionSet)[,"cellSize"]
+column.name <- "cellSize"
+phenoData(SDExpressionSet)[,column.name]
+condition <- "cellSize"
+phenoData(SDExpressionSet)[,column.name]
+phenoData(SDExpressionSet)[,column.name][1]
+as.numeric(phenoData(SDExpressionSet)[,column.name])
+str(phenoData(SDExpressionSet)[,column.name])
+as.data.frame(phenoData(SDExpressionSet)[,column.name])
+phenoData(SDExpressionSet)[,"cellSize"]
+as.numeric(phenoData(SDExpressionSet)[,"cellSize"])
+str(phenoData(SDExpressionSet)[,column.name]@data)
+as.numeric(phenoData(SDExpressionSet)[,column.name]@data)
+as.numeric(phenoData(SDExpressionSet)[,column.name]@data[,1])
+SDExpressionSet$"t(9;22)"
+str(phenoData(SDExpressionSet[[column.name]]))
+str(phenoData(SDExpressionSet)[[column.name]])
+condition <- "cellSize"
+SCdat <- SDExpressionSet
+length(unique(phenoData(SCdat)[[condition]]))
+show(SCdat)
+condition <- "condition"
+length(unique(phenoData(SCdat)[[condition]]))
+length(phenoData(SCdat)$[[condition]])
+length(phenoData(SCdat)[[condition]])
+ncol(exprs(SCdat))
+data(scDatExSim)
+library(scDD)
+class(scDatExSim)
+show(scDatExSim)
+prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+nperms <- 100
+RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
+RES$Genes
+unique(phenoData(SCdat)[[condition]]
+)
+library(scDD)
+RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
+library(scDD)
+RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
+library(scDD)
+show(scDat)
+show(SCdat)
+phenoData(SCdat)$cond2 <- SCdat$condition
+show(SCdat)
+phenoData(SCdat)$cond2 <- c(rep("fuzzybear", 100), rep("tiger", 100))
+RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
+RES$Genes
+RES <- scDD(scDatExSim, prior_param=prior_param, permutations=0, testZeroes=FALSE)
+RES$Genes
+RES <- scDD(scDatExSim, prior_param=prior_param, permutations=nperms, testZeroes=FALSE, condition="cond2")
+RES <- scDD(SCdat, prior_param=prior_param, permutations=nperms, testZeroes=FALSE, condition="cond2")
+RES$Genes
+RES2 <- scDD(SCdat, prior_param=prior_param, permutations=0, testZeroes=FALSE, condition="cond2")
+RES2$Genes
+library(scDD)
+RES <- scDD(SCdat, prior_param=prior_param, permutations=nperms, testZeroes=FALSE, condition="cond2")
+RES$Genes
+RES <- scDD(SCdat, prior_param=prior_param, permutations=nperms, testZeroes=FALSE, condition="cond2")
+RES$Genes
+set.seed(555)
+RES2 <- scDD(SCdat, prior_param=prior_param, permutations=nperms, testZeroes=FALSE, condition="cond2")
+set.seed(555)
+RES4 <- scDD(SCdat, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
+head(RES2$Genes)
+head(RES4$Genes)
+phenoData(SCdat)[["cond2"]]
+phenoData(SCdat)[["condition"]]
+unique(phenoData(SCdat)[["cond2"]])
+unique(phenoData(SCdat)[["cond2"]])[1]
+set.seed(555)
+RES4 <- scDD(SCdat, prior_param=prior_param, permutations=nperms, testZeroes=FALSE)
+head(RES4)
+head(RES4$Genes)
+library(scDD)
+library(scDD)
+?scDD
+SCdat = scyeast
+dat<-read.table("NormalizedQuakeData_NoTrimDeDup.txt",header=TRUE)
+ones<-grep("Unstressed",colnames(dat))
+twos<-grep("Stressed",colnames(dat))
+condition<-vector(length=length(colnames(dat)))
+condition[ones]<-1
+condition[twos]<-2
+names(condition)<-colnames(dat)
+scyeast<-ExpressionSet(assayData = as.matrix(dat),
+phenoData = as(data.frame(condition), "AnnotatedDataFrame"))
+prior_param <-list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+library(Biobase)
+library(scDD)
+SCdat=scyeast
+dat<-read.table("NormalizedQuakeData_NoTrimDeDup.txt",header=TRUE)
+ones<-grep("Unstressed",colnames(dat))
+twos<-grep("Stressed",colnames(dat))
+condition<-vector(length=length(colnames(dat)))
+condition[ones]<-1
+condition[twos]<-2
+names(condition)<-colnames(dat)
+scyeast<-ExpressionSet(assayData = as.matrix(dat),
+phenoData = as(data.frame(condition), "AnnotatedDataFrame"))
+prior_param <-list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+setwd("~/Desktop")
+dat<-read.table("NormalizedQuakeData_NoTrimDeDup.txt",header=TRUE)
+ones<-grep("Unstressed",colnames(dat))
+twos<-grep("Stressed",colnames(dat))
+condition<-vector(length=length(colnames(dat)))
+condition[ones]<-1
+condition[twos]<-2
+names(condition)<-colnames(dat)
+scyeast<-ExpressionSet(assayData = as.matrix(dat),
+phenoData = as(data.frame(condition), "AnnotatedDataFrame"))
+prior_param <-list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+SCdat = scyeast
+rm(SCdag)
+rm(SCdat)
+SCdat = scyeast
+rm(scyeast)
+permutations = 0
+testZeroes = FALSE
+adjust.perms = FALSE
+n.cores <- 1
+parallelBy="Genes"
+out<-scDD(SCdat,
+prior_param = prior_param,
+permutations = 0,
+testZeroes = FALSE,
+adjust.perms = FALSE,
+n.cores = 2,
+parallelBy="Genes")
+n.cores <- 2
+# check whether SCdat is a member of the ExpressionSet class
+if(!("ExpressionSet" %in% class(SCdat))){
+stop("Please provide a valid 'ExpressionSet' object.")
+}
+alpha = prior_param$alpha
+m0 = prior_param$mu0
+s0 = prior_param$s0
+a0 = prior_param$a0
+b0 = prior_param$b0
+if (length(unique(phenoData(SCdat)[[condition]])) != 2 | length(phenoData(SCdat)[[condition]]) != ncol(exprs(SCdat))){
+stop("Error: Please specify valid condition labels.")
+}
+condition="condition"
+if (length(unique(phenoData(SCdat)[[condition]])) != 2 | length(phenoData(SCdat)[[condition]]) != ncol(exprs(SCdat))){
+stop("Error: Please specify valid condition labels.")
+}
+ref <- unique(phenoData(SCdat)[[condition]])[1]
+ref
+message("Clustering observed expression data for each gene")
+message(paste0("Setting up parallel back-end using ", n.cores, " cores" ))
+BiocParallel::register(BPPARAM = BiocParallel::MulticoreParam(workers=n.cores))
+oa <- c1 <- c2 <- vector("list", nrow(exprs(SCdat)))
+bf <- den <- comps.all <- comps.c1 <- comps.c2 <- rep(NA, nrow(exprs(SCdat)))
+permutations
+mclustRestricted()
+genefit <- function(y){
+cond0 <- phenoData(SCdat)[[condition]][y>0]
+y <- log(y[y>0])
+oa <- mclustRestricted(y, restrict=TRUE)
+c1 <- mclustRestricted(y[cond0==ref], restrict=TRUE)
+c2 <- mclustRestricted(y[cond0!=ref], restrict=TRUE)
+return(list(
+oa=oa,
+c1=c1,
+c2=c2
+))
+}
+out <- bplapply(1:nrow(exprs(SCdat)), function(x) genefit(exprs(SCdat)[x,]))
+library(BiocParallel)
+out <- bplapply(1:nrow(exprs(SCdat)), function(x) genefit(exprs(SCdat)[x,]))
+nrow(exprs(SCdat)
+)
+show(SCdat)
+y <- exprs(SCdat)[1,]
+str(y)
+out1 <- genefit(y)
+str(out1)
+y <- exprs(SCdat[1:2,])
+str(y)
+out <- bplapply(1:2, function(x) genefit(y))
+range(exprs(SCdat))
