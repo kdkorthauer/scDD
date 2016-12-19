@@ -1,0 +1,15 @@
+*.Rproj*
+.Rproj*
+*buildignore
+vignettes/*.R
+vignettes/*.toc
+vignettes/*.aux
+vignettes/*.blg
+vignettes/*.tex
+vignettes/*.pdf
+vignettes/figure/*
+.Rhistory
+.Rapp.history
+.Rproj.user
+.Rproj.user/*
+.gitignore
