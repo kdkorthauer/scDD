@@ -100,7 +100,13 @@
 #'  during the classification step.  Any clusters containing fewer than 
 #'  \code{min.size} cells will be considered an outlier
 #'  cluster and ignored in the classfication algorithm.  The default value
-#'   is three.  
+#'   is three.
+#'   
+#' @param min.nonzero a positive integer that specifies the minimum number of
+#' nonzero cells in each condition required for the test of differential 
+#' distributions.  If a gene has fewer nonzero cells per condition, it will
+#' still be tested for DZ (if \code{testZeroes} is TRUE). Default value is
+#' NULL (no minimum value is enforced).      
 #' 
 #' @return A \code{SummarizedExperiment} object that contains the data and 
 #' sample information from the input object, but where the results objects
@@ -180,7 +186,8 @@ scDD <- function(SCdat,
                  testZeroes=TRUE, adjust.perms=FALSE, 
                  param=bpparam(), 
                  parallelBy=c("Genes", "Permutations"),
-                 condition="condition", min.size=3){
+                 condition="condition", min.size=3,
+                 min.nonzero=NULL){
   
   # check whether SCdat is a member of the SummarizedExperiment class
   if(!("SummarizedExperiment" %in% class(SCdat))){
@@ -210,21 +217,27 @@ scDD <- function(SCdat,
   # reference category/condition - the first listed one
   ref <- unique(colData(SCdat)[[condition]])[1]
   
-  # check for genes that are all (or almost all) zeroes 
+  # check for genes that are all (or almost all) zeroes
+  if (is.null(min.nonzero)){
+    min.nonzero <- min.size
+  }
   tofit <- which(
            (rowSums(normExprs(SCdat)[,colData(SCdat)[[condition]]==ref]>0) >= 
-             max(min.size,2)) &
+             max(min.size,2,min.nonzero)) &
            (rowSums(normExprs(SCdat)[,colData(SCdat)[[condition]]!=ref]>0) >= 
-              max(min.size,2)))
+              max(min.size,2,min.nonzero)))
   
   if (length(tofit) < nrow(normExprs(SCdat))){
     if(testZeroes){
-      message("Notice: There exist genes that are all (or almost all) zero. 
-              For genes with 0 or 1 nonzero measurements per condition, 
-              only testing for DZ")    
+      message(paste0("Notice: ", nrow(normExprs(SCdat))-length(tofit), 
+              " genes have less than ", min.nonzero, 
+              " nonzero cells per condition. ",
+              " Only testing for DZ for these genes."))  
     }else{
-      message("Notice: There exist genes that are all (or almost all) zero. 
-              Skipping genes with 0 or 1 nonzero measurements per condition")
+      message(paste0("Notice: ", nrow(normExprs(SCdat))-length(tofit), 
+                     " genes have less than ", min.nonzero, 
+                     " nonzero cells per condition. ",
+                     " Skipping these genes."))  
     }
   }
   
@@ -239,11 +252,13 @@ scDD <- function(SCdat,
                                 function(x) length(unique(x[x>0])) == 1) )
   if (length(skipConstant) > 0){
     if(testZeroes){
-      message("Notice: There exist genes with constant nonzero values. 
-              These genes will only be considered for the DZ pattern.")    
+      message(paste0("Notice: ", length(skipConstant), 
+                     " Genes have constant nonzero values. ", 
+                     " Only testing for DZ for these genes."))  
     }else{
-      message("Notice: There exist genes with constant nonzero values. 
-              Skipping these genes.")    
+      message(paste0("Notice: ", length(skipConstant), 
+                     " Genes have constant nonzero values. ", 
+                     " Skipping these genes."))  
     }
     tofit <- tofit[-skipConstant]
   }
