@@ -22,3 +22,4 @@ RoxygenNote: 5.0.1
 VignetteBuilder: knitr
 biocViews: Bayesian, Clustering, RNASeq, SingleCell,
         MultipleComparison, Visualization, DifferentialExpression
+
