@@ -1,0 +1,29 @@
+citHeader("To cite scDD in publications use:")
+
+citEntry(entry = "Article",
+  title        = "A statistical approach for identifying differential 
+  distributions in single-cell {RNA}-seq experiments",
+  author       = personList(as.person("Keegan D Korthauer"),
+                   as.person("Li-Fang Chu"),
+                   as.person("Michael A Newton"),
+                   as.person("Li Yuan"),
+                   as.person("James Thomson"),
+                   as.person("Ron Stewart"),
+                   as.person("Christina Kendziorski") ),
+  journal      = "Genome Biology",
+  year         = "2016",
+  volume       = "17",
+  number       = "1",
+  pages        = "222",
+  url          = "https://genomebiology.biomedcentral.com/
+        articles/10.1186/s13059-016-1077-y.",
+
+  textVersion  =
+  paste("Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
+Kendziorski C. (2016).",
+        "A statistical approach for identifying differential 
+distributions in single-cell RNA-seq experiments.",
+        "Genome Biology, 17(1), 222.",
+        "URL https://genomebiology.biomedcentral.com/
+        articles/10.1186/s13059-016-1077-y.")
+)
