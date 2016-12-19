@@ -1,0 +1,512 @@
+type <- "Normcounts"
+type <- "NormCounts"
+type
+assays(SCdat[[type]])
+assays(SCdat[type])
+assays(SCdat)
+assays(SCdat)[[type]]
+type
+exprs <- function(SCdat){
+return(assays(SCdat)[["NormCounts"]])
+}
+results <- function(SCdat, type=c("Genes", "Clusters.c1" , "Clusters.c2",
+"Clusters.combined")){
+type <- match.arg(type)
+return(assays(SCdat)[[type]])
+}
+str(exprs(SCdat))
+class(exprs(SCdat))
+load(scDatEx)
+data("scDatEx")
+data(scDatEx)
+class(scDatEx)
+SDSummarizedExp <- SummarizedExperiment(assays=list(SD[[1]]),
+colData=data.frame(condition))
+ls()
+View(exprs)
+library(scDD)
+exprs
+data(scDatEx)
+phenoData(scDatEx)
+as.data.frame(phenoData(scDatEx))
+data.frame(phenoData(scDatEx))
+phenoData(scDatEx)["condition"]
+phenoData(scDatEx)[,"condition"]
+data.frame(phenoData(scDatEx)[,"condition"])
+matrix(phenoData(scDatEx)[,"condition"])
+str(phenoData(scDatEx))
+str(phenoData(scDatEx)@data$condition)
+data.frame(phenoData(scDatEx)@data$condition))
+data.frame(phenoData(scDatEx)@data$condition)
+cond <- data.frame(phenoData(scDatEx)@data$condition)
+rownames(cond) <- colnames(exprs(scDatEx))
+colnames(cond) <- "condition"
+cond
+str(exprs(scDatEx))
+scDatEx <- SummarizedExperiment(assays=exprs(scDatEx),
+colData=data.frame(phenoData(scDatEx)@data$condition))
+class(scDatEx)
+assays(scDatEx)
+assays(scDatEx)[[1]]
+colData(scDatEx)
+data(scDatEx)
+cond <- data.frame(phenoData(scDatEx)@data$condition)
+rownames(cond) <- colnames(exprs(scDatEx))
+colnames(cond) <- "condition"
+scDatEx <- SummarizedExperiment(assays=exprs(scDatEx),
+colData=cond)
+class(scDatEx)
+colData(scDatEx)
+data(scDatExList)
+str(scDatExList)
+data(scDatExSim)
+class(scDatExSim)
+data(scDatExSim)
+cond <- data.frame(phenoData(scDatExSim)@data$condition)
+rownames(cond) <- colnames(exprs(scDatExSim))
+colnames(cond) <- "condition"
+scDatExSim <- SummarizedExperiment(assays=exprs(scDatExSim),
+colData=cond)
+class(scDatExSim)
+str(assays(scDatExSim)[[1]])
+str(colData(scDatExSim))
+colData(scDatExSim)
+phenoData <- function(SCdat){
+return(colData(SCdat))
+}
+exprs <- function(SCdat){
+return(assays(SCdat)[["NormCounts"]])
+}
+str(exprs(scDatEx))
+data(scDatEx)
+cond <- data.frame(phenoData(scDatEx)@data$condition)
+rownames(cond) <- colnames(exprs(scDatEx))
+colnames(cond) <- "condition"
+scDatEx <- SummarizedExperiment(assays=list("NormCounts"=exprs(scDatEx)),
+colData=cond)
+data(scDatExSim)
+cond <- data.frame(phenoData(scDatExSim)@data$condition)
+rownames(cond) <- colnames(exprs(scDatExSim))
+colnames(cond) <- "condition"
+scDatExSim <- SummarizedExperiment(assays=list("NormCounts"=exprs(scDatExSim)),
+colData=cond)
+show(scDatEx)
+show(scDatExSim)
+str(assays(scDatEx)[[1]])
+str(assays(scDatExSim)[[1]])
+str(colData(scDatEx))
+str(colData(scDatExSim))
+data(scDatEx)
+str(phenoData(scDatEx))
+str(phenoData(scDatEx)[["condition"]])
+cond <- data.frame(phenoData(scDatEx)@data$condition)
+rownames(cond) <- colnames(exprs(scDatEx))
+colnames(cond) <- "condition"
+scDatEx <- SummarizedExperiment(assays=list("NormCounts"=exprs(scDatEx)),
+colData=cond)
+str(colData(scDatEx)[["condition"]])
+data(scDatEx)
+cond <- data.frame(phenoData(scDatEx)@data$condition)
+rownames(cond) <- colnames(exprs(scDatEx))
+colnames(cond) <- "condition"
+scDatEx <- SummarizedExperiment(assays=list("NormCounts"=exprs(scDatEx)),
+colData=cond)
+data(scDatExSim)
+cond <- data.frame(phenoData(scDatExSim)@data$condition)
+rownames(cond) <- colnames(exprs(scDatExSim))
+colnames(cond) <- "condition"
+scDatExSim <- SummarizedExperiment(assays=list("NormCounts"=exprs(scDatExSim)),
+colData=cond)
+exprs <- function(SCdat){
+return(assays(SCdat)[["NormCounts"]])
+}
+phenoData <- function(SCdat){
+return(colData(SCdat))
+}
+str(exprs(SCdat))
+str(exprs(scDatEx))
+str(exprs(scDatExSim))
+str(phenoData(scDatEx))
+str(phenoData(scDatExSim))
+condition
+condition <- "condition"
+scDatEx -> SCdat
+is.null(assayNames(SCdat))
+assayNames(SCdat)
+length(unique(phenoData(SCdat)[[condition]]))
+length(phenoData(SCdat)[[condition]]) != ncol(exprs(SCdat))
+ncol(exprs(SCdat))
+length(phenoData(SCdat)[[condition]])
+length(unique(phenoData(SCdat)[[condition]])) != 2 |
+length(phenoData(SCdat)[[condition]]) != ncol(exprs(SCdat))
+ref <- unique(phenoData(SCdat)[[condition]])[1]
+ref
+min.size <- 4
+tofit <- which(
+(rowSums(exprs(SCdat)[,phenoData(SCdat)[[condition]]==ref]>0) >=
+max(min.size,2)) &
+(rowSums(exprs(SCdat)[,phenoData(SCdat)[[condition]]!=ref]>0) >=
+max(min.size,2)))
+str(tofit)
+nrow(exprs(SCdat))
+skipConstant <- which(
+apply(exprs(SCdat)[tofit,phenoData(SCdat)[[condition]]==ref], 1,
+function(x) length(unique(x[x>0])) == 1) |
+apply(exprs(SCdat)[tofit,phenoData(SCdat)[[condition]]!=ref], 1,
+function(x) length(unique(x[x>0])) == 1) )
+length(skipConstnat)
+length(skipConstant)
+str(SummarizedExperiment)
+str(SCdat)
+SCdat@metadata
+metadata(SCdat)
+metadata(SCdat) <- "toy example"
+metadata(SCdat) <- list("toy example")
+show(SCdat)
+str(SCdat)
+class(scDatEx)
+#save(scDatEx, file="")
+getwd()
+save(scDatEx, file="./data/scDatEx.RData")
+#save(scDatExSim, file="./data/scDatExSim.RData")
+class(scDatExSim)
+save(scDatExSim, file="./data/scDatExSim.RData")
+library(SummarizedExperiment)
+class(scDatExSim)
+dim(scDatExSim)
+prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+library(scDD)
+prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+RES <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+sampleNames(scDatEx)
+str(colData(scDatEx))
+rownames(scDatEx)
+colnames(scDatEx)
+RES <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+library(scDD)
+?exprs
+library(scDD)
+?phenoData
+?exprs
+library(scDD)
+?exprs
+?phenoData
+?results
+RES <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+head(RES$Genes)
+RES$Genes
+str(RES)
+library(scDD)
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+show(scDatExSim)
+library(scDD)
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+class(assays(scDatEx)[[1]])
+assays(scDatEx)[["Genes"]] <- 5
+assays(scDatEx)[["Genes"]] <- list(5)
+class(assays(scDatEx)[[1]])
+class(assay(scDatEx)[[1]])
+(assay(scDatEx)[[1]])
+assays(scDatEx)[["NormCountsDup"]] <- exprs(scDatEx)
+str(assays(scDatEx))
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+library(scDD)
+@
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+dimnames(SCdat)
+str(rownames(SCdat))
+str(colnames(SCdat))
+library(scDD)
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+library(scDD)
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+metadata(SCdat)
+metadata(SCdat)[["toy2"]] <- "test"
+metadata(SCdat)
+library(scDD)
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+show(scDatExSim)
+head(metadata(scDatExSim)[["Genes"]])
+results(scDatExSim)
+results(scDatEx)
+results <- function(SCdat, type=c("Genes", "Zhat.c1" , "Zhat.c2",
+"Zhat.combined")){
+type <- match.arg(type)
+return(metadata(SCdat)[[type]])
+}
+results(scDatEx)
+results(scDatExSim)
+RES <- results(scDatExSim)
+head(RES)
+str(RES)
+PARTITION.C1 <- results(scDatExSim, type="Zhat.c1")
+head(PARTITION.C1)
+PARTITION.C1[1:5,1:5]
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param,
+testZeroes=FALSE, permutations=100)
+PARTITION.C1 <- results(scDatExSim, type="Zhat.c1")
+PARTITION.C1[1:5,1:5]
+RES <- results(scDatExSim)
+head(RES)
+data(scDatEx)
+class(scDatEx)
+class(scDatEx)
+dim(scDatEx)
+nDE <- 5
+nDP <- 5
+nDM <- 5
+nDB <- 5
+nEE <- 5
+nEP <- 5
+numSamples <- 100
+seed <- 816
+SD <- simulateSet(scDatEx, numSamples=numSamples,
+nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB,
+nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE,
+random.seed=seed)
+library(scDD)
+SD <- simulateSet(scDatEx, numSamples=numSamples,
+nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB,
+nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE,
+random.seed=seed)
+dim(SCdat)
+Dataset1 <- SCdat[,phenoData(SCdat)[[condition]]==ref]
+show(Dataset1)
+dim(Dataset1)[1]
+str(colnames(Dataset1))
+str(rownames(Dataset1))
+zeropercent <- matrix(data=0, nrow=dim(Dataset1)[1], ncol=2)
+rownames(zeropercent) <- colnames(Dataset1)
+str(zeropercent)
+head(zeropercent)
+str(rownames(zeropercent))
+zeropercent <- matrix(data=0, nrow=dim(Dataset1)[1], ncol=2)
+rownames(zeropercent) <- rownames(Dataset1)
+SD <- simulateSet(scDatEx, numSamples=numSamples,
+nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB,
+nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE,
+random.seed=seed)
+library(scDD)
+Dataset2 <- SCdat[,phenoData(SCdat)[[condition]]!=ref]
+### Find zero-percent
+zeropercent <- matrix(data=0, nrow=dim(Dataset1)[1], ncol=2)
+rownames(zeropercent) <- rownames(Dataset1)
+zeropercent[,1] <- apply(exprs(Dataset1), 1, function(x) sum(x==0)/length(x))
+zeropercent[,2] <- apply(exprs(Dataset2), 1, function(x) sum(x==0)/length(x))
+logdata1 <- t(apply(exprs(Dataset1), 1, log))
+logdata2 <- t(apply(exprs(Dataset2), 1, log))
+logdata1[logdata1==-Inf] <- 0
+logdata2[logdata2==-Inf] <- 0
+str(logdata2)
+str(logdata1)
+SD <- simulateSet(scDatEx, numSamples=numSamples,
+nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB,
+nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE,
+random.seed=seed)
+library(scDD)
+str(SD)
+library(SummarizedExperiment)
+library(SummarizedExperiment)
+condition <- c(rep(1, numSamples), rep(2, numSamples))
+rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
+colnames(SD[[1]]) <- names(condition) <- paste0("Sample",
+1:ncol(SD[[1]]), sep="")
+SDSumExp <- SummarizedExperiment(assays=list("NormCounts"=exprs(scDatEx)),
+colData=cond)
+condition <- c(rep(1, numSamples), rep(2, numSamples))
+rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
+colnames(SD[[1]]) <- names(condition) <- paste0("Sample",
+1:ncol(SD[[1]]), sep="")
+str(condition)
+SDSumExp <- SummarizedExperiment(assays=list("NormCounts"=exprs(scDatEx)),
+colData=cond)
+SDSumExp <- SummarizedExperiment(assays=list("NormCounts"=exprs(scDatEx)),
+colData=data.frame(cond))
+condition <- data.frame(condition)
+str(condition)
+str(rownames(condition))
+condition <- c(rep(1, numSamples), rep(2, numSamples))
+SDSumExp <- SummarizedExperiment(assays=list("NormCounts"=SD[[1]]),
+colData=data.frame(condition))
+class(SDSumExp)
+show(SDSumExp)
+str(exprs(SDSumExp))
+str(phenoData(SDSumExp))
+data(scDatExList)
+str(scDatExList)
+condition.names <- names(scDatExList)
+scDatExMat <- preprocess(scDatExList, ConditionNames=condition.names,
+zero.thresh=1, median_norm=FALSE)
+scDatExMatNormThresh <- preprocess(scDatExList, ConditionNames=condition.names,
+zero.thresh=0.75, median_norm=TRUE)
+data(scDatExSim)
+de <- sideViolin(exprs(scDatExSim)[1,], scDatExSim$condition,
+title.gene=featureNames(scDatExSim)[1])
+de <- sideViolin(exprs(scDatExSim)[1,], scDatExSim$condition,
+title.gene=rownames(scDatExSim)[1])
+de
+library(scDD)
+?metadata
+?SummarizedExperiment
+?SummarizedExperiment::metadata
+?metadata
+metadata(scDatEx0
+metadata(scDatEx)
+metadata(scDatExSim)
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+metadata(scDatExSim)
+str(metadata(scDatExSim))
+str(S4Vectors:::metadata(scDatExSim))
+?results
+rm(list=ls())
+scDD
+library(scDD)
+data(scDatExSim)
+class(scDatExSim)
+dim(scDatExSim)
+prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+library(scDD)
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+RES <- results(scDatExSim)
+RES <- scDD::results(scDatExSim)
+rm(list=ls())
+library(scDD)
+sessionInfo()
+?methods(class="SummarizedExperiment")
+methods(class="SummarizedExperiment")
+showClass("SummarizedExperiment")
+showMethods
+showMethods()
+showMethods(class="SummarizedExperiment")
+?show
+?exprs
+?phenoData
+?pData
+library(scDD)
+library(scDD)
+data(scDatExSim)
+class(scDatExSim)
+dim(scDatExSim)
+prior_param=list(alpha=0.01, mu0=0, s0=0.01, a0=0.01, b0=0.01)
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
+RES <- results(scDatExSim)
+head(RES)
+PARTITION.C1 <- results(scDatExSim, type="Zhat.c1")
+PARTITION.C1[1:5,1:5]
+scDatExSim <- scDD(scDatExSim, prior_param=prior_param,
+testZeroes=FALSE, permutations=100)
+data(scDatEx)
+class(scDatEx)
+dim(scDatEx)
+nDE <- 5
+nDP <- 5
+nDM <- 5
+nDB <- 5
+nEE <- 5
+nEP <- 5
+numSamples <- 100
+seed <- 816
+head(results(scDatExSim))
+SD <- simulateSet(scDatEx, numSamples=numSamples,
+nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB,
+nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE,
+random.seed=seed)
+SD <- simulateSet(scDatEx, numSamples=numSamples,
+nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB,
+nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE,
+random.seed=seed)
+library(scDD)
+SD <- simulateSet(scDatEx, numSamples=numSamples,
+nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB,
+nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE,
+random.seed=seed)
+library(SummarizedExperiment)
+condition <- c(rep(1, numSamples), rep(2, numSamples))
+str(SD)
+condition <- c(rep(1, numSamples), rep(2, numSamples))
+rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
+colnames(SD[[1]]) <- names(condition) <- paste0("Sample",
+1:ncol(SD[[1]]), sep="")
+SDSumExp <- SummarizedExperiment(assays=list("NormCounts"=SD[[1]]),
+colData=data.frame(condition))
+class(SDSumExp)
+show(SDSumExp)
+str(normExprs(SDSumExp))
+str(colData(SDSumExp)[["condition"]])
+data(scDatExList)
+PARTITION.C1 <- results(scDatExSim, type="Zhat.c1")
+PARTITION.C1[1:5,1:5]
+class(PARTITION.C1)
+library(scDD)
+?scDD
+?preprocess
+?sideViolin
+?simulateSet
+?testKS
+?results
+?normExprs
+help(package="scDD")
+remove.packages("parallel")
+install.packages("parallel")
+install.packages("parallel")
+install.packages("parallel")
+remove.packages("scDD")
+install.packages("parallel")
+install.packages("parallel")
+library(parallel)
+library(BiocParallel)
+source("https://bioconductor.org/biocLite.R")
+bioclite("BiocParallel")
+biocLite("BiocParallel")
+library(BiocParallel)
+install.packages("ggplot2")
+available.packages
+available.packages()
+?available.packages
+available.packages() -> ap
+str(ap)
+head(ap)
+"parallel" %in% rownames(ap)
+"abc" %in% rownames(ap)
+install.packages("doParallel")
+install.packages("parallel"
+)
+?install.packages
+install.packages("parallel", repos="http://cran.mtu.edu/")
+biocLite("parallel")
+install.packages("parallel")
+install.packages("base")
+install.packages("base")
+install.packages("base")
+install.packages("base")
+install.packages("base")
+sessionInfo()
+library(scDD)
+library(scDD)
+library(scDD)
+library(scDD)
+library(scDD)
+library(BiocCheck)
+BiocCheck
+checkRVersionDependency
+BiocCheck:::checkRVersionDependency
+getRversion()
+getRversion()$major
+getRversion()$minor
+library(scDD)
+library(scDD)
+?scDD
+sessionInfo()
+library(scDD)
+sessionInfo(0)
+sessionInfo()
+?tryCatch
+library(scDD)
+sessionInfo()
+library(scDD)
+library(scDD)
+library(scDD)
+scDD
+library(scDD)
+library(scDD)
