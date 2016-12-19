@@ -303,7 +303,7 @@ scDD <- function(SCdat,
     comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class, min.size)))
     comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class, min.size)))
     
-    message("Notice! Number of permutations is set to zero; using 
+    message("Notice: Number of permutations is set to zero; using 
             Kolmogorov-Smirnov to test for differences in distributions
             instead of the Bayes Factor permutation test")
     
