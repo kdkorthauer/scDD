@@ -474,10 +474,10 @@ scDD <- function(SCdat,
   
   for (g in 1:nrow(normExprs(SCdat)[tofit,])){
     MAP1[tofit[g],][normExprs(SCdat[tofit[g], 
-                colData(SCdat)[[condition]]==ref])!=0] <- c1[[g]]$class + 1 
+                colData(SCdat)[[condition]]==ref])!=0] <- c1[[g]]$class 
     MAP2[tofit[g],][normExprs(SCdat[tofit[g], 
-                colData(SCdat)[[condition]]!=ref])!=0] <- c2[[g]]$class + 1 
-    MAP[tofit[g],][normExprs(SCdat[tofit[g], ])!=0] <- oa[[g]]$class + 1 
+                colData(SCdat)[[condition]]!=ref])!=0] <- c2[[g]]$class
+    MAP[tofit[g],][normExprs(SCdat[tofit[g], ])!=0] <- oa[[g]]$class
   }
   
   comps.all.ALL <- comps.c1.ALL <- comps.c2.ALL <- rep(NA, 
