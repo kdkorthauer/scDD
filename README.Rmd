@@ -19,8 +19,9 @@ source("https://bioconductor.org/biocLite.R")
 biocLite("scDD")
 ```
 
-For examples and tips on using the package, please see the vignette PDF, 
-which you can bring up by typing 
+For examples and tips on using the package, please see the vignette PDF 
+[here](http://bioconductor.org/packages/devel/bioc/vignettes/scDD/inst/doc/scDD.pdf)
+which you can alternatively bring up by typing 
 
 ```R
 browseVignettes("scDD")
