@@ -217,6 +217,12 @@ scDD <- function(SCdat,
   # reference category/condition - the first listed one
   ref <- unique(colData(SCdat)[[condition]])[1]
   
+  # check for genes with negative expression values
+  if (sum(normExprs(SCdat) < 0) > 0){
+    stop(paste0("Error: Negative values for Normalized Expression counts ",
+                "detected. Please ensure all counts are non-negative"))
+  }
+  
   # check for genes that are all (or almost all) zeroes
   if (is.null(min.nonzero)){
     min.nonzero <- min.size
