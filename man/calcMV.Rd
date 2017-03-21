@@ -44,4 +44,3 @@ given dataset. Optionally, multiply
  fold change value \code{FC.thresh}.  Estimates of mean and variance are 
  robust to outliers.
 }
-

@@ -138,9 +138,13 @@
 #' 
 #' @importFrom BiocParallel MulticoreParam
 #' 
+#' @importFrom BiocParallel bpparam
+#' 
 #' @importFrom parallel detectCores
 #' 
-#' @import SummarizedExperiment 
+#' @importFrom S4Vectors metadata
+#' 
+#' @import SummarizedExperiment
 #' 
 #' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
 #' Kendziorski C. A statistical approach for identifying differential 

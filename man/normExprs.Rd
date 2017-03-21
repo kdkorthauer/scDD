@@ -31,4 +31,3 @@ data(scDatExSim)
 
 normCounts <- normExprs(scDatExSim)
 }
-

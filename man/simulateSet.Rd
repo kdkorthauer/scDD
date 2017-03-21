@@ -7,7 +7,7 @@
 simulateSet(SCdat, numSamples = 100, nDE = 250, nDP = 250, nDM = 250,
   nDB = 250, nEE = 5000, nEP = 4000, sd.range = c(1, 3), modeFC = c(2,
   3, 4), plots = TRUE, plot.file = NULL, random.seed = 284,
-  varInflation = NULL, condition = "condition")
+  varInflation = NULL, condition = "condition", param = bpparam())
 }
 \arguments{
 \item{SCdat}{An object of class \code{SummarizedExperiment} that contains 
@@ -70,6 +70,19 @@ condition that corresponds to the multiplicative
  possible values since \code{scDD} can currently only handle two-group 
  comparisons.  The default option assumes that there
  is a column named "condition" that contains this variable.}
+
+\item{param}{a \code{MulticoreParam} or \code{SnowParam} object of 
+the \code{BiocParallel}
+package that defines a parallel backend.  The default option is 
+\code{BiocParallel::bpparam()} which will automatically creates a cluster 
+appropriate for 
+the operating system.  Alternatively, the user can specify the number
+of cores they wish to use by first creating the corresponding 
+\code{MulticoreParam} (for Linux-like OS) or \code{SnowParam} (for Windows)
+object, and then passing it into the \code{scDD}
+function. This could be done to specify a parallel backend on a Linux-like
+OS with, say 12 
+cores by setting \code{param=BiocParallel::MulticoreParam(workers=12)}}
 }
 \value{
 A named list of two items: the first (labeled 'Simulated_Data') is a
@@ -146,4 +159,3 @@ in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222.
 \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
 1077-y}
 }
-
