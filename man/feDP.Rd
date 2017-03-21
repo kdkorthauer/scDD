@@ -71,4 +71,3 @@ condition membership and clustering when
   (most often the case), an FDR-adjusted t-test
   is performed to detect overall mean shifts.
 }
-

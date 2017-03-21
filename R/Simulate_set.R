@@ -29,12 +29,27 @@
 #' 
 #' @param plot.file Character containing the file string if the plots are to be
 #'  sent to a pdf instead of to the standard output.
+#'  
+#' @param param a \code{MulticoreParam} or \code{SnowParam} object of 
+#' the \code{BiocParallel}
+#' package that defines a parallel backend.  The default option is 
+#' \code{BiocParallel::bpparam()} which will automatically creates a cluster 
+#' appropriate for 
+#' the operating system.  Alternatively, the user can specify the number
+#' of cores they wish to use by first creating the corresponding 
+#' \code{MulticoreParam} (for Linux-like OS) or \code{SnowParam} (for Windows)
+#' object, and then passing it into the \code{scDD}
+#' function. This could be done to specify a parallel backend on a Linux-like
+#' OS with, say 12 
+#' cores by setting \code{param=BiocParallel::MulticoreParam(workers=12)}
 #' 
 #' @inheritParams singleCellSimu
 #' 
 #' @inheritParams findIndex
 #' 
 #' @import SummarizedExperiment
+#' 
+#' @importFrom BiocParallel register
 #' 
 #' @export
 #' 
@@ -113,13 +128,18 @@ simulateSet <- function(SCdat, numSamples=100,
                          nDE=250, nDP=250, nDM=250, nDB=250, 
                          nEE=5000, nEP=4000, sd.range=c(1,3), modeFC=c(2,3,4), 
                          plots=TRUE, plot.file=NULL, random.seed=284,
-                         varInflation=NULL, condition="condition"){
+                         varInflation=NULL, condition="condition",
+                         param=bpparam()){
 if(!is.null(plot.file)){
   pdf(file=paste0(plot.file))
 }
 
 # reference category/condition - the first listed one
 ref <- unique(colData(SCdat)[[condition]])[1]  
+
+message(paste0("Setting up parallel back-end using ", 
+               param$workers, " cores" ))
+BiocParallel::register(BPPARAM = param)
   
 message("Identifying a set of genes to simulate from...")  
 index <- findIndex(SCdat, condition)
