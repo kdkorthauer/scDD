@@ -27,4 +27,3 @@ Test for a difference in the proportion of zeroes between
 conditions that is not explained by the 
   detection rate.  Utilizes Bayesian logistic regression.
 }
-

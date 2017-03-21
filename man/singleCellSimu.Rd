@@ -70,4 +70,3 @@ Called by \code{\link{simulateSet}} to simulate a specified number of genes
 from 
   one DD category at a time.
 }
-

@@ -18,8 +18,7 @@ Imports: fields, mclust, BiocParallel, outliers, ggplot2, EBSeq, arm,
         SummarizedExperiment, grDevices, graphics, stats, S4Vectors
 Suggests: BiocStyle, knitr, gridExtra
 License: GPL-2
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 VignetteBuilder: knitr
 biocViews: Bayesian, Clustering, RNASeq, SingleCell,
         MultipleComparison, Visualization, DifferentialExpression
-

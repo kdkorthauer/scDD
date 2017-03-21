@@ -67,4 +67,3 @@ scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
 
 RES <- results(scDatExSim)
 }
-
