@@ -1,5 +1,5 @@
 Package: scDD
-Version: 0.99.4
+Version: 0.99.5
 Date: 2016-12-7
 Title: Mixture modeling of single-cell RNA-seq data to indentify genes
         with differential distributions
@@ -15,7 +15,8 @@ Maintainer: Keegan Korthauer <keegan@jimmy.harvard.edu>
 Depends: R (>= 3.4)
 NeedsCompilation: yes
 Imports: fields, mclust, BiocParallel, outliers, ggplot2, EBSeq, arm,
-        SummarizedExperiment, grDevices, graphics, stats, S4Vectors
+        SummarizedExperiment, grDevices, graphics, stats, S4Vectors,
+        scran
 Suggests: BiocStyle, knitr, gridExtra
 License: GPL-2
 RoxygenNote: 6.0.1
