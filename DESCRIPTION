@@ -22,3 +22,5 @@ RoxygenNote: 6.0.1
 VignetteBuilder: knitr
 biocViews: Bayesian, Clustering, RNASeq, SingleCell,
         MultipleComparison, Visualization, DifferentialExpression
+URL: https://github.com/kdkorthauer/scDD
+BugReports: https://github.com/kdkorthauer/scDD/issues
