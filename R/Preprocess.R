@@ -19,6 +19,9 @@
 #'  the maximum proportion
 #'  of zeroes per gene allowable in the processed dataset
 #'  
+#' @param scran_norm Logical indicating whether or not to normalize the data
+#'  using scran Normalization from \code{scran}
+#'  
 #' @param median_norm Logical indicating whether or not to normalize the data
 #'  using Median Normalization from \code{EBSeq}
 #' 
@@ -27,6 +30,8 @@
 #' @importFrom EBSeq MedianNorm
 #' 
 #' @importFrom EBSeq GetNormalizedMat
+#' 
+#' @importFrom scran computeSumFactors
 #'
 #' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
 #' Kendziorski C. A statistical approach for identifying differential 
@@ -67,57 +72,81 @@
 #'  # are all zero set the median_norm argument to FALSE to return raw data
 #'  
 #'  scDatExMat <- preprocess(scDatExList, ConditionNames=condition.names, 
-#'                           zero.thresh=1, median_norm=FALSE)
+#'                           zero.thresh=1)
 #'  
 #'  
 #'  # apply the preprocess function again, but this time threshold on the 
-#'  # proportion of zeroes and apply median normalization
+#'  # proportion of zeroes and apply scran normalization
 #'  # set the zero.thresh argument to 0.75 so that genes with more than 75% 
 #'  # zeroes are filtered out 
-#'  # set the median_norm argument to TRUE to return median normalized counts
+#'  # set the scran_norm argument to TRUE to return scran normalized counts
 #'  
-#'  scDatExMatNormThresh <- preprocess(scDatExList, 
+#'  normDat.scran <- preprocess(scDatExList, 
 #'                                     ConditionNames=condition.names, 
-#'                                     zero.thresh=0.75, median_norm=TRUE)
+#'                                     zero.thresh=0.90, scran_norm=TRUE)
+#'  
+#'  # set the median_norm argument to TRUE to return Median normalized counts
+#'  
+#'  normDat.median <- preprocess(scDatExList, 
+#'                                     ConditionNames=condition.names, 
+#'                                     zero.thresh=0.90, median_norm=TRUE)
 
 preprocess <- function(DataList, ConditionNames, 
-                       zero.thresh=0.9, median_norm=FALSE){
+                       zero.thresh=0.9,
+                       scran_norm=FALSE,
+                       median_norm=FALSE){
   if(!is.list(DataList)){
     stop("Input data must be a list of data matrices, 
          where each item is a different condition")
   }
+  
+  if(median_norm & scran_norm){
+    stop(paste0("Specified conflicting options for normalization. Only one ",
+                " of scran_norm and median_norm can be set to TRUE"))
+  }
+  
   if(length(ConditionNames)==1){
     these <- which(names(DataList) %in% ConditionNames)
-    expressed <- which(apply(DataList[[these]], 1, max)>1)
-    pe_mat <- DataList[[these]][expressed,]
-    # median normalize
-    if(median_norm){
-      libsize <- MedianNorm(pe_mat)
-      pe_mat<- GetNormalizedMat(pe_mat, libsize)
-    }
-    
+    pe_mat <- DataList[[these]]
     condition <- rep(1, ncol(pe_mat))
+    
+    # threshold on zero percentage
     pz1 <- apply(pe_mat, 1, function(x) sum(x==0)/length(x))
     pe_mat <- pe_mat[pz1 <= zero.thresh ,]
-  }else if(length(ConditionNames)==2){
-    these <- which(names(DataList) %in% ConditionNames)
-    expressed <- list(which(apply(DataList[[these[1]]], 1, max)>1), 
-                      which(apply(DataList[[these[2]]], 1, max)>1))
-    expressed <- expressed[[1]][expressed[[1]] %in% expressed[[2]]]
-    pe_mat <- list(DataList[[these[1]]][expressed,], 
-                   DataList[[these[2]]][expressed,])
-    pe_mat <- list(DataList[[these[1]]], DataList[[these[2]]])
-    condition <- c(rep(1, ncol(pe_mat[[1]])), rep(2, ncol(pe_mat[[2]])))
-    pz1 <- apply(pe_mat[[1]], 1, function(x) sum(x==0)/length(x))
-    pz2 <- apply(pe_mat[[2]], 1, function(x) sum(x==0)/length(x))
-    pe_mat <- cbind(pe_mat[[1]], pe_mat[[2]])
+    
     # median normalize
     if (median_norm){ 
+      message("Performing Median Normalization...")
       libsize <- MedianNorm(pe_mat)
+      pe_mat <- GetNormalizedMat(pe_mat, libsize)
+    }else if(scran_norm){
+      message("Performing scran Normalization...")
+      libsize <-  computeSumFactors(pe_mat)
       pe_mat <- GetNormalizedMat(pe_mat, libsize)
     }
     
+  }else if(length(ConditionNames)==2){
+    these <- which(names(DataList) %in% ConditionNames)
+    pe_mat <- list(DataList[[these[1]]], DataList[[these[2]]])
+    condition <- c(rep(1, ncol(pe_mat[[1]])), rep(2, ncol(pe_mat[[2]])))
+    
+    # threshold on zero percentage
+    pz1 <- apply(pe_mat[[1]], 1, function(x) sum(x==0)/length(x))
+    pz2 <- apply(pe_mat[[2]], 1, function(x) sum(x==0)/length(x))
+    pe_mat <- cbind(pe_mat[[1]], pe_mat[[2]])
     pe_mat <- pe_mat[pz1 <= zero.thresh & pz2 <= zero.thresh,]
+    
+    # normalize
+    if (median_norm){ 
+      message("Performing Median Normalization")
+      libsize <- MedianNorm(pe_mat)
+      pe_mat <- GetNormalizedMat(pe_mat, libsize)
+    }else if(scran_norm){
+      message("Performing scran Normalization")
+      libsize <-  computeSumFactors(pe_mat)
+      pe_mat <- GetNormalizedMat(pe_mat, libsize)
+    }
+    
   }else{ stop("Only 1 or 2 conditions supported")}
   return(pe_mat)
-}
+  }

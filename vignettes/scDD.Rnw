@@ -471,26 +471,29 @@ condition.names <- names(scDatExList)
 
 Finally, apply the \Rfunction{preprocess} function to reformat the data into
 one data matrix with 100 rows and $78+64=142$ columns.  In this example, we 
-set the \Robject{zero.thresh} argument to 1 so that genes are filtered out if 
-they are all zero, and we set the \Robject{median_norm} argument to
-\Rcode{FALSE} to return raw data (no normalization is carried out).
+set the \Robject{zero.thresh} argument to 0.9 so that genes are filtered out if 
+they are 90 percent zero.
 
 <<preprocess>>=
 scDatExMat <- preprocess(scDatExList, ConditionNames=condition.names, 
-                        zero.thresh=1, median_norm=FALSE)
+                        zero.thresh=0.9)
 @
 
 Now, apply the preprocess function again, but this time use a more stringent
-threshold on the proportion of zeroes and apply median normalization.  In this
+threshold on the proportion of zeroes and apply normalization using size 
+factors calculated using the \Rpackage{scran}.  In this
 example, we set the \Robject{zero.thresh} argument to 0.75 so that genes with 
 more than 75 percent zeroes are filtered out and we set the 
-\Robject{median_norm} argument to \Rcode{TRUE} to return median normalized
-counts.
+\Robject{scran_norm} argument to \Rcode{TRUE} to return \Rpackage{scran} 
+normalized counts. 
 
 <<threshe>>= 
-scDatExMatNormThresh <- preprocess(scDatExList, ConditionNames=condition.names, 
-                                   zero.thresh=0.75, median_norm=TRUE)
+datNorm.scran <- preprocess(scDatExList, ConditionNames=condition.names, 
+                                   zero.thresh=0.75, scran_norm=TRUE)
 @
+
+Also included is the option to use median normalization, invoked by setting
+\Robject{median_norm} to \Rcode{TRUE}.
 
 \section{Plotting}
 

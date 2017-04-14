@@ -4,7 +4,8 @@
 \alias{preprocess}
 \title{preprocess}
 \usage{
-preprocess(DataList, ConditionNames, zero.thresh = 0.9, median_norm = FALSE)
+preprocess(DataList, ConditionNames, zero.thresh = 0.9, scran_norm = FALSE,
+  median_norm = FALSE)
 }
 \arguments{
 \item{DataList}{A list object where each item contains a matrix of 
@@ -20,6 +21,9 @@ which contains the name(s) of the
 \item{zero.thresh}{A numeric value between 0 and 1 that represents
 the maximum proportion
 of zeroes per gene allowable in the processed dataset}
+
+\item{scran_norm}{Logical indicating whether or not to normalize the data
+using scran Normalization from \code{scran}}
 
 \item{median_norm}{Logical indicating whether or not to normalize the data
 using Median Normalization from \code{EBSeq}}
@@ -62,18 +66,24 @@ only keep genes with a certain number of nonzero entries.
  # are all zero set the median_norm argument to FALSE to return raw data
  
  scDatExMat <- preprocess(scDatExList, ConditionNames=condition.names, 
-                          zero.thresh=1, median_norm=FALSE)
+                          zero.thresh=1)
  
  
  # apply the preprocess function again, but this time threshold on the 
- # proportion of zeroes and apply median normalization
+ # proportion of zeroes and apply scran normalization
  # set the zero.thresh argument to 0.75 so that genes with more than 75\% 
  # zeroes are filtered out 
- # set the median_norm argument to TRUE to return median normalized counts
+ # set the scran_norm argument to TRUE to return scran normalized counts
  
- scDatExMatNormThresh <- preprocess(scDatExList, 
+ normDat.scran <- preprocess(scDatExList, 
                                     ConditionNames=condition.names, 
-                                    zero.thresh=0.75, median_norm=TRUE)
+                                    zero.thresh=0.90, scran_norm=TRUE)
+ 
+ # set the median_norm argument to TRUE to return Median normalized counts
+ 
+ normDat.median <- preprocess(scDatExList, 
+                                    ConditionNames=condition.names, 
+                                    zero.thresh=0.90, median_norm=TRUE)
 }
 \references{
 Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
