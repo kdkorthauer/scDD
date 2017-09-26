@@ -1,16 +1,9 @@
 # scDD: An R package to identify differentially distributed genes in scRNA-seq 
-Version 0.99.3 of R Package 'scDD' (accepted to Bioconductor).  Note that this
-version requires the 3.4.0 version of R (current development version), and now
-uses ```summarizedExperiment``` objects instead of ```ExpressionSet``` objects.
-To access previous versions of the package (including 1.1.0 as used in the 
-[Genome Biology publication]
-(https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y), 
-see the 
-[Releases page](https://github.com/kdkorthauer/scDD/releases)).
 
+## Installation 
 The Bioconductor landing page is 
-[http://bioconductor.org/packages/devel/bioc/html/scDD](http://bioconductor.org/packages/devel/bioc/html/scDD.html).
-To install, make sure you have development version of Bioconductor (3.5), and 
+[https://bioconductor.org/packages/scDD](https://bioconductor.org/packages/scDD).
+To install, make sure you have the current version of Bioconductor, and 
 use the following commands:
 
 ```R
@@ -19,6 +12,7 @@ source("https://bioconductor.org/biocLite.R")
 biocLite("scDD")
 ```
 
+## Quick Start
 For examples and tips on using the package, please see the vignette PDF 
 [here](http://bioconductor.org/packages/devel/bioc/vignettes/scDD/inst/doc/scDD.pdf)
 which you can alternatively bring up by typing 
@@ -29,28 +23,22 @@ browseVignettes("scDD")
 
 after installing and loading the package into R.  
 
+## Getting Help
 Please send bug reports and feature requests by sending a message to Bioconductor
 Support at [https://support.bioconductor.org](https://support.bioconductor.org)
 or by opening a new issue on 
 [this page](https://github.com/kdkorthauer/scDD/issues)
 
+## Citation
 Please cite the following publication if you use scDD in your work:
 > Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
 Kendziorski C. A statistical approach for identifying differential 
 distributions in single-cell RNA-seq experiments. Genome Biology. 
 2016 Oct 25;17(1):222. 
-[https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y]
-(https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y)
+[https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y)
 
 You can obtain this citation within R by typing
 
 ```R
 citation("scDD")
 ```
-
-Note: The package was built using the development version of R (3.4.0,
-2016-10-26 r71594).  If you are unable to install this version of R on your 
-system due to admin policies, visit the 
-[develop](https://github.com/kdkorthauer/scDD/tree/develop) branch of scDD, 
-which contains instructions to install a version of scDD though GitHub that
-has the R devel version dependency removed.
