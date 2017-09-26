@@ -7,7 +7,7 @@
 results(SCdat, type = c("Genes", "Zhat.c1", "Zhat.c2", "Zhat.combined"))
 }
 \arguments{
-\item{SCdat}{An object of class \code{SummarizedExperiment} that contains 
+\item{SCdat}{An object of class \code{SingleCellExperiment} that contains 
 normalized single-cell expression and metadata, and the output of the
 \code{scDD} function.}
 
@@ -52,7 +52,7 @@ convenience function by calling \code{metadata(SCdat)}.
 }
 \examples{
  
-# load toy simulated example SummarizedExperiment object to find DD genes  
+# load toy simulated example SingleCellExperiment object to find DD genes  
 data(scDatExSim)
 
 # set arguments to pass to scDD function

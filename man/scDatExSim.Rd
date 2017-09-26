@@ -4,7 +4,7 @@
 \name{scDatExSim}
 \alias{scDatExSim}
 \title{Data: Toy example of simulated data}
-\format{An object of class \code{SummarizedExperiment} containing 
+\format{An object of class \code{SingleCellExperiment} containing 
 data for 30 genes for 200 samples
  (100 from condition 1 and 100 from condition 2).  Condition labels (1 or 2)
   are stored in the colData slot.  
@@ -18,7 +18,7 @@ data(scDatExSim)
 An RData object, see Format section for details
 }
 \description{
-Toy example data in \code{SummarizedExperiment} format for 500 
+Toy example data in \code{SingleCellExperiment} format for 500 
 genes to illustrate how to generate simulated data from example data
  using \code{\link{simulateSet}}.  Contains 5 genes from each category 
  (DE, DP, DM, DB, EE, and EP).

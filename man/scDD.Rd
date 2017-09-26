@@ -10,17 +10,17 @@ scDD(SCdat, prior_param = list(alpha = 0.1, mu0 = 0, s0 = 0.01, a0 = 0.01, b0
   condition = "condition", min.size = 3, min.nonzero = NULL)
 }
 \arguments{
-\item{SCdat}{An object of class \code{SummarizedExperiment} that contains 
+\item{SCdat}{An object of class \code{SingleCellExperiment} that contains 
 normalized single-cell expression and metadata. The \code{assays} 
   slot contains a named list of matrices, where the normalized counts are 
-  housed in the one named \code{"NormCounts"}.  This matrix should have one
+  housed in the one named \code{normcounts}.  This matrix should have one
    row for each gene and one sample for each column.  
   The \code{colData} slot should contain a data.frame with one row per 
   sample and columns that contain metadata for each sample.  This data.frame
   should contain a variable that represents biological condition, which is 
   in the form of numeric values (either 1 or 2) that indicates which 
   condition each sample belongs to (in the same order as the columns of 
-  \code{NormCounts}).  Optional additional metadata about each cell can also
+  \code{normcounts}).  Optional additional metadata about each cell can also
   be contained in this data.frame, and additional information about the 
   experiment can be contained in the \code{metadata} slot as a list.}
 
@@ -104,7 +104,7 @@ still be tested for DZ (if \code{testZeroes} is TRUE). Default value is
 NULL (no minimum value is enforced).}
 }
 \value{
-A \code{SummarizedExperiment} object that contains the data and 
+A \code{SingleCellExperiment} object that contains the data and 
 sample information from the input object, but where the results objects
 are now added to the \code{metadata} slot.  The metadata slot is now a
 list with four items: the first (main results object) is a data.frame 
@@ -145,12 +145,12 @@ conditions.  Models each log-transformed gene as a Dirichlet
 }
 \examples{
  
-# load toy simulated example SummarizedExperiment to find DD genes
+# load toy simulated example SingleCellExperiment object to find DD genes
 
 data(scDatExSim)
 
 
-# check that this object is a member of the SummarizedExperiment class
+# check that this object is a member of the SingleCellExperiment class
 # and that it contains 200 samples and 30 genes
 
 class(scDatExSim)

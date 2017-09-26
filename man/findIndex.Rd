@@ -7,14 +7,19 @@
 findIndex(SCdat, condition = "condition")
 }
 \arguments{
-\item{SCdat}{An object of class \code{ExpressionSet} that contains 
-normalized single-cell expression and metadata, where the \code{assayData} 
-  slot contains one row for each gene and one sample for each column.  
-  The \code{PhenoData} slot should contain a vector of numeric values
-  (either 1 or 2) that indicates which 
-  condition each sample belongs to (in the same order as the columns 
-  of \code{assayData}).  Optional additional metadata about the 
-  experiment can be contained in the \code{experimentData} slot.}
+\item{SCdat}{An object of class \code{SingleCellExperiment} that contains 
+normalized single-cell expression and metadata. The \code{assays} 
+  slot contains a named list of matrices, where the normalized counts are 
+  housed in the one named \code{normcounts}.  This matrix should have one
+   row for each gene and one sample for each column.  
+  The \code{colData} slot should contain a data.frame with one row per 
+  sample and columns that contain metadata for each sample.  This data.frame
+  should contain a variable that represents biological condition, which is 
+  in the form of numeric values (either 1 or 2) that indicates which 
+  condition each sample belongs to (in the same order as the columns of 
+  \code{normcounts}).  Optional additional metadata about each cell can also
+  be contained in this data.frame, and additional information about the 
+  experiment can be contained in the \code{metadata} slot as a list.}
 
 \item{condition}{A character object that contains the name of the column in 
 \code{colData} that represents 

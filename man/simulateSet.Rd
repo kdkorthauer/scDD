@@ -10,17 +10,17 @@ simulateSet(SCdat, numSamples = 100, nDE = 250, nDP = 250, nDM = 250,
   varInflation = NULL, condition = "condition", param = bpparam())
 }
 \arguments{
-\item{SCdat}{An object of class \code{SummarizedExperiment} that contains 
+\item{SCdat}{An object of class \code{SingleCellExperiment} that contains 
 normalized single-cell expression and metadata. The \code{assays} 
   slot contains a named list of matrices, where the normalized counts are 
-  housed in the one named \code{"NormCounts"}.  This matrix should have one
+  housed in the one named \code{normcounts}.  This matrix should have one
    row for each gene and one sample for each column.  
   The \code{colData} slot should contain a data.frame with one row per 
   sample and columns that contain metadata for each sample.  This data.frame
   should contain a variable that represents biological condition, which is 
   in the form of numeric values (either 1 or 2) that indicates which 
   condition each sample belongs to (in the same order as the columns of 
-  \code{NormCounts}).  Optional additional metadata about each cell can also
+  \code{normcounts}).  Optional additional metadata about each cell can also
   be contained in this data.frame, and additional information about the 
   experiment can be contained in the \code{metadata} slot as a list.}
 
@@ -141,14 +141,14 @@ SD <- simulateSet(scDatEx, numSamples=numSamples, nDE=nDE, nDP=nDP, nDM=nDM,
                   
                   
 # convert the simulated data object returned by simulateSet into a
-# SummarizedExperiment object
+# SingleCellExperiment object
 
-library(SummarizedExperiment)  
+library(SingleCellExperiment)  
 condition <- c(rep(1, numSamples), rep(2, numSamples))
 rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
 colnames(SD[[1]]) <- names(condition) <- paste0("Sample",
     1:ncol(SD[[1]]), sep="")
-SDSumExp <- SummarizedExperiment(assays=list("NormCounts"=SD[[1]]), 
+SDSumExp <- SingleCellExperiment(assays=list("NormCounts"=SD[[1]]), 
     colData=data.frame(condition))
 }
 \references{

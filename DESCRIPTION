@@ -15,8 +15,8 @@ Maintainer: Keegan Korthauer <keegan@jimmy.harvard.edu>
 Depends: R (>= 3.4)
 NeedsCompilation: yes
 Imports: fields, mclust, BiocParallel, outliers, ggplot2, EBSeq, arm,
-        SingleCellExperiment, grDevices, graphics, stats, S4Vectors,
-        scran
+        SingleCellExperiment, SummarizedExperiment, grDevices, 
+        graphics, stats, S4Vectors, scran
 Suggests: BiocStyle, knitr, gridExtra
 License: GPL-2
 RoxygenNote: 6.0.1
