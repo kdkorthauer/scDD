@@ -47,7 +47,7 @@
 #' 
 #' @inheritParams findIndex
 #' 
-#' @import SummarizedExperiment
+#' @import SingleCellExperiment
 #' 
 #' @importFrom BiocParallel register
 #' 
@@ -113,14 +113,14 @@
 #'                   
 #'                   
 #' # convert the simulated data object returned by simulateSet into a
-#' # SummarizedExperiment object
+#' # SingleCellExperiment object
 #' 
-#' library(SummarizedExperiment)  
+#' library(SingleCellExperiment)  
 #' condition <- c(rep(1, numSamples), rep(2, numSamples))
 #' rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
 #' colnames(SD[[1]]) <- names(condition) <- paste0("Sample",
 #'     1:ncol(SD[[1]]), sep="")
-#' SDSumExp <- SummarizedExperiment(assays=list("NormCounts"=SD[[1]]), 
+#' SDSumExp <- SingleCellExperiment(assays=list("NormCounts"=SD[[1]]), 
 #'     colData=data.frame(condition))
 
 
@@ -153,7 +153,7 @@ generateZero <- "empirical"
 message("Simulating individual genes...")
 
 # pull off matrix of expression values for condition 1
-Dataset1 <- normExprs(SCdat[,colData(SCdat)[[condition]]==ref])
+Dataset1 <- normcounts(SCdat[,colData(SCdat)[[condition]]==ref])
 
 set.seed(random.seed)
 

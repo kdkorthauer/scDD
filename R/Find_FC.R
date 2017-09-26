@@ -55,9 +55,9 @@ Dataset1 <- SCdat[,colData(SCdat)[[condition]]==ref]
 Dataset2 <- SCdat[,colData(SCdat)[[condition]]!=ref]
 
 ### Find Mean Difference
-x1bar <- apply(normExprs(Dataset1)[index,], 1, function(x) 
+x1bar <- apply(normcounts(Dataset1)[index,], 1, function(x) 
   if(sum(x!=0)>0){ mean(x[x!=0]) }else{0})
-x2bar <- apply(normExprs(Dataset2)[index,], 1, function(x) 
+x2bar <- apply(normcounts(Dataset2)[index,], 1, function(x) 
   if(sum(x!=0)>0){ mean(x[x!=0]) }else{0})
 
 ### Find FC by MA_Plot
@@ -115,7 +115,7 @@ if(plot.FC){
   points(1/2*log2(x1bar*x2bar), log2(x1bar/x2bar), pch=20, cex=0.5, col="grey")
   points(1/2*log2(x1bar*x2bar), log2(FC.vec), pch=20, cex=0.5, col="red")
 }
-FC <- rep(NA, nrow(normExprs(Dataset1)))
+FC <- rep(NA, nrow(normcounts(Dataset1)))
 FC[index] <- FC.vec
 return(FC)
 }

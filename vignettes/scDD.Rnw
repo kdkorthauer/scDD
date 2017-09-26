@@ -180,12 +180,12 @@ will use for identifying and classifying DD genes.
 data(scDatExSim)
 @
 
-Verify that this object is a member of the \Rclass{SummarizedExperiment} class 
+Verify that this object is a member of the \Rclass{SingleCellExperiment} class 
 and that it contains 200 samples and 30 genes.  The \Rcode{colData} slot 
 (which contains a dataframe of metadata for the cells) should have a column 
 that contains the biological condition or grouping of interest.  In this 
 example data, that variable is the 'condition' variable.  Note that the 
-input gene set needs to be in \Rclass{SummarizedExperiment} format, and should 
+input gene set needs to be in \Rclass{SingleCellExperiment} format, and should 
 contain normalized counts.  In practice, it is also advisable to filter 
 the input gene set to remove genes that have an extremely high proportion
 of zeroes (see Section 6).  More specifically, the test for differential
@@ -228,7 +228,7 @@ more details).
 scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
 @
 
-Four results objects are added to the \Robject{scDatExSim} SummarizedExperiment 
+Four results objects are added to the \Robject{scDatExSim} SingleCellExperiment 
 object in the \Rclass{metadata} slot. For convenience, the results objects can
 be extracted with the \Rfunction{results} function.  
 
@@ -400,20 +400,20 @@ that are mostly zero, and getting the data into format that is expected by
 the \Rfunction{scDD} function.  The following subsections will detail 
 these steps.
 
-\subsection{Constructing a SummarizedExperiment object}
+\subsection{Constructing a SingleCellExperiment object}
 
 In this subsection, we provide a quick example of how to construct an object 
-of the \Rclass{SummarizedExperiment} class.  
+of the \Rclass{SingleCellExperiment} class.  
 For more detailed instructions, refer 
-to the \Rpackage{SummarizedExperiment} package documentation.
+to the \Rpackage{SingleCellExperiment} package documentation.
 
 Here we will convert the simulated data object \Robject{SD} returned by 
 \Rfunction{simulateSet} (from the previous section) into a 
-\Rclass{SummarizedExperiment} object.
-First, load the \Rpackage{SummarizedExperiment} package:
+\Rclass{SingleCellExperiment} object.
+First, load the \Rpackage{SingleCellExperiment} package:
 
 <<load summarizedexp, message=FALSE>>=
-library(SummarizedExperiment)
+library(SingleCellExperiment)
 @
 
 Next, create a vector of condition membership labels (these should be 1 or 2).
@@ -434,12 +434,12 @@ colnames(SD[[1]]) <- names(condition) <- paste0("Sample",
                                                 1:ncol(SD[[1]]), sep="")
 @
 
-Once our labeling is intact, we can call the \Rfunction{SummarizedExperiment} 
+Once our labeling is intact, we can call the \Rfunction{SingleCellExperiment} 
 function and specify the two relevant pieces of information.  Optionally, 
 additional experiment information can be stored in additional slots; see 
-\Rpackage{SummarizedExperiment} package for more details.
+\Rpackage{SingleCellExperiment} package for more details.
 <<create estet>>=
-SDSumExp <- SummarizedExperiment(assays=list("NormCounts"=SD[[1]]),
+sce <- SingleCellExperiemnt(assays=list(normcounts=SD[[1]]),
                                 colData=data.frame(condition))
 @
 
@@ -512,10 +512,10 @@ using the toy example simulated dataset.  First, load the toy simulated dataset:
 data(scDatExSim)
 @
 
-Next, load the \Rpackage{SummarizedExperiment} package to facilitate 
-subset operations on \Rcode{SummarizedExperiment} class objects:
+Next, load the \Rpackage{SingleCellExperiment} package to facilitate 
+subset operations on \Rcode{SingleCellExperiment} class objects:
 <<load sumExp, message=FALSE>>=
-library(SummarizedExperiment)
+library(SingleCellExperiment)
 @
 
 The following lines will produce the figures in Figure~\ref{figure/plotGrid-1}.

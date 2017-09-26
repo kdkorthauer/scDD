@@ -8,7 +8,7 @@
 #' \code{metadata} slot and can also be accessed without the help of this 
 #' convenience function by calling \code{metadata(SCdat)}.
 #'   
-#' @param SCdat An object of class \code{SummarizedExperiment} that contains 
+#' @param SCdat An object of class \code{SingleCellExperiment} that contains 
 #' normalized single-cell expression and metadata, and the output of the
 #' \code{scDD} function.
 #' 
@@ -44,7 +44,7 @@
 #'  
 #' @examples 
 #'  
-#' # load toy simulated example SummarizedExperiment object to find DD genes  
+#' # load toy simulated example SingleCellExperiment object to find DD genes  
 #' data(scDatExSim)
 #' 
 #' # set arguments to pass to scDD function
@@ -63,33 +63,4 @@ results <- function(SCdat, type=c("Genes", "Zhat.c1" , "Zhat.c2",
                                   "Zhat.combined")){
   type <- match.arg(type)
   return(metadata(SCdat)[[type]])
-}
-
-#' normExprs
-#' 
-#' extract Normalized expression matrix from SummarizedExperiment object
-#' 
-#' @details Convenient helper function to extract the normalized expression
-#' matrix (in the \code{"NormedCounts"} slot of \code{assays}) from the
-#' SummarizedExperiment
-#'   
-#' @param SCdat An object of class \code{SummarizedExperiment} that contains 
-#' normalized single-cell expression and metadata
-#'
-#' @return A \code{matrix} which contains the normalized count data
-#'  where genes are in rows and cells are in columns
-#'  
-#' @export
-#'  
-#' @examples 
-#'  
-#' # load toy simulated example SummarizedExperiment to find DD genes  
-#' data(scDatExSim)
-#' 
-#' # extract normalized expression matrix from the SummarizedExperiment object 
-#' 
-#' normCounts <- normExprs(scDatExSim)
-
-normExprs <- function(SCdat){
-  return(assays(SCdat)[["NormCounts"]])
 }

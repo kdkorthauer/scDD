@@ -15,17 +15,17 @@
 #'   proportion of zeroes (dropout rate) is different across conditions is 
 #'   performed (DZ).
 #'   
-#' @param SCdat An object of class \code{SummarizedExperiment} that contains 
+#' @param SCdat An object of class \code{SingleCellExperiment} that contains 
 #' normalized single-cell expression and metadata. The \code{assays} 
 #'   slot contains a named list of matrices, where the normalized counts are 
-#'   housed in the one named \code{"NormCounts"}.  This matrix should have one
+#'   housed in the one named \code{normcounts}.  This matrix should have one
 #'    row for each gene and one sample for each column.  
 #'   The \code{colData} slot should contain a data.frame with one row per 
 #'   sample and columns that contain metadata for each sample.  This data.frame
 #'   should contain a variable that represents biological condition, which is 
 #'   in the form of numeric values (either 1 or 2) that indicates which 
 #'   condition each sample belongs to (in the same order as the columns of 
-#'   \code{NormCounts}).  Optional additional metadata about each cell can also
+#'   \code{normcounts}).  Optional additional metadata about each cell can also
 #'   be contained in this data.frame, and additional information about the 
 #'   experiment can be contained in the \code{metadata} slot as a list.
 #' 
@@ -108,7 +108,7 @@
 #' still be tested for DZ (if \code{testZeroes} is TRUE). Default value is
 #' NULL (no minimum value is enforced).      
 #' 
-#' @return A \code{SummarizedExperiment} object that contains the data and 
+#' @return A \code{SingleCellExperiment} object that contains the data and 
 #' sample information from the input object, but where the results objects
 #' are now added to the \code{metadata} slot.  The metadata slot is now a
 #' list with four items: the first (main results object) is a data.frame 
@@ -144,7 +144,7 @@
 #' 
 #' @importFrom S4Vectors metadata
 #' 
-#' @import SummarizedExperiment
+#' @import SingleCellExperiment
 #' 
 #' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
 #' Kendziorski C. A statistical approach for identifying differential 
@@ -155,12 +155,12 @@
 #'  
 #' @examples 
 #'  
-#' # load toy simulated example SummarizedExperiment to find DD genes
+#' # load toy simulated example SingleCellExperiment object to find DD genes
 #' 
 #' data(scDatExSim)
 #' 
 #' 
-#' # check that this object is a member of the SummarizedExperiment class
+#' # check that this object is a member of the SingleCellExperiment class
 #' # and that it contains 200 samples and 30 genes
 #' 
 #' class(scDatExSim)
@@ -193,14 +193,15 @@ scDD <- function(SCdat,
                  condition="condition", min.size=3,
                  min.nonzero=NULL){
   
-  # check whether SCdat is a member of the SummarizedExperiment class
-  if(!("SummarizedExperiment" %in% class(SCdat))){
-    stop("Please provide a valid 'SummarizedExperiment' object.")
+  # check whether SCdat is a member of the SingleCellExperiment class
+  if(!("SingleCellExperiment" %in% class(SCdat))){
+    stop("Please provide a valid 'SingleCellExperiment' object.")
   }
   
-  if (is.null(assayNames(SCdat)) || assayNames(SCdat)[1] != "NormCounts") {
-    message("renaming the first element in assays(SCdat) to 'NormCounts'")
-    assayNames(SCdat)[1] <- "NormCounts"
+  if (is.null(assayNames(SCdat)) || !("normcounts" %in% assayNames(SCdat)[1])) {
+    stop(paste0("Please make sure the 'SingleCellExperiment' object includes ",
+                "an assays slot named 'normcounts' that contains normalized ",
+                "counts on the original scale"))
   }
   
   parallelBy <- match.arg(parallelBy)
@@ -214,7 +215,7 @@ scDD <- function(SCdat,
   
   # check that condition inputs are valid
   if (length(unique(colData(SCdat)[[condition]])) != 2 | 
-      length(colData(SCdat)[[condition]]) != ncol(normExprs(SCdat))){
+      length(colData(SCdat)[[condition]]) != ncol(normcounts(SCdat))){
     stop("Error: Please specify valid condition labels.")
   }
   
@@ -222,7 +223,7 @@ scDD <- function(SCdat,
   ref <- unique(colData(SCdat)[[condition]])[1]
   
   # check for genes with negative expression values
-  if (sum(normExprs(SCdat) < 0) > 0){
+  if (sum(normcounts(SCdat) < 0) > 0){
     stop(paste0("Error: Negative values for Normalized Expression counts ",
                 "detected. Please ensure all counts are non-negative"))
   }
@@ -232,19 +233,19 @@ scDD <- function(SCdat,
     min.nonzero <- min.size
   }
   tofit <- which(
-           (rowSums(normExprs(SCdat)[,colData(SCdat)[[condition]]==ref]>0) >= 
+           (rowSums(normcounts(SCdat)[,colData(SCdat)[[condition]]==ref]>0) >= 
              max(min.size,2,min.nonzero)) &
-           (rowSums(normExprs(SCdat)[,colData(SCdat)[[condition]]!=ref]>0) >= 
+           (rowSums(normcounts(SCdat)[,colData(SCdat)[[condition]]!=ref]>0) >= 
               max(min.size,2,min.nonzero)))
   
-  if (length(tofit) < nrow(normExprs(SCdat))){
+  if (length(tofit) < nrow(normcounts(SCdat))){
     if(testZeroes){
-      message(paste0("Notice: ", nrow(normExprs(SCdat))-length(tofit), 
+      message(paste0("Notice: ", nrow(normcounts(SCdat))-length(tofit), 
               " genes have less than ", min.nonzero, 
               " nonzero cells per condition. ",
               " Only testing for DZ for these genes."))  
     }else{
-      message(paste0("Notice: ", nrow(normExprs(SCdat))-length(tofit), 
+      message(paste0("Notice: ", nrow(normcounts(SCdat))-length(tofit), 
                      " genes have less than ", min.nonzero, 
                      " nonzero cells per condition. ",
                      " Skipping these genes."))  
@@ -254,10 +255,10 @@ scDD <- function(SCdat,
   # check for genes for which all nonzero values are identical within at least 
   # one of the conditions. These will cause problems in model fitting
   skipConstant <- which( 
-                apply(normExprs(SCdat)[tofit,
+                apply(normcounts(SCdat)[tofit,
                                        colData(SCdat)[[condition]]==ref], 1,
                                 function(x) length(unique(x[x>0])) == 1) |
-                apply(normExprs(SCdat)[tofit,
+                apply(normcounts(SCdat)[tofit,
                                        colData(SCdat)[[condition]]!=ref], 1,
                                 function(x) length(unique(x[x>0])) == 1) )
   if (length(skipConstant) > 0){
@@ -280,9 +281,9 @@ scDD <- function(SCdat,
                  param$workers, " cores" ))
   BiocParallel::register(BPPARAM = param)
   
-  oa <- c1 <- c2 <- vector("list", nrow(normExprs(SCdat)[tofit,]))
+  oa <- c1 <- c2 <- vector("list", nrow(normcounts(SCdat)[tofit,]))
   bf <- den <- comps.all <- 
-    comps.c1 <- comps.c2 <- rep(NA, nrow(normExprs(SCdat)[tofit,]))
+    comps.c1 <- comps.c2 <- rep(NA, nrow(normcounts(SCdat)[tofit,]))
   
   if (permutations == 0){
 
@@ -302,8 +303,8 @@ scDD <- function(SCdat,
       ))
     }
     
-    out <- bplapply(1:nrow(normExprs(SCdat)[tofit,]), function(x) 
-      genefit(normExprs(SCdat)[tofit[x],]))
+    out <- bplapply(1:nrow(normcounts(SCdat)[tofit,]), function(x) 
+      genefit(normcounts(SCdat)[tofit[x],]))
     oa <- lapply(out, function(x) x[["oa"]])
     c1 <- lapply(out, function(x) x[["c1"]])
     c2 <- lapply(out, function(x) x[["c2"]])
@@ -317,7 +318,7 @@ scDD <- function(SCdat,
             Kolmogorov-Smirnov to test for differences in distributions
             instead of the Bayes Factor permutation test")
     
-    res_ks <- testKS(normExprs(SCdat)[tofit,], 
+    res_ks <- testKS(normcounts(SCdat)[tofit,], 
                      colData(SCdat)[[condition]], inclZero=FALSE)
     
     if (testZeroes){
@@ -351,8 +352,8 @@ scDD <- function(SCdat,
       ))
     }
     
-    out <- bplapply(1:nrow(normExprs(SCdat)[tofit,]), function(x) 
-      genefit(normExprs(SCdat)[tofit[x],]))
+    out <- bplapply(1:nrow(normcounts(SCdat)[tofit,]), function(x) 
+      genefit(normcounts(SCdat)[tofit[x],]))
     oa <- lapply(out, function(x) x[["oa"]])
     c1 <- lapply(out, function(x) x[["c1"]])
     c2 <- lapply(out, function(x) x[["c2"]])
@@ -369,17 +370,17 @@ scDD <- function(SCdat,
       message("Performing permutations to evaluate independence of clustering
               and condition for each gene")
       message(paste0("Parallelizing by ", parallelBy))
-      bf.perm <- vector("list", nrow(normExprs(SCdat)[tofit,]))
-      names(bf.perm) <- rownames(normExprs(SCdat)[tofit,])
+      bf.perm <- vector("list", nrow(normcounts(SCdat)[tofit,]))
+      names(bf.perm) <- rownames(normcounts(SCdat)[tofit,])
       
       if(parallelBy=="Permutations"){
         if(adjust.perms){
-          C <- apply(normExprs(SCdat)[tofit,], 2, 
+          C <- apply(normcounts(SCdat)[tofit,], 2, 
                      function(x) sum(x>0)/length(x))
           
           t1 <- proc.time()
-          for (g in 1:nrow(normExprs(SCdat)[tofit,])){
-            bf.perm[[g]] <- permMclustCov(normExprs(SCdat)[tofit[g],], 
+          for (g in 1:nrow(normcounts(SCdat)[tofit,])){
+            bf.perm[[g]] <- permMclustCov(normcounts(SCdat)[tofit[g],], 
                                           permutations, C, 
                                           colData(SCdat)[[condition]], 
                                           remove.zeroes=TRUE, 
@@ -397,8 +398,8 @@ scDD <- function(SCdat,
           
         }else{
           t1 <- proc.time()
-          for (g in 1:nrow(normExprs(SCdat)[tofit,])){
-            bf.perm[[g]] <- permMclust(normExprs(SCdat[tofit[g],]), 
+          for (g in 1:nrow(normcounts(SCdat)[tofit,])){
+            bf.perm[[g]] <- permMclust(normcounts(SCdat[tofit[g],]), 
                                        permutations,
                                        colData(SCdat)[[condition]], 
                                        remove.zeroes=TRUE, log.transf=TRUE, 
@@ -415,9 +416,9 @@ scDD <- function(SCdat,
           }
       }
       }else if(parallelBy=="Genes"){
-        C <- apply(normExprs(SCdat)[tofit,], 2, function(x) sum(x>0)/length(x))
-        bf.perm <- bplapply(1:nrow(normExprs(SCdat)[tofit,]), function(x) 
-              permMclustGene(normExprs(SCdat)[tofit[x],], adjust.perms, 
+        C <- apply(normcounts(SCdat)[tofit,], 2, function(x) sum(x>0)/length(x))
+        bf.perm <- bplapply(1:nrow(normcounts(SCdat)[tofit,]), function(x) 
+              permMclustGene(normcounts(SCdat)[tofit[x],], adjust.perms, 
                              permutations, colData(SCdat)[[condition]], 
                              remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE,
                              min.size=min.size,
@@ -426,10 +427,10 @@ scDD <- function(SCdat,
                  parallelize by using the parallelizeBy argument")}
       
       if (adjust.perms){
-        pvals <- sapply(1:nrow(normExprs(SCdat)[tofit,]), function(x) 
+        pvals <- sapply(1:nrow(normcounts(SCdat)[tofit,]), function(x) 
           sum( bf.perm[[x]] > bf[x] - den[x] ) )/(permutations)
       }else{
-        pvals <- sapply(1:nrow(normExprs(SCdat)[tofit,]), function(x) 
+        pvals <- sapply(1:nrow(normcounts(SCdat)[tofit,]), function(x) 
           sum( bf.perm[[x]] > bf[x]) ) / (permutations)
       }
       
@@ -441,15 +442,15 @@ scDD <- function(SCdat,
   }
   
   message("Classifying significant genes into patterns")
-  dd.cats <- classifyDD(normExprs(SCdat)[tofit,], colData(SCdat)[[condition]],
+  dd.cats <- classifyDD(normcounts(SCdat)[tofit,], colData(SCdat)[[condition]],
                         sig, oa, c1, c2, alpha=alpha, 
                         m0=m0, s0=s0, a0=a0, b0=b0, 
                         log.nonzero=TRUE, ref=ref, min.size=min.size)
   
-  cats <- rep("NS", nrow(normExprs(SCdat)[tofit,]))
+  cats <- rep("NS", nrow(normcounts(SCdat)[tofit,]))
   cats[sig] <- dd.cats
   
-  extraDP <- feDP(normExprs(SCdat)[tofit,], colData(SCdat)[[condition]], 
+  extraDP <- feDP(normcounts(SCdat)[tofit,], colData(SCdat)[[condition]], 
                   sig, oa, c1, c2, log.nonzero=TRUE,
                   testZeroes=testZeroes, adjust.perms=adjust.perms, 
                   min.size=min.size)
@@ -462,51 +463,51 @@ scDD <- function(SCdat,
   }else{
     NCs <- which(p.adjust(pvals, method="BH") > 0.05 & cats == "NC")
   }
-  NC.cats <- classifyDD(normExprs(SCdat)[tofit,], colData(SCdat)[[condition]],
+  NC.cats <- classifyDD(normcounts(SCdat)[tofit,], colData(SCdat)[[condition]],
                         NCs, oa, c1, c2, alpha=alpha, 
                         m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE, 
                         ref=ref, min.size=min.size)
   cats[NCs] <- NC.cats
   
-  cats.all <- pvals.all <- rep(NA, nrow(normExprs(SCdat)))
+  cats.all <- pvals.all <- rep(NA, nrow(normcounts(SCdat)))
   cats.all[tofit] <- cats
   pvals.all[tofit] <- pvals
    
   # zero test
   ns <- which(!(cats.all %in% c("DE", "DP", "DM", "DB")))
-  pvals.z <- rep(NA, nrow(normExprs(SCdat)))
+  pvals.z <- rep(NA, nrow(normcounts(SCdat)))
   if (testZeroes){
-    ztest <- testZeroes(normExprs(SCdat), colData(SCdat)[[condition]], ns)
+    ztest <- testZeroes(normcounts(SCdat), colData(SCdat)[[condition]], ns)
     pvals.z[ns] <- ztest
     cats.all[p.adjust(pvals.z, method="BH") < 0.025] <- "DZ"
     cats.all[p.adjust(pvals.z, method="BH") >= 0.025] <- "NS"
   }
   
   # build MAP objects
-  MAP1 <- matrix(1, nrow=nrow(normExprs(SCdat)), 
+  MAP1 <- matrix(1, nrow=nrow(normcounts(SCdat)), 
                  ncol=sum(colData(SCdat)[[condition]]==ref))
-  MAP2 <- matrix(1, nrow=nrow(normExprs(SCdat)), 
+  MAP2 <- matrix(1, nrow=nrow(normcounts(SCdat)), 
                  ncol=sum(colData(SCdat)[[condition]]!=ref))
-  MAP <- matrix(1, nrow=nrow(normExprs(SCdat)), 
-                ncol=ncol(normExprs(SCdat)))
+  MAP <- matrix(1, nrow=nrow(normcounts(SCdat)), 
+                ncol=ncol(normcounts(SCdat)))
   rownames(MAP1) <- rownames(MAP2) <- rownames(MAP) <- rownames(SCdat)
   colnames(MAP1) <- colnames(SCdat[,colData(SCdat)[[condition]]==ref])
   colnames(MAP2) <- colnames(SCdat[,colData(SCdat)[[condition]]!=ref])
   colnames(MAP) <- colnames(SCdat)
-  MAP1[normExprs(SCdat)[, colData(SCdat)[[condition]]==ref]==0] <- 0
-  MAP2[normExprs(SCdat)[, colData(SCdat)[[condition]]!=ref]==0] <- 0
-  MAP[normExprs(SCdat)==0] <- 0
+  MAP1[normcounts(SCdat)[, colData(SCdat)[[condition]]==ref]==0] <- 0
+  MAP2[normcounts(SCdat)[, colData(SCdat)[[condition]]!=ref]==0] <- 0
+  MAP[normcounts(SCdat)==0] <- 0
   
-  for (g in 1:nrow(normExprs(SCdat)[tofit,])){
-    MAP1[tofit[g],][normExprs(SCdat[tofit[g], 
+  for (g in 1:nrow(normcounts(SCdat)[tofit,])){
+    MAP1[tofit[g],][normcounts(SCdat[tofit[g], 
                 colData(SCdat)[[condition]]==ref])!=0] <- c1[[g]]$class 
-    MAP2[tofit[g],][normExprs(SCdat[tofit[g], 
+    MAP2[tofit[g],][normcounts(SCdat[tofit[g], 
                 colData(SCdat)[[condition]]!=ref])!=0] <- c2[[g]]$class
-    MAP[tofit[g],][normExprs(SCdat[tofit[g], ])!=0] <- oa[[g]]$class
+    MAP[tofit[g],][normcounts(SCdat[tofit[g], ])!=0] <- oa[[g]]$class
   }
   
   comps.all.ALL <- comps.c1.ALL <- comps.c2.ALL <- rep(NA, 
-                                                       nrow(normExprs(SCdat)))
+                                                       nrow(normcounts(SCdat)))
   comps.all.ALL[tofit] <- comps.all
   comps.c1.ALL[tofit] <- comps.c1
   comps.c2.ALL[tofit] <- comps.c2
@@ -523,7 +524,7 @@ scDD <- function(SCdat,
   rownames(Genes) <- rownames(SCdat)
   
   # place these results objects in the appropriately named assays()
-  # slots of the SummarizedExperiment object
+  # slots of the SingleCellExperiment object
   metadata(SCdat)[["Genes"]] <- Genes
   metadata(SCdat)[["Zhat.combined"]] <- MAP
   metadata(SCdat)[["Zhat.c1"]] <- MAP1

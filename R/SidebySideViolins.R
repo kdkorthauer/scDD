@@ -44,43 +44,43 @@
 #' data(scDatExSim)
 #' 
 #' 
-#' # load SummarizedExperiment package to facilitate subset operations 
+#' # load SingleCellExperiment package to facilitate subset operations 
 #' 
-#' library(SummarizedExperiment)
+#' library(SingleCellExperiment)
 #' 
 #' 
 #' # plot side by side violin plots for Gene 1 (DE)
 #' 
-#' sideViolin(normExprs(scDatExSim)[1,], scDatExSim$condition, 
+#' sideViolin(normcounts(scDatExSim)[1,], scDatExSim$condition, 
 #'            title.gene=rownames(scDatExSim)[1])
 #' 
 #' 
 #' # plot side by side violin plots for Gene 6 (DP)
 #' 
-#' sideViolin(normExprs(scDatExSim)[6,], scDatExSim$condition, 
+#' sideViolin(normcounts(scDatExSim)[6,], scDatExSim$condition, 
 #'            title.gene=rownames(scDatExSim)[6])
 #' 
 #' 
 #' # plot side by side violin plots for Gene 11 (DM)
 #' 
-#' sideViolin(normExprs(scDatExSim)[11,], scDatExSim$condition, 
+#' sideViolin(normcounts(scDatExSim)[11,], scDatExSim$condition, 
 #'            title.gene=rownames(scDatExSim)[11])
 #' 
 #' 
 #' # plot side by side violin plots for Gene 16 (DB)
 #' 
-#' sideViolin(normExprs(scDatExSim)[16,], scDatExSim$condition, 
+#' sideViolin(normcounts(scDatExSim)[16,], scDatExSim$condition, 
 #'            title.gene=rownames(scDatExSim)[16])
 #' 
 #' # plot side by side violin plots for Gene 21 (EP)
 #' 
-#' sideViolin(normExprs(scDatExSim)[21,], scDatExSim$condition, 
+#' sideViolin(normcounts(scDatExSim)[21,], scDatExSim$condition, 
 #'            title.gene=rownames(scDatExSim)[21])
 #' 
 #' 
 #' # plot side by side violin plots for Gene 26 (EE)
 #' 
-#' sideViolin(normExprs(scDatExSim)[26,], scDatExSim$condition, 
+#' sideViolin(normcounts(scDatExSim)[26,], scDatExSim$condition, 
 #'            title.gene=rownames(scDatExSim)[26])
 #' 
 #' 
