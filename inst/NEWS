@@ -1,1 +1,32 @@
-Changes in future versions of this package will be described here.
+\name{NEWS}
+\title{News for Package \pkg{scDD}}
+
+\section{Version 1.2.0, Bioconductor 3.6 Release (2017-10-31)}{
+  \itemize{
+    \item{The input and output object of the main scDD function has been
+     changed from SummarizedExperiment to SingleCellExperiment to increase
+     interoperability among other Bioconductor packages}
+    \item{The simulateSet function now returns a SingleCellExperiment object 
+     (previously it returned an object in list format)}
+    \item{The preprocess function now takes as input a SingleCellExperiment
+     object instead of a list of data frames}
+  }
+}
+
+\section{Version 1.0.0, Bioconductor 3.5 Release (2017-04-23)}{
+  \itemize{
+    \item{scDD is a package for identifying differentially distributed genes in
+    single-cell RNA-seq data. It is designed to detect differences in 
+    expression that are more complex than a simple mean shift, including:}
+    \item{traditional differential expression (DE)}
+    \item{differential modality (DM)}
+    \item{differential proportion of cells in each state (DP)}
+    \item{both differential modality and differential proportion (DB)}
+  }
+}
+
+\section{Version 0.99.0 (2016-12-07)}{
+  \itemize{
+    \item Package prepared for Bioconductor submission.
+  }
+}
