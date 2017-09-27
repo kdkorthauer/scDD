@@ -51,6 +51,8 @@
 #' 
 #' @importFrom BiocParallel register
 #' 
+#' @import SingleCellExperiment
+#' 
 #' @export
 #' 
 #'
@@ -60,18 +62,20 @@
 #' in single-cell RNA-seq experiments. Genome Biology. 2016 Oct 25;17(1):222. 
 #' \url{https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-
 #' 1077-y}
-#'
-#' @return A named list of two items: the first (labeled 'Simulated_Data') is a
-#'  matrix of simulated 
-#'   data with \code{numSamples} columns and \code{nDE + nDP + nDM + nDB + nEE
-#'    + nEP} rows 
-#'   (total number of genes).  The second item (named 'FC') is a vector of the
-#'    number of standard 
-#'   deviations used for fold changes. For DE genes, this value is computed 
-#'   from the sampled fold
-#'   changes obtained from \code{\link{findFC}}.  For DP, DM, DB, and EP genes,
-#'    this is one of the 
-#'   values in \code{modeFC}.  For EE genes, this value is \code{NA}.
+#'  
+#' @return  An object of class \code{SingleCellExperiment} that contains 
+#' simulated single-cell expression and metadata. The \code{assays} 
+#'   slot contains a named list of matrices, where the simulated counts are 
+#'   housed in the one named \code{normcounts}.  This matrix should have one
+#'    row for each gene (\code{nDE + nDP + nDM + nDB + nEE
+#'    + nEP} rows) and one sample for each column (\code{numSamples} columns).  
+#'   The \code{colData} slot contains a data.frame with one row per 
+#'   sample and a column that represents biological condition, which is 
+#'   in the form of numeric values (either 1 or 2) that indicates which 
+#'   condition each sample belongs to (in the same order as the columns of 
+#'   \code{normcounts}). The \code{rowData} slot contains information about the
+#'   category of the gene (EE, EP, DE, DM, DP, or DB), as well as the simulated
+#'   foldchange value.
 #' 
 #' @examples 
 #' 
@@ -110,19 +114,6 @@
 #'                   nDB=nDB, nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, 
 #'                   plots=FALSE, 
 #'                   random.seed=seed)
-#'                   
-#'                   
-#' # convert the simulated data object returned by simulateSet into a
-#' # SingleCellExperiment object
-#' 
-#' library(SingleCellExperiment)  
-#' condition <- c(rep(1, numSamples), rep(2, numSamples))
-#' rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
-#' colnames(SD[[1]]) <- names(condition) <- paste0("Sample",
-#'     1:ncol(SD[[1]]), sep="")
-#' SDSumExp <- SingleCellExperiment(assays=list("NormCounts"=SD[[1]]), 
-#'     colData=data.frame(condition))
-
 
 simulateSet <- function(SCdat, numSamples=100, 
                          nDE=250, nDP=250, nDM=250, nDB=250, 
@@ -248,8 +239,9 @@ if (nEE > 0){
   rownames(Simulated_Data_EE) <- rnms
   pe_mat <- rbind(pe_mat, Simulated_Data_EE)
   fcs <- c(fcs, rep(NA, nEE))
-  names(fcs) <- rownames(pe_mat[(1:sum(nDE,nDP,nDM,nDB)),])
 }
+
+names(fcs) <- rownames(pe_mat)
 
 if (nDE + nDP + nDM + nDB + nEE + nEP == 0){
   stop("Error: This function simulates gene expression data, but the number of
@@ -268,9 +260,20 @@ pe_mat2 <- pe_mat + unifmat
 pe_mat2[pe_mat==0] <- 0
 
 SD <- list(Simulated_Data=pe_mat2, FC=fcs)
+condition <- c(rep(1, numSamples), rep(2, numSamples))
+fcs <- data.frame(Category=names(fcs),
+                  FC=as.numeric(fcs))
+rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
+rownames(fcs) <- rownames(SD[[1]])
+colnames(SD[[1]]) <- names(condition) <- paste0("Sample",
+     1:ncol(SD[[1]]), sep="")
+sce <- SingleCellExperiment(assays=list(normcounts=SD[[1]]), 
+          colData=data.frame(condition),
+          rowData=fcs)
+
 message(paste0("Done! Simulated ", nDE, " DE, ", nDP, " DP, ", nDM, " DM, ",
                nDB, " DB, ", nEE, " EE, and ", nEP, " EP genes "))
-return(SD)
+return(sce)
 }
 
 

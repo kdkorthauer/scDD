@@ -85,17 +85,19 @@ OS with, say 12
 cores by setting \code{param=BiocParallel::MulticoreParam(workers=12)}}
 }
 \value{
-A named list of two items: the first (labeled 'Simulated_Data') is a
- matrix of simulated 
-  data with \code{numSamples} columns and \code{nDE + nDP + nDM + nDB + nEE
-   + nEP} rows 
-  (total number of genes).  The second item (named 'FC') is a vector of the
-   number of standard 
-  deviations used for fold changes. For DE genes, this value is computed 
-  from the sampled fold
-  changes obtained from \code{\link{findFC}}.  For DP, DM, DB, and EP genes,
-   this is one of the 
-  values in \code{modeFC}.  For EE genes, this value is \code{NA}.
+An object of class \code{SingleCellExperiment} that contains 
+simulated single-cell expression and metadata. The \code{assays} 
+  slot contains a named list of matrices, where the simulated counts are 
+  housed in the one named \code{normcounts}.  This matrix should have one
+   row for each gene (\code{nDE + nDP + nDM + nDB + nEE
+   + nEP} rows) and one sample for each column (\code{numSamples} columns).  
+  The \code{colData} slot contains a data.frame with one row per 
+  sample and a column that represents biological condition, which is 
+  in the form of numeric values (either 1 or 2) that indicates which 
+  condition each sample belongs to (in the same order as the columns of 
+  \code{normcounts}). The \code{rowData} slot contains information about the
+  category of the gene (EE, EP, DE, DM, DP, or DB), as well as the simulated
+  foldchange value.
 }
 \description{
 Simulation of a complete dataset, where the number of each type of 
@@ -138,18 +140,6 @@ SD <- simulateSet(scDatEx, numSamples=numSamples, nDE=nDE, nDP=nDP, nDM=nDM,
                   nDB=nDB, nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, 
                   plots=FALSE, 
                   random.seed=seed)
-                  
-                  
-# convert the simulated data object returned by simulateSet into a
-# SingleCellExperiment object
-
-library(SingleCellExperiment)  
-condition <- c(rep(1, numSamples), rep(2, numSamples))
-rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
-colnames(SD[[1]]) <- names(condition) <- paste0("Sample",
-    1:ncol(SD[[1]]), sep="")
-SDSumExp <- SingleCellExperiment(assays=list("NormCounts"=SD[[1]]), 
-    colData=data.frame(condition))
 }
 \references{
 Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 

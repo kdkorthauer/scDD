@@ -346,7 +346,9 @@ modality and mean expression levels), and for ED genes these include EE
 (equivalent expression for unimodal genes) and EP (equivalent proportion
 for multimodal genes). The simulation parameters are based on observed data
 from two conditions, so the function requires an \Rclass{SingleCellExperiment} 
-formatted dataset as input.
+formatted dataset as input. The output of the function is also a 
+\Rclass{SingleCellExperiment} object with information about the true category
+of each gene and its simulated fold change stored in the \Rcode{rowdata} slot.
 
 First, we load the toy example \Rclass{SingleCellExperiment} to simulate from
 <<load exdat2>>=
@@ -387,9 +389,11 @@ SD <- simulateSet(scDatEx, numSamples=numSamples,
                   random.seed=seed)
 @               
 
-The matrix in the first list element of the \Robject{SD} object contains 
-simulated expression values. The second element stores the fold change/modal
-distance values which can be useful in assessing performance of a differential
+The \Rcode{normcounts} assay \Robject{SD} object (of class 
+\Rclass{SingleCellExperiment}) contains 
+simulated expression values. The \Rcode{rowdata} slot stores the 
+fold change/modal distance values and gene expression categories,
+which are useful in assessing performance of a differential
 expression method.
 
 \section{Formatting and Preprocessing}
@@ -407,40 +411,54 @@ of the \Rclass{SingleCellExperiment} class.
 For more detailed instructions, refer 
 to the \Rpackage{SingleCellExperiment} package documentation.
 
-Here we will convert the simulated data object \Robject{SD} returned by 
-\Rfunction{simulateSet} (from the previous section) into a 
-\Rclass{SingleCellExperiment} object.
+Here we will convert the toy example data object \Robject{scDatExList} into a 
+\Rclass{SingleCellExperiment} object. This object is a list of two matrices 
+(one for each condition) of  normalized counts. Each matrix has genes in rows
+and cells in columns, and is named "C1" or "C2" (for condition 1 or 2).
+
 First, load the \Rpackage{SingleCellExperiment} package:
 
 <<load summarizedexp, message=FALSE>>=
 library(SingleCellExperiment)
 @
 
-Next, create a vector of condition membership labels (these should be 1 or 2).
-In our simulated dataset, we generated \Robject{numSamples} samples in each of 
-two conditions.
-
-<<create condition>>=
-condition <- c(rep(1, numSamples), rep(2, numSamples))
+Next, load the toy example data list:
+<<load exdatlist>>=
+data(scDatExList)
 @
 
-The rows and columns of the expression matrix should have unique names, and 
-the names of the columns should to correspond to the names of the condition 
+Next, create a vector of condition membership labels (these should be 1 or 2).
+In our example data list, we have 78 cells in condition 1, and 64 cells in 
+condition 2.
+
+<<create condition>>=
+condition <- c(rep(1, ncol(scDatExList$C1)), rep(2,  ncol(scDatExList$C2)))
+@
+
+The rows and columns of the expression matrix should have unique names. This is 
+already the case for our toy example dataset.  
+The names of the columns should also correspond to the names of the condition 
 membership labels in \Robject{condition}.
 
 <<rownames>>=
-rownames(SD[[1]]) <- paste0(rownames(SD[[1]]), 1:nrow(SD[[1]]), sep="")
-colnames(SD[[1]]) <- names(condition) <- paste0("Sample", 
-                                                1:ncol(SD[[1]]), sep="")
+# Example of row and column names
+head(rownames(scDatExList$C1))
+head(colnames(scDatExList$C2))
+
+names(condition) <- c(colnames(scDatExList$C1), colnames(scDatExList$C2))
 @
 
 Once our labeling is intact, we can call the \Rfunction{SingleCellExperiment} 
-function and specify the two relevant pieces of information. Optionally, 
+function and specify the two relevant pieces of information. 
+The \Rcode{normcounts} assays slot should contain one matrix, so we use 
+\Rcode{rbind} here to combine both conditinos. Optionally, 
 additional experiment information can be stored in additional slots; see 
 \Rpackage{SingleCellExperiment} package for more details.
-<<create estet>>=
-sce <- SingleCellExperiment(assays=list(normcounts=SD[[1]]),
+<<create sce>>=
+sce <- SingleCellExperiment(assays=list(normcounts=cbind(scDatExList$C1, 
+                                                         scDatExList$C2)),
                                 colData=data.frame(condition))
+show(sce)
 @
 
 \subsection{Filtering and Normalization}

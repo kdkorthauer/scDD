@@ -200,7 +200,7 @@ scDD <- function(SCdat,
     stop("Please provide a valid 'SingleCellExperiment' object.")
   }
   
-  if (is.null(assayNames(SCdat)) || !("normcounts" %in% assayNames(SCdat)[1])) {
+  if (is.null(assayNames(SCdat)) || !("normcounts" %in% assayNames(SCdat))) {
     stop(paste0("Please make sure the 'SingleCellExperiment' object includes ",
                 "an assays slot named 'normcounts' that contains normalized ",
                 "counts on the original scale"))
