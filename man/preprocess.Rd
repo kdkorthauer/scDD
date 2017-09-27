@@ -4,19 +4,35 @@
 \alias{preprocess}
 \title{preprocess}
 \usage{
-preprocess(DataList, ConditionNames, zero.thresh = 0.9, scran_norm = FALSE,
-  median_norm = FALSE)
+preprocess(SCdat, condition = "condition", zero.thresh = 0.9,
+  scran_norm = FALSE, median_norm = FALSE)
 }
 \arguments{
-\item{DataList}{A list object where each item contains a matrix of 
-data with rows 
-designating genes and samples designating columns.  
-The name of the list objects represents
-their condition.}
+\item{SCdat}{An object of class \code{SingleCellExperiment} that contains 
+single-cell expression and metadata. The \code{assays} 
+ slot contains a named list of matrices, where the normalized counts are 
+ housed in the one named \code{normcounts}, and unnormalized counts are 
+ stored in the one names \code{counts}. If either \code{scran_norm} or 
+ \code{median_norm} is set to TRUE, the \code{normcounts} slot will be 
+ created from the \code{counts} slot. The counts and normalized counts 
+ matrices should have one
+  row for each gene and one sample for each column.  
+ The \code{colData} slot should contain a data.frame with one row per 
+ sample and columns that contain metadata for each sample.  This data.frame
+ should contain a variable that represents biological condition, which is 
+ in the form of numeric values (either 1 or 2) that indicates which 
+ condition each sample belongs to (in the same order as the columns of 
+ \code{normcounts}).  Optional additional metadata about each cell can also
+ be contained in this data.frame, and additional information about the 
+ experiment can be contained in the \code{metadata} slot as a list.}
 
-\item{ConditionNames}{Character vector of length 1 or 2 
-which contains the name(s) of the
- conditions (the names of the items in \code{DataList}) to be processed.}
+\item{condition}{A character object that contains the name of the column in 
+\code{colData} that represents 
+ the biological group or condition of interest (e.g. treatment versus 
+ control).  Note that this variable should only contain two 
+ possible values since \code{scDD} can currently only handle two-group 
+ comparisons.  The default option assumes that there
+ is a column named "condition" that contains this variable.}
 
 \item{zero.thresh}{A numeric value between 0 and 1 that represents
 the maximum proportion
@@ -29,45 +45,29 @@ using scran Normalization from \code{scran}}
 using Median Normalization from \code{EBSeq}}
 }
 \value{
-pe_mat Processed matrix with genes in rows and samples in columns. 
- Column names 
- indicate condition.
+An object of class \code{SingleCellExperiment} with genes removed if
+they have more than \code{zero.thresh} zeroes, and the \code{normcounts} 
+assay added if either \code{scran_norm} or \code{median_norm} is set to TRUE
+and only \code{counts} is provided. If \code{normcounts} already exists and
+either \code{scran_norm} or \code{median_norm} is set to TRUE, then the new
+normalized counts are placed in the \code{normcounts} assay slot, and the
+original values are moved to a new slot called \code{normcounts-orig}.
 }
 \description{
-Function to preprocess a list of data matrices to (1) combine 
-into one matrix and (2)
-only keep genes with a certain number of nonzero entries.
+Function to preprocess SingleCellExperiment object (1) to
+only keep genes with a certain number of nonzero entries,
+and (2) optionally apply a normalization procedure.
 }
 \examples{
  
- # load toy example data list
+ # load toy example SingleCellExperiment object
  
- data(scDatExList)
+ data(scDatEx)
  
+ # apply the preprocess function to filter out genes if they have more than
+ # 75\% zero
  
- # check that the data is formated as a list of 2 matrices 
- # (one for each of 2 conditions), 
- # that each matrix has 100 rows (one for each gene), 
- # and that the number of columns in 
- # each matrix corresponds to the number of samples in 
- # each condition (78 and 64, respectively)
- 
- str(scDatExList)
- 
- 
- # get the names of the conditions to pass to the preprocess function
- 
- condition.names <- names(scDatExList)
- 
- 
- # apply the preprocess function to reformat the data into one 
- # data matrix with 100 rows and 78+64=142 columns
- # set the zero.thresh argument to 1 so that genes are filtered out if they
- # are all zero set the median_norm argument to FALSE to return raw data
- 
- scDatExMat <- preprocess(scDatExList, ConditionNames=condition.names, 
-                          zero.thresh=1)
- 
+ scDatEx <- preprocess(scDatEx, zero.thresh=0.75)
  
  # apply the preprocess function again, but this time threshold on the 
  # proportion of zeroes and apply scran normalization
@@ -75,15 +75,11 @@ only keep genes with a certain number of nonzero entries.
  # zeroes are filtered out 
  # set the scran_norm argument to TRUE to return scran normalized counts
  
- normDat.scran <- preprocess(scDatExList, 
-                                    ConditionNames=condition.names, 
-                                    zero.thresh=0.90, scran_norm=TRUE)
+ scDatEx.scran <- preprocess(scDatEx, zero.thresh=0.75, scran_norm=TRUE)
  
  # set the median_norm argument to TRUE to return Median normalized counts
  
- normDat.median <- preprocess(scDatExList, 
-                                    ConditionNames=condition.names, 
-                                    zero.thresh=0.90, median_norm=TRUE)
+ scDatEx.median <- preprocess(scDatEx, zero.thresh=0.75, median_norm=TRUE)
 }
 \references{
 Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 

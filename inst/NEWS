@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{News for Package \pkg{scDD}}
 
-\section{Version 1.2.0, Bioconductor 3.6 Release (2017-10-31)}{
+\section{Version 1.1.5, (2017-09-27)}{
   \itemize{
     \item{The input and output object of the main scDD function has been
      changed from SummarizedExperiment to SingleCellExperiment to increase

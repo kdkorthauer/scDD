@@ -48,9 +48,10 @@
 #' 
 #' @importFrom scran computeSumFactors
 #' 
+#' @import SummarizedExperiment
+#'
 #' @import SingleCellExperiment
 #' 
-#' @import SummarizedExperiment
 #'
 #' @references Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
 #' Kendziorski C. A statistical approach for identifying differential 
@@ -62,7 +63,10 @@
 #' @return An object of class \code{SingleCellExperiment} with genes removed if
 #' they have more than \code{zero.thresh} zeroes, and the \code{normcounts} 
 #' assay added if either \code{scran_norm} or \code{median_norm} is set to TRUE
-#' and only \code{counts} is provided.
+#' and only \code{counts} is provided. If \code{normcounts} already exists and
+#' either \code{scran_norm} or \code{median_norm} is set to TRUE, then the new
+#' normalized counts are placed in the \code{normcounts} assay slot, and the
+#' original values are moved to a new slot called \code{normcounts-orig}.
 #'  
 #' @examples 
 #'  
@@ -70,13 +74,10 @@
 #'  
 #'  data(scDatEx)
 #'  
-#'  # apply the preprocess function to reformat the data into one 
-#'  # data matrix with 100 rows and 78+64=142 columns
-#'  # set the zero.thresh argument to 1 so that genes are filtered out if they
-#'  # are all zero set the median_norm argument to FALSE to return raw data
+#'  # apply the preprocess function to filter out genes if they have more than
+#'  # 75% zero
 #'  
-#'  scDatExMat <- preprocess(scDatEx, zero.thresh=1)
-#'  
+#'  scDatEx <- preprocess(scDatEx, zero.thresh=0.75)
 #'  
 #'  # apply the preprocess function again, but this time threshold on the 
 #'  # proportion of zeroes and apply scran normalization
@@ -84,14 +85,14 @@
 #'  # zeroes are filtered out 
 #'  # set the scran_norm argument to TRUE to return scran normalized counts
 #'  
-#'  normDat.scran <- preprocess(scDatEx, zero.thresh=0.90, scran_norm=TRUE)
+#'  scDatEx.scran <- preprocess(scDatEx, zero.thresh=0.75, scran_norm=TRUE)
 #'  
 #'  # set the median_norm argument to TRUE to return Median normalized counts
 #'  
-#'  normDat.median <- preprocess(scDatEx, zero.thresh=0.90, median_norm=TRUE)
+#'  scDatEx.median <- preprocess(scDatEx, zero.thresh=0.75, median_norm=TRUE)
 
 preprocess <- function(SCdat,
-                       condition="condition"
+                       condition="condition",
                        zero.thresh=0.9,
                        scran_norm=FALSE,
                        median_norm=FALSE){
@@ -113,11 +114,18 @@ preprocess <- function(SCdat,
   }
   
   if (sum(median_norm, scran_norm) == 1 &
-      ( ("normcounts" %in% assayNames(SCdat)) | 
-        !("counts" %in% assayNames(SCdat)) ) ){
-    stop(paste0("If median or scran norm is specified, the input object cannot",
-         " already contain normalized counts in 'normcounts', ",
-         "and must contain raw counts in 'counts'."))
+        !("counts" %in% assayNames(SCdat)) ){
+    stop(paste0("If median or scran norm is specified, the input object ",
+                "must contain raw counts in 'counts'."))
+  }
+  
+  if (sum(median_norm, scran_norm) == 1 &
+       "normcounts" %in% assayNames(SCdat) ){
+    warning(paste0("median or scran norm is specified and the 'normcounts' ",
+                "assay already exists; replacing 'normcounts' in output ",
+                "with the specified normalization method. Original contents ",
+                "of 'normcounts' are now in 'normcounts-orig'."))
+    assay(SCdat, "normcounts-orig") <- normcounts(SCdat)
   }
     
   if (sum(median_norm, scran_norm) == 0 &
@@ -127,26 +135,33 @@ preprocess <- function(SCdat,
   }
   
   
-  these <- which(names(DataList) %in% ConditionNames)
-  pe_mat <- list(DataList[[these[1]]], DataList[[these[2]]])
-  condition <- c(rep(1, ncol(pe_mat[[1]])), rep(2, ncol(pe_mat[[2]])))
+  if (sum(median_norm, scran_norm) == 0){
+    pe_mat <- normcounts(SCdat)
+  }else{
+    pe_mat <- assay(SCdat, "counts")
+  }
   
-  # threshold on zero percentage
-  pz1 <- apply(pe_mat[[1]], 1, function(x) sum(x==0)/length(x))
-  pz2 <- apply(pe_mat[[2]], 1, function(x) sum(x==0)/length(x))
-  pe_mat <- cbind(pe_mat[[1]], pe_mat[[2]])
-  pe_mat <- pe_mat[pz1 <= zero.thresh & pz2 <= zero.thresh,]
+  # reference category/condition - the first listed one
+  ref <- unique(colData(SCdat)[[condition]])[1]
+  cond <- colData(SCdat)[[condition]]
+ 
+  # threshold on zero percentage (within each condition)
+  pz1 <- apply(pe_mat[,cond==ref], 1, function(x) sum(x==0)/length(x))
+  pz2 <- apply(pe_mat[,cond!=ref], 1, function(x) sum(x==0)/length(x))
+  SCdat <- SCdat[pz1 <= zero.thresh & pz2 <= zero.thresh,]
   
   # normalize
   if (median_norm){ 
     message("Performing Median Normalization")
-    libsize <- MedianNorm(pe_mat)
-    pe_mat <- GetNormalizedMat(pe_mat, libsize)
+    libsize <- MedianNorm(assay(SCdat, "counts"))
+    normcounts(SCdat) <- GetNormalizedMat(assay(SCdat, "counts"),
+                                          libsize)
   }else if(scran_norm){
     message("Performing scran Normalization")
-    libsize <-  computeSumFactors(pe_mat)
-    pe_mat <- GetNormalizedMat(pe_mat, libsize)
+    libsize <-  computeSumFactors(assay(SCdat, "counts"))
+    normcounts(SCdat) <- GetNormalizedMat(assay(SCdat, "counts"),
+                                          libsize)
   }
   
-  return(pe_mat)
+  return(SCdat)
 }

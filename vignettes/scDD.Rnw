@@ -9,8 +9,8 @@
 BiocStyle::latex()
 @
 
-  \bioctitle[scDD]{scDD: A statistical approach for identifying differential 
-  distributions in single-cell RNA-seq experiments}
+  \bioctitle[scDD]{Identifying differential 
+  distributions in single-cell RNA-seq experiments with scDD}
     \author{Keegan Korthauer\footnote{\email{keegan@jimmy.harvard.edu}}}
 
 \begin{document}
@@ -348,7 +348,7 @@ for multimodal genes). The simulation parameters are based on observed data
 from two conditions, so the function requires an \Rclass{SingleCellExperiment} 
 formatted dataset as input. The output of the function is also a 
 \Rclass{SingleCellExperiment} object with information about the true category
-of each gene and its simulated fold change stored in the \Rcode{rowdata} slot.
+of each gene and its simulated fold change stored in the \Rcode{rowData} slot.
 
 First, we load the toy example \Rclass{SingleCellExperiment} to simulate from
 <<load exdat2>>=
@@ -387,11 +387,15 @@ SD <- simulateSet(scDatEx, numSamples=numSamples,
                   nDE=nDE, nDP=nDP, nDM=nDM, nDB=nDB, 
                   nEE=nEE, nEP=nEP, sd.range=c(2,2), modeFC=4, plots=FALSE, 
                   random.seed=seed)
+
+# load the SingleCellExperiment package to use rowData method
+library(SingleCellExperiment)
+head(rowData(SD))
 @               
 
 The \Rcode{normcounts} assay \Robject{SD} object (of class 
 \Rclass{SingleCellExperiment}) contains 
-simulated expression values. The \Rcode{rowdata} slot stores the 
+simulated expression values. The \Rcode{rowData} slot stores the 
 fold change/modal distance values and gene expression categories,
 which are useful in assessing performance of a differential
 expression method.
@@ -451,8 +455,8 @@ names(condition) <- c(colnames(scDatExList$C1), colnames(scDatExList$C2))
 Once our labeling is intact, we can call the \Rfunction{SingleCellExperiment} 
 function and specify the two relevant pieces of information. 
 The \Rcode{normcounts} assays slot should contain one matrix, so we use 
-\Rcode{rbind} here to combine both conditinos. Optionally, 
-additional experiment information can be stored in additional slots; see 
+\Rcode{rbind} here to combine both conditions. Optionally, 
+additional experiment information can be stored in additional slots; see the
 \Rpackage{SingleCellExperiment} package for more details.
 <<create sce>>=
 sce <- SingleCellExperiment(assays=list(normcounts=cbind(scDatExList$C1, 
@@ -464,51 +468,47 @@ show(sce)
 \subsection{Filtering and Normalization}
 
 In this subsection, we demonstrate the utility of the \Rfunction{preprocess} 
-function, which can be helpful if working with raw data, or data which 
+function, which can be helpful if working with raw counts, or data which 
 contains genes that are predominantly zero (common in single-cell RNA-seq 
 experiments). This function takes as input a list of data matrices, one for
 each condition.
 
-First, load the toy example data list:
+First, load the toy example data and verify it is a 
+\Rclass{SingleCellExperiment} object:
 <<load exdat3e>>=
-data(scDatExList)
+data(scDatEx)
+show(scDatEx)
 @
 
-Verify that the data is formatted as a list of 2 matrices (one for each of 
-2 conditions), that each matrix has 100 rows (one for each gene), and that 
-the number of columns in each matrix corresponds to the number of samples in 
-each condition (78 and 64, respectively):
-<<check str>>=
-str(scDatExList)
-@
-
-Obtain the names of the conditions to pass to the preprocess function:
-<<name cond>>=
-condition.names <- names(scDatExList)
-@
-
-Finally, apply the \Rfunction{preprocess} function to reformat the data into
-one data matrix with 100 rows and $78+64=142$ columns. In this example, we 
-set the \Robject{zero.thresh} argument to 0.9 so that genes are filtered out if 
-they are 90 percent zero.
+Now, apply the \Rfunction{preprocess} function with the \Robject{zero.thresh} argument set to 0.9 so that genes are filtered out if 
+they are 90 (or more) percent zero.
 
 <<preprocess>>=
-scDatExMat <- preprocess(scDatExList, ConditionNames=condition.names, 
-                        zero.thresh=0.9)
+scDatEx <- preprocess(scDatEx, zero.thresh=0.9)
+show(scDatEx)
 @
+
+We can see that no genes were removed, since all have fewer than 90 percent 
+of zeroes to begin with.
 
 Now, apply the preprocess function again, but this time use a more stringent
 threshold on the proportion of zeroes and apply normalization using size 
 factors calculated using the \Rpackage{scran}. In this
-example, we set the \Robject{zero.thresh} argument to 0.75 so that genes with 
-more than 75 percent zeroes are filtered out and we set the 
+example, we set the \Robject{zero.thresh} argument to 0.50 so that genes with 
+more than 50 percent zeroes are filtered out and we set the 
 \Robject{scran_norm} argument to \Rcode{TRUE} to return \Rpackage{scran} 
 normalized counts. 
 
 <<threshe>>= 
-datNorm.scran <- preprocess(scDatExList, ConditionNames=condition.names, 
-                                   zero.thresh=0.75, scran_norm=TRUE)
+scDatEx.scran <- preprocess(scDatEx, zero.thresh=0.5, scran_norm=TRUE)
+show(scDatEx.scran)
 @
+
+We can see that 38 genes were removed due to having more than 50 percent zeroes.
+The warning message here is letting us know that our SingleCellExperiment 
+object already contained a \Rcode{normcounts} assay, and that by specifying 
+\Rcode{scran_norm=TRUE}, we are replacing that with the scran normalized counts 
+and moving the original values to a new slot called \Rcode{normcounts-orig}. 
 
 Also included is the option to use median normalization, invoked by setting
 \Robject{median_norm} to \Rcode{TRUE}.

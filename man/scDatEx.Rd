@@ -7,7 +7,8 @@
 \format{An object of class \code{SingleCellExperiment} containing
  data for 500 genes for 142 samples
  (78 from condition 1 and 64 from condition 2).  Condition labels (1 or 2)
-  are stored in the colData slot.}
+  are stored in the colData slot. The assays slot contains both normcounts
+  and counts for illustration, but these objects are identical.}
 \usage{
 data(scDatEx)
 }
