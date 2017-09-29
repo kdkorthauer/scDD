@@ -104,7 +104,7 @@ preprocess <- function(SCdat,
   
   # check that condition inputs are valid
   if (length(unique(colData(SCdat)[[condition]])) != 2 | 
-      length(colData(SCdat)[[condition]]) != ncol(normcounts(SCdat))){
+      length(colData(SCdat)[[condition]]) != dim(SCdat)[2]){
     stop("Error: Please specify valid condition labels.")
   }
   
