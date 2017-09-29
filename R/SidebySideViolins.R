@@ -126,6 +126,7 @@ sideViolin <- function(y, cond, MAP=NULL, logT=TRUE, title.gene="",
                       aes(shape=shps), show.legend=FALSE) +
     geom_violin(data=daty[daty$y>0, ], alpha=0.5, aes(fill=factor(cond)), 
                 show.legend=FALSE, scale="count") + 
+    theme_classic() +
     ggtitle(paste0(title.gene)) +
     theme(plot.title = element_text(size=20, face="bold", vjust=2)) + 
     labs(x="Condition", y="log(EC + 1)") +
