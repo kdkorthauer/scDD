@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Using scDD}
+%\VignetteIndexEntry{scDD Quickstart}
 %\VignettePackage{scDD}
 %\VignetteEngine{knitr::knitr}
 
@@ -11,15 +11,12 @@ BiocStyle::latex()
 
   \bioctitle[scDD]{Identifying differential 
   distributions in single-cell RNA-seq experiments with scDD}
-    \author{Keegan Korthauer\footnote{\email{keegan@jimmy.harvard.edu}}}
+    \author{Keegan Korthauer\thanks{\email{keegan@jimmy.harvard.edu}}}
 
 \begin{document}
 
 \maketitle
-\tableofcontents
-
-\section{Introduction}
-
+\begin{abstract}
 The \Rpackage{scDD} package models single-cell gene expression data 
 (from single-cell RNA-seq) using flexible nonparamentric Bayesian mixture 
 models in order to explicitly handle heterogeneity within cell populations. 
@@ -32,6 +29,14 @@ often treated as a nuisance factor in studies of differential expression in
 single-cell RNA-seq experiments. Here, we explicitly accommodate it in order 
 to improve power to detect differences in expression distributions that are 
 more complicated than a mean shift.
+\end{abstract}
+
+\packageVersion{\Sexpr{BiocStyle::pkg_ver("scDD")}}
+Report issues on \url{https://github.com/kdkorthauer/scDD/issues}
+
+\newpage
+\tableofcontents
+\newpage
 
 \section{Background}
 
