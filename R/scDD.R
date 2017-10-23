@@ -54,7 +54,19 @@
 #'   using the \code{sideViolin} function).
 #' 
 #' @param testZeroes Logical indicating whether or not to test for a 
-#' difference in the proportion of zeroes
+#' difference in the proportion of zeroes. This will only be done for genes 
+#' that have at least one zero value (genes where all cells have a nonzero value
+#' will have a `zero.pvalue` of NA).
+#' 
+#' @param level numeric value between 0 and 1 that specifies the alpha level
+#' for significance of a differential gene test (default value 0.05). This is 
+#' used to decide whether to classify a gene into one of the differential
+#' patterns. If `testZeroes` is FALSE and the adjusted p-value for a given gene 
+#' is below `level`, then the gene is categorized. Alternatively, if `testZeroes` 
+#' is TRUE, then the adjusted p-value must be below `level/2` in order to be
+#' considered significant and categorized. This is done to control for multiple
+#' testing since `testZeroes=TRUE` means that each gene is tested for a 
+#' difference in nonzeroes and zeroes separately.
 #' 
 #' @param adjust.perms Logical indicating whether or not to adjust the 
 #' permutation tests for the sample
@@ -113,11 +125,10 @@
 #' are now added to the \code{metadata} slot.  The metadata slot is now a
 #' list with four items: the first (main results object) is a data.frame 
 #' with nine columns: 
-#' gene name (matches rownames of SCdat), permutation p-value for testing of 
-#' independence of 
+#' gene name (matches rownames of SCdat), permutation (or KS) p-value for 
+#' testing of independence of 
 #'  condition membership with clustering, Benjamini-Hochberg adjusted version 
-#'  of the previous column, p-value for test of difference in dropout rate
-#'   (only for non-DD genes), 
+#'  of the previous column, p-value for test of difference in dropout rate, 
 #'  Benjamini-Hochberg adjusted version of the previous column, name of the 
 #'  DD (DE, DP, DM, DB) pattern or DZ (otherwise NS = not significant), the 
 #'  number of clusters identified overall, the number of clusters identified in 
@@ -193,7 +204,8 @@ scDD <- function(SCdat,
                  param=bpparam(), 
                  parallelBy=c("Genes", "Permutations"),
                  condition="condition", min.size=3,
-                 min.nonzero=NULL){
+                 min.nonzero=NULL,
+                 level=0.05){
   
   # check whether SCdat is a member of the SingleCellExperiment class
   if(!("SingleCellExperiment" %in% class(SCdat))){
@@ -324,9 +336,9 @@ scDD <- function(SCdat,
                      colData(SCdat)[[condition]], inclZero=FALSE)
     
     if (testZeroes){
-      sig <- which(res_ks$p < 0.025)
+      sig <- which(res_ks$p < level/2)
     }else{
-      sig <- which(res_ks$p < 0.05)
+      sig <- which(res_ks$p < level)
     }
     
     pvals <- res_ks$p.unadj
@@ -437,9 +449,9 @@ scDD <- function(SCdat,
       }
       
       if (testZeroes){
-        sig <- which(p.adjust(pvals, method="BH") < 0.025)
+        sig <- which(p.adjust(pvals, method="BH") < level/2)
       }else{
-        sig <- which(p.adjust(pvals, method="BH") < 0.05)
+        sig <- which(p.adjust(pvals, method="BH") < level)
       }
   }
   
@@ -461,9 +473,9 @@ scDD <- function(SCdat,
   # classify additional genes with evidence of DD in 
   # the form of a mean shift found by 'extraDP'
   if(testZeroes){
-    NCs <- which(p.adjust(pvals, method="BH") > 0.025 & cats == "NC")
+    NCs <- which(p.adjust(pvals, method="BH") > level/2 & cats == "NC")
   }else{
-    NCs <- which(p.adjust(pvals, method="BH") > 0.05 & cats == "NC")
+    NCs <- which(p.adjust(pvals, method="BH") > level & cats == "NC")
   }
   NC.cats <- classifyDD(normcounts(SCdat)[tofit,], colData(SCdat)[[condition]],
                         NCs, oa, c1, c2, alpha=alpha, 
@@ -476,13 +488,13 @@ scDD <- function(SCdat,
   pvals.all[tofit] <- pvals
    
   # zero test
-  ns <- which(!(cats.all %in% c("DE", "DP", "DM", "DB")))
   pvals.z <- rep(NA, nrow(normcounts(SCdat)))
   if (testZeroes){
-    ztest <- testZeroes(normcounts(SCdat), colData(SCdat)[[condition]], ns)
-    pvals.z[ns] <- ztest
-    cats.all[p.adjust(pvals.z, method="BH") < 0.025] <- "DZ"
-    cats.all[p.adjust(pvals.z, method="BH") >= 0.025] <- "NS"
+    pvals.z <- testZeroes(normcounts(SCdat), colData(SCdat)[[condition]])
+    cats.all[p.adjust(pvals.z, method="BH") < level/2 &
+               !(cats.all %in% c("DE", "DP", "DM", "DB"))] <- "DZ"
+    cats.all[p.adjust(pvals.z, method="BH") >= level/2 &
+               !(cats.all %in% c("DE", "DP", "DM", "DB"))] <- "NS"
   }
   
   # build MAP objects
