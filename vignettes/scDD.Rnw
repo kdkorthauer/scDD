@@ -238,18 +238,9 @@ object in the \Rclass{metadata} slot. For convenience, the results objects can
 be extracted with the \Rfunction{results} function. 
 
 The main results object is the \Rcode{"Genes"} object which is a 
-\Rclass{data.frame} containing the following nine columns: 
-\begin{enumerate}
+\Rclass{data.frame} containing the following columns: 
+\begin{itemize}
   \item \Rcode{gene}: gene name (matches rownames of SCdat)
-  \item \Rcode{nonzero.pvalue}: p-value for KS test of differential 
-  distributions
-  \item \Rcode{nonzero.pvalue.adj}: Benjamini-Hochberg adjusted p-value 
-  for KS test of differential distributions
-  \item \Rcode{zero.pvalue}: p-value for test of difference in dropout rate
-  (only for non-DD genes and if \Rcode{testZeroes==TRUE})
-  \item \Rcode{zero.pvalue.adj}: Benjamini-Hochberg adjusted p-value for 
-  test of difference in dropout rate (only for non-DD genes and if 
-  \Rcode{testZeroes==TRUE})
   \item \Rcode{DDcategory}: name of the DD pattern (DE, DP, DM, DB, DZ), 
   or NC (no call), or NS (not significant). 
   \item \Rcode{Clusters.combined}: the number of clusters identified 
@@ -258,7 +249,20 @@ The main results object is the \Rcode{"Genes"} object which is a
   condition 1 alone
   \item \Rcode{Clusters.c2}: the number of clusters identified in 
   condition 2 alone
-\end{enumerate}
+  \item \Rcode{nonzero.pvalue}: p-value for KS test of differential 
+  distributions of expressed cells
+  \item \Rcode{nonzero.pvalue.adj}: Benjamini-Hochberg adjusted p-value 
+  for KS test of differential distributions
+  \item \Rcode{zero.pvalue}: p-value for test of difference in dropout rate
+  (only if \Rcode{testZeroes==TRUE})
+  \item \Rcode{zero.pvalue.adj}: Benjamini-Hochberg adjusted p-value for 
+  test of difference in dropout rate (only if \Rcode{testZeroes==TRUE})
+  \item \Rcode{combined.pvalue}: Fisher's combined p-value for a difference
+  in nonzero or zero values (only if \Rcode{testZeroes==TRUE})
+  \item \Rcode{combined.pvalue.adj}: Benjamini-Hochberg adjusted Fisher's 
+  combined p-value for a difference
+  in nonzero or zero values (only if \Rcode{testZeroes==TRUE})
+\end{itemize}
 
 This can be extracted using the following call to \Rfunction{results}:
 

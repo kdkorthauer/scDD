@@ -122,18 +122,30 @@
 #' 
 #' @return A \code{SingleCellExperiment} object that contains the data and 
 #' sample information from the input object, but where the results objects
-#' are now added to the \code{metadata} slot.  The metadata slot is now a
+#' are now added to the \code{metadata} slot. The metadata slot is now a
 #' list with four items: the first (main results object) is a data.frame 
-#' with nine columns: 
-#' gene name (matches rownames of SCdat), permutation (or KS) p-value for 
-#' testing of independence of 
-#'  condition membership with clustering, Benjamini-Hochberg adjusted version 
-#'  of the previous column, p-value for test of difference in dropout rate, 
-#'  Benjamini-Hochberg adjusted version of the previous column, name of the 
-#'  DD (DE, DP, DM, DB) pattern or DZ (otherwise NS = not significant), the 
-#'  number of clusters identified overall, the number of clusters identified in 
-#'  condition 1 alone, and the number of clusters identified in condition 
-#'  2 alone. The remaining three elements are matrices (first for condition
+#' with the following columns: 
+#' \itemize{
+#'   \item `gene`: gene name (matches rownames of SCdat)
+#'   \item `DDcategory`: name of the DD (DE, DP, DM, DB, DZ) pattern (or NS = not significant) 
+#'   \item `Clusters.combined`: the number of clusters identified overall
+#'   \item `Clusters.C1`: the number of clusters identified in condition 1 alone
+#'   \item `Clusters.C2`: the number of clusters identified in condition 2 alone
+#'   \item `nonzero.pvalue`: permutation (or KS) p-value for testing difference
+#'   in nonzero expression values
+#'   \item `nonzero.pvalue.adj`: Benjamini-Hochberg adjusted version of the 
+#'     `nonzero.pvalue`column
+#'   \item `zero.pvalue`: p-value for test of difference in dropout rate 
+#'   (only if `testZeroes` is TRUE) 
+#'   \item `zero.pvalue`: Benjamini-Hochberg adjusted version of the previous column 
+#'   (only if `testZeroes` is TRUE) 
+#'   \item `combined.pvalue`: Fisher's combined p-value for a difference in nonzero or zero values
+#'   (only if `testZeroes` is TRUE) 
+#'   \item `combined.pvalue.adj`: Benjamini-Hochberg adjusted version of the previous column 
+#'   (only if `testZeroes` is TRUE) 
+#' }
+#'  
+#' The remaining three elements are matrices (first for condition
 #'   1 and 2 combined, 
 #'  then condition 1 alone, then condition 2 alone) that contains the cluster
 #'   memberships for each sample (cluster 1,2,3,...) in columns and
@@ -527,14 +539,31 @@ scDD <- function(SCdat,
   comps.c2.ALL[tofit] <- comps.c2
   
   Genes = data.frame(gene=rownames(SCdat), 
-                   nonzero.pvalue=pvals.all,
-                   nonzero.pvalue.adj=p.adjust(pvals.all, method="BH"), 
-                   zero.pvalue=pvals.z, 
-                   zero.pvalue.adj=p.adjust(pvals.z, method="BH"), 
                    DDcategory=cats.all, 
                    Clusters.combined=comps.all.ALL, 
                    Clusters.c1=comps.c1.ALL, 
-                   Clusters.c2=comps.c2.ALL)
+                   Clusters.c2=comps.c2.ALL,
+                   nonzero.pvalue=pvals.all,
+                   nonzero.pvalue.adj=p.adjust(pvals.all, method="BH"))
+  
+  # only give dropout-related p-values if testZeroes = TRUE 
+  if(testZeroes){
+    fishersCombinedPval = function(x){ 
+      pchisq(-2 * sum(log(x[!is.na(x)])),
+             df=2*length(x[!is.na(x)]),lower=FALSE)
+    }
+    
+    # compute combined p-value
+    pvals.comb <- apply(cbind(pvals.all, pvals.z), 1, function(x)
+      fishersCombinedPval(x))
+    
+    Genes <- cbind(Genes,
+                   zero.pvalue=pvals.z, 
+                   zero.pvalue.adj=p.adjust(pvals.z, method="BH"),
+                   combined.pvalue=pvals.comb,
+                   combined.pvalue.adj=p.adjust(pvals.comb, method="BH"))
+  }
+  
   rownames(Genes) <- rownames(SCdat)
   
   # place these results objects in the appropriately named assays()

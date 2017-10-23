@@ -32,7 +32,9 @@ contains the cluster membership for
 transformation of nonzero values.}
 
 \item{testZeroes}{Logical indicating whether or not to test for a 
-difference in the proportion of zeroes}
+difference in the proportion of zeroes. This will only be done for genes 
+that have at least one zero value (genes where all cells have a nonzero value
+will have a `zero.pvalue` of NA).}
 
 \item{adjust.perms}{Logical indicating whether or not to adjust the 
 permutation tests for the sample
