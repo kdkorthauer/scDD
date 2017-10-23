@@ -7,7 +7,8 @@
 scDD(SCdat, prior_param = list(alpha = 0.1, mu0 = 0, s0 = 0.01, a0 = 0.01, b0
   = 0.01), permutations = 0, testZeroes = TRUE, adjust.perms = FALSE,
   param = bpparam(), parallelBy = c("Genes", "Permutations"),
-  condition = "condition", min.size = 3, min.nonzero = NULL)
+  condition = "condition", min.size = 3, min.nonzero = NULL,
+  level = 0.05)
 }
 \arguments{
 \item{SCdat}{An object of class \code{SingleCellExperiment} that contains 
@@ -102,6 +103,16 @@ nonzero cells in each condition required for the test of differential
 distributions.  If a gene has fewer nonzero cells per condition, it will
 still be tested for DZ (if \code{testZeroes} is TRUE). Default value is
 NULL (no minimum value is enforced).}
+
+\item{level}{numeric value between 0 and 1 that specifies the alpha level
+for significance of a differential gene test (default value 0.05). This is 
+used to decide whether to classify a gene into one of the differential
+patterns. If `testZeroes` is FALSE and the adjusted p-value for a given gene 
+is below `level`, then the gene is categorized. Alternatively, if `testZeroes` 
+is TRUE, then the adjusted p-value must be below `level/2` in order to be
+considered significant and categorized. This is done to control for multiple
+testing since `testZeroes=TRUE` means that each gene is tested for a 
+difference in nonzeroes and zeroes separately.}
 }
 \value{
 A \code{SingleCellExperiment} object that contains the data and 
