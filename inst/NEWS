@@ -1,6 +1,23 @@
 \name{NEWS}
 \title{News for Package \pkg{scDD}}
 
+\section{Version 1.1.7, (2017-10-23)}{
+  \itemize{
+    \item{A parameter 'level' was added to the main 'scDD' function which allows
+    the user to control the significance level used as the cutoff for 
+    considering a gene to be differentially distributed. Previously it was fixed
+    at 0.05 (now the default value).}
+    \item{Two columns were added to the results object that contain (1) an 
+    overall combined p-value (via Fisher's method) for nonzero and zero 
+    differences, and (2) Benjamini-Hochberg adjusted version of (1).}
+    \item{If `testZeroes` is FALSE, the columns with p-values for the test of
+    differential dropout are no longer included. Previously they held NA values}
+    \item{If `testZeroes` is TRUE, all zero test p-values are included in the 
+    output. Previously, only the tests where the nonzero test was not 
+    significant were reported.}
+  }
+}
+
 \section{Version 1.1.5, (2017-09-27)}{
   \itemize{
     \item{The input and output object of the main scDD function has been
