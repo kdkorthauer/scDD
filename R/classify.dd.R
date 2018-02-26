@@ -265,11 +265,12 @@ testZeroes <- function(dat, cond, these=1:nrow(dat)){
   for (j in 1:length(these)){ 
     y <- dat[these[j],]
     if (sum(y==0) > 0){
-      M0 <- arm::bayesglm(y>0 ~ detection, family=binomial(link="logit"),
-                          Warning=FALSE)
-      M1 <- arm::bayesglm(y>0 ~ detection + factor(cond), 
+      M0 <- suppressWarnings(arm::bayesglm(y>0 ~ detection, 
+                                           family=binomial(link="logit"),
+                          Warning=FALSE))
+      M1 <- suppressWarnings(arm::bayesglm(y>0 ~ detection + factor(cond), 
                           family=binomial(link="logit"),
-                          Warning=FALSE)
+                          Warning=FALSE))
       pval[j] <- anova(M1, M0, test="Chisq")[2,5]
     }
   }
