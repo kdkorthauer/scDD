@@ -49,13 +49,15 @@ mclustRestricted <- function(y, restrict=TRUE, min.size){
     y <- y + runif(length(y), -0.1, 0.1)
   }
   
-  mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=1:5))	
+  mc <- suppressWarnings(Mclust(y, warn=FALSE, modelNames=c("V"), G=1:5, 
+                                verbose=FALSE))	
   cl <- mc$classification
   comps <- mc$G
   
   if(comps > length(unique(cl))){
     mc <- suppressWarnings(Mclust(y, warn=FALSE, 
-                                  modelNames=c("V"), G=1:(comps-1)))
+                                  modelNames=c("V"), G=1:(comps-1),
+                                  verbose=FALSE))
     cl <- mc$classification
     comps <- mc$G
   }
@@ -116,7 +118,8 @@ mclustRestricted <- function(y, restrict=TRUE, min.size){
         comps_old <- comps
         comps <- comps-1 
         mc <- suppressWarnings(Mclust(y, warn=FALSE, 
-                                      modelNames=c("V"), G=1:comps))
+                                      modelNames=c("V"), G=1:comps,
+                                      verbose=FALSE))
         cl <- mc$classification
         comps <- mc$G
         mincat <- min(table(cl))
@@ -173,7 +176,8 @@ mclustRestricted <- function(y, restrict=TRUE, min.size){
         if (err == 1){
           comps <- comps+1 
           mc <- suppressWarnings(Mclust(y, warn=FALSE, 
-                                        modelNames=c("V"), G=1:comps))
+                                        modelNames=c("V"), G=1:comps,
+                                        verbose=FALSE))
           cl <- mc$classification
           comps <- mc$G
         }
@@ -183,7 +187,8 @@ mclustRestricted <- function(y, restrict=TRUE, min.size){
       comps_old <- comps
       comps <- comps+1 
       mc <- tryCatch({suppressWarnings(Mclust(y, warn=FALSE, 
-                                              modelNames=c("V"), G=comps))},
+                                              modelNames=c("V"), G=comps,
+                                              verbose=FALSE))},
                       error = function(e) {return(NULL)})
       cl <- mc$classification
       
@@ -205,13 +210,15 @@ mclustRestricted <- function(y, restrict=TRUE, min.size){
         
         if(!((min(meandiff) > addThresh & (vardiff < 10)) & mincat>2)){
           mc <- suppressWarnings(Mclust(y, warn=FALSE, 
-                                        modelNames=c("V"), G=comps_old))
+                                        modelNames=c("V"), G=comps_old,
+                                        verbose=FALSE))
           cl <- mc$classification
           comps <- mc$G
         }
       }else{ # couldn't fit requested model; revert to previous fit
         mc <- suppressWarnings(Mclust(y, warn=FALSE, 
-                                      modelNames=c("V"), G=comps_old))
+                                      modelNames=c("V"), G=comps_old,
+                                      verbose=FALSE))
         cl <- mc$classification
         comps <- mc$G
       }
@@ -223,7 +230,8 @@ mclustRestricted <- function(y, restrict=TRUE, min.size){
   if (comps > 1 & max(table(cl)) < min.size){
     comps <- comps-1 
     mc <- suppressWarnings(Mclust(y, warn=FALSE, 
-                                  modelNames=c("V"), G=1:comps))
+                                  modelNames=c("V"), G=1:comps,
+                                  verbose=FALSE))
     cl <- mc$classification
     comps <- mc$G
   }
