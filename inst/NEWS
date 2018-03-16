@@ -1,6 +1,14 @@
 \name{NEWS}
 \title{News for Package \pkg{scDD}}
 
+\section{Version 1.3.2, (2018-03-16)}{
+  \itemize{
+    \item{The combined p-value column returns NA for genes that have NA for the
+    nonzero p-value (previously, this column would be filled with the zero 
+    pvalue for genes with missing nonzero p-values).}
+  }
+}
+
 \section{Version 1.1.7, (2017-10-23)}{
   \itemize{
     \item{A parameter 'level' was added to the main 'scDD' function which allows
