@@ -1,3 +1,12 @@
+Changes in Version 1.3.3 (2018-03-23)
+______________________________________
+
+o An option has been added to skip the categorization step if only intereseted
+  significance of difference. This will speed up computation.
+  
+o The testing zeroes step and the KS test have been parallelized to speed up
+  computation.
+
 Changes in Version 1.3.2 (2018-03-16)
 ______________________________________
 

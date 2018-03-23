@@ -261,19 +261,23 @@ classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2,
 
 testZeroes <- function(dat, cond, these=1:nrow(dat)){
   detection <- colSums(dat>0)/nrow(dat)
-  pval <- rep(NA, length(these))
-  for (j in 1:length(these)){ 
-    y <- dat[these[j],]
+  
+  onegene <- function(y, detection){
     if (sum(y==0) > 0){
       M0 <- suppressWarnings(arm::bayesglm(y>0 ~ detection, 
                                            family=binomial(link="logit"),
-                          Warning=FALSE))
+                                           Warning=FALSE))
       M1 <- suppressWarnings(arm::bayesglm(y>0 ~ detection + factor(cond), 
-                          family=binomial(link="logit"),
-                          Warning=FALSE))
-      pval[j] <- anova(M1, M0, test="Chisq")[2,5]
+                                           family=binomial(link="logit"),
+                                           Warning=FALSE))
+      return(anova(M1, M0, test="Chisq")[2,5])
+    }else{
+      return(NA)
     }
   }
+  
+  pval <- unlist(bplapply(seq_along(these), 
+                   function(j) onegene(y=dat[these[j],], detection=detection)))
   return(pval)
 }
 

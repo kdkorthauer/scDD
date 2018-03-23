@@ -64,7 +64,8 @@ testKS <- function(dat, condition, inclZero=TRUE, numDE=NULL, DEIndex){
     suppressWarnings(ks.test(x1,x2, exact=FALSE))$p.value
   }
   
-  ks.pval.unadj <- apply(dat, 1, function(x) onegene(x) )
+  ks.pval.unadj <- unlist(bplapply(seq_len(nrow(dat)), 
+                                   function(x) onegene(dat[x,]) ))
   ks.pval <- p.adjust(ks.pval.unadj, method="BH")
   sig_genes_ks <- which(ks.pval < 0.05)
   names(sig_genes_ks) <- rownames(dat)[sig_genes_ks]

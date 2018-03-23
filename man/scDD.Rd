@@ -8,7 +8,7 @@ scDD(SCdat, prior_param = list(alpha = 0.1, mu0 = 0, s0 = 0.01, a0 = 0.01, b0
   = 0.01), permutations = 0, testZeroes = TRUE, adjust.perms = FALSE,
   param = bpparam(), parallelBy = c("Genes", "Permutations"),
   condition = "condition", min.size = 3, min.nonzero = NULL,
-  level = 0.05)
+  level = 0.05, categorize = TRUE)
 }
 \arguments{
 \item{SCdat}{An object of class \code{SingleCellExperiment} that contains 
@@ -115,6 +115,11 @@ is TRUE, then the adjusted p-value must be below `level/2` in order to be
 considered significant and categorized. This is done to control for multiple
 testing since `testZeroes=TRUE` means that each gene is tested for a 
 difference in nonzeroes and zeroes separately.}
+
+\item{categorize}{a logical indicating whether to determine which 
+categories (DE, DP, DM, DB) each gene belongs to (default = TRUE). This
+can only be set to FALSE if `permutations` is set to zero, since the full
+model fitting will automatically be carried out if permutations are run.}
 }
 \value{
 A \code{SingleCellExperiment} object that contains the data and 
@@ -137,7 +142,8 @@ with the following columns:
   \item `zero.pvalue`: Benjamini-Hochberg adjusted version of the previous column 
   (only if `testZeroes` is TRUE) 
   \item `combined.pvalue`: Fisher's combined p-value for a difference in nonzero or zero values
-  (only if `testZeroes` is TRUE) 
+  (only if `testZeroes` is TRUE). This is only NA for genes with non-NA nonzero.pvalue 
+  and zero.pvalue.
   \item `combined.pvalue.adj`: Benjamini-Hochberg adjusted version of the previous column 
   (only if `testZeroes` is TRUE) 
 }

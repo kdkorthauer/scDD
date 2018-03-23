@@ -118,7 +118,12 @@
 #' nonzero cells in each condition required for the test of differential 
 #' distributions.  If a gene has fewer nonzero cells per condition, it will
 #' still be tested for DZ (if \code{testZeroes} is TRUE). Default value is
-#' NULL (no minimum value is enforced).      
+#' NULL (no minimum value is enforced).
+#' 
+#' @param categorize a logical indicating whether to determine which 
+#' categories (DE, DP, DM, DB) each gene belongs to (default = TRUE). This
+#' can only be set to FALSE if `permutations` is set to zero, since the full
+#' model fitting will automatically be carried out if permutations are run.
 #' 
 #' @return A \code{SingleCellExperiment} object that contains the data and 
 #' sample information from the input object, but where the results objects
@@ -140,7 +145,8 @@
 #'   \item `zero.pvalue`: Benjamini-Hochberg adjusted version of the previous column 
 #'   (only if `testZeroes` is TRUE) 
 #'   \item `combined.pvalue`: Fisher's combined p-value for a difference in nonzero or zero values
-#'   (only if `testZeroes` is TRUE). This is only NA for genes with non-NA nonzero.pvalue.
+#'   (only if `testZeroes` is TRUE). This is only NA for genes with non-NA nonzero.pvalue 
+#'   and zero.pvalue.
 #'   \item `combined.pvalue.adj`: Benjamini-Hochberg adjusted version of the previous column 
 #'   (only if `testZeroes` is TRUE) 
 #' }
@@ -217,7 +223,7 @@ scDD <- function(SCdat,
                  parallelBy=c("Genes", "Permutations"),
                  condition="condition", min.size=3,
                  min.nonzero=NULL,
-                 level=0.05){
+                 level=0.05, categorize = TRUE){
   
   # check whether SCdat is a member of the SingleCellExperiment class
   if(!("SingleCellExperiment" %in% class(SCdat))){
@@ -225,9 +231,13 @@ scDD <- function(SCdat,
   }
   
   if (is.null(assayNames(SCdat)) || !("normcounts" %in% assayNames(SCdat))) {
-    stop(paste0("Please make sure the 'SingleCellExperiment' object includes ",
-                "an assays slot named 'normcounts' that contains normalized ",
-                "counts on the original scale"))
+    stop("Please make sure the 'SingleCellExperiment' object includes ",
+         "an assays slot named 'normcounts' that contains normalized ",
+         "counts on the original scale")
+  }
+  
+  if (!categorize && permutations != 0){
+    stop("Categorization will be carried out if permuations are run.")
   }
   
   parallelBy <- match.arg(parallelBy)
@@ -300,9 +310,6 @@ scDD <- function(SCdat,
     tofit <- tofit[-skipConstant]
   }
   
-  # cluster each gene in SCdat
-  message("Clustering observed expression data for each gene")
-
   message(paste0("Setting up parallel back-end using ", 
                  param$workers, " cores" ))
   BiocParallel::register(BPPARAM = param)
@@ -310,6 +317,10 @@ scDD <- function(SCdat,
   oa <- c1 <- c2 <- vector("list", nrow(normcounts(SCdat)[tofit,]))
   bf <- den <- comps.all <- 
     comps.c1 <- comps.c2 <- rep(NA, nrow(normcounts(SCdat)[tofit,]))
+  
+  # cluster each gene in SCdat
+  if (categorize)
+    message("Clustering observed expression data for each gene")
   
   if (permutations == 0){
 
@@ -329,16 +340,18 @@ scDD <- function(SCdat,
       ))
     }
     
-    out <- bplapply(1:nrow(normcounts(SCdat)[tofit,]), function(x) 
-      genefit(normcounts(SCdat)[tofit[x],]))
-    oa <- lapply(out, function(x) x[["oa"]])
-    c1 <- lapply(out, function(x) x[["c1"]])
-    c2 <- lapply(out, function(x) x[["c2"]])
-    rm(out); gc()
+    if (categorize){
+      out <- bplapply(1:nrow(normcounts(SCdat)[tofit,]), function(x) 
+        genefit(normcounts(SCdat)[tofit[x],]))
+      oa <- lapply(out, function(x) x[["oa"]])
+      c1 <- lapply(out, function(x) x[["c1"]])
+      c2 <- lapply(out, function(x) x[["c2"]])
+      rm(out); gc()
     
-    comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class, min.size)))
-    comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class, min.size)))
-    comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class, min.size)))
+      comps.all <- unlist(lapply(oa, function(x) luOutlier(x$class, min.size)))
+      comps.c1  <- unlist(lapply(c1, function(x) luOutlier(x$class, min.size)))
+      comps.c2  <- unlist(lapply(c2, function(x) luOutlier(x$class, min.size)))
+    }
     
     message("Notice: Number of permutations is set to zero; using 
             Kolmogorov-Smirnov to test for differences in distributions
@@ -467,69 +480,76 @@ scDD <- function(SCdat,
       }
   }
   
-  message("Classifying significant genes into patterns")
-  dd.cats <- classifyDD(normcounts(SCdat)[tofit,], colData(SCdat)[[condition]],
+  cats.all <- pvals.all <- rep(NA, nrow(normcounts(SCdat)))
+  pvals.all[tofit] <- pvals
+  
+  if (categorize){
+    message("Classifying significant genes into patterns")
+    dd.cats <- classifyDD(normcounts(SCdat)[tofit,], colData(SCdat)[[condition]],
                         sig, oa, c1, c2, alpha=alpha, 
                         m0=m0, s0=s0, a0=a0, b0=b0, 
                         log.nonzero=TRUE, ref=ref, min.size=min.size)
   
-  cats <- rep("NS", nrow(normcounts(SCdat)[tofit,]))
-  cats[sig] <- dd.cats
+    cats <- rep("NS", nrow(normcounts(SCdat)[tofit,]))
+    cats[sig] <- dd.cats
   
-  extraDP <- feDP(normcounts(SCdat)[tofit,], colData(SCdat)[[condition]], 
+    extraDP <- feDP(normcounts(SCdat)[tofit,], colData(SCdat)[[condition]], 
                   sig, oa, c1, c2, log.nonzero=TRUE,
                   testZeroes=testZeroes, adjust.perms=adjust.perms, 
                   min.size=min.size)
-  cats[-sig] <- names(extraDP)
+    cats[-sig] <- names(extraDP)
   
-  # classify additional genes with evidence of DD in 
-  # the form of a mean shift found by 'extraDP'
-  if(testZeroes){
-    NCs <- which(p.adjust(pvals, method="BH") > level/2 & cats == "NC")
-  }else{
-    NCs <- which(p.adjust(pvals, method="BH") > level & cats == "NC")
-  }
-  NC.cats <- classifyDD(normcounts(SCdat)[tofit,], colData(SCdat)[[condition]],
+    # classify additional genes with evidence of DD in 
+    # the form of a mean shift found by 'extraDP'
+    if(testZeroes){
+      NCs <- which(p.adjust(pvals, method="BH") > level/2 & cats == "NC")
+    }else{
+      NCs <- which(p.adjust(pvals, method="BH") > level & cats == "NC")
+    }
+    NC.cats <- classifyDD(normcounts(SCdat)[tofit,], colData(SCdat)[[condition]],
                         NCs, oa, c1, c2, alpha=alpha, 
                         m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE, 
                         ref=ref, min.size=min.size)
-  cats[NCs] <- NC.cats
+    cats[NCs] <- NC.cats
+    cats.all[tofit] <- cats
+  }
   
-  cats.all <- pvals.all <- rep(NA, nrow(normcounts(SCdat)))
-  cats.all[tofit] <- cats
-  pvals.all[tofit] <- pvals
-   
   # zero test
   pvals.z <- rep(NA, nrow(normcounts(SCdat)))
   if (testZeroes){
     pvals.z <- testZeroes(normcounts(SCdat), colData(SCdat)[[condition]])
     cats.all[p.adjust(pvals.z, method="BH") < level/2 &
                !(cats.all %in% c("DE", "DP", "DM", "DB"))] <- "DZ"
-    cats.all[p.adjust(pvals.z, method="BH") >= level/2 &
-               !(cats.all %in% c("DE", "DP", "DM", "DB"))] <- "NS"
+    if (categorize)
+      cats.all[p.adjust(pvals.z, method="BH") >= level/2 &
+                 !(cats.all %in% c("DE", "DP", "DM", "DB"))] <- "NS"
   }
   
   # build MAP objects
-  MAP1 <- matrix(1, nrow=nrow(normcounts(SCdat)), 
+  if (categorize){
+    MAP1 <- matrix(1, nrow=nrow(normcounts(SCdat)), 
                  ncol=sum(colData(SCdat)[[condition]]==ref))
-  MAP2 <- matrix(1, nrow=nrow(normcounts(SCdat)), 
+    MAP2 <- matrix(1, nrow=nrow(normcounts(SCdat)), 
                  ncol=sum(colData(SCdat)[[condition]]!=ref))
-  MAP <- matrix(1, nrow=nrow(normcounts(SCdat)), 
+    MAP <- matrix(1, nrow=nrow(normcounts(SCdat)), 
                 ncol=ncol(normcounts(SCdat)))
-  rownames(MAP1) <- rownames(MAP2) <- rownames(MAP) <- rownames(SCdat)
-  colnames(MAP1) <- colnames(SCdat[,colData(SCdat)[[condition]]==ref])
-  colnames(MAP2) <- colnames(SCdat[,colData(SCdat)[[condition]]!=ref])
-  colnames(MAP) <- colnames(SCdat)
-  MAP1[normcounts(SCdat)[, colData(SCdat)[[condition]]==ref]==0] <- 0
-  MAP2[normcounts(SCdat)[, colData(SCdat)[[condition]]!=ref]==0] <- 0
-  MAP[normcounts(SCdat)==0] <- 0
+    rownames(MAP1) <- rownames(MAP2) <- rownames(MAP) <- rownames(SCdat)
+    colnames(MAP1) <- colnames(SCdat[,colData(SCdat)[[condition]]==ref])
+    colnames(MAP2) <- colnames(SCdat[,colData(SCdat)[[condition]]!=ref])
+    colnames(MAP) <- colnames(SCdat)
+    MAP1[normcounts(SCdat)[, colData(SCdat)[[condition]]==ref]==0] <- 0
+    MAP2[normcounts(SCdat)[, colData(SCdat)[[condition]]!=ref]==0] <- 0
+    MAP[normcounts(SCdat)==0] <- 0
   
-  for (g in 1:nrow(normcounts(SCdat)[tofit,])){
-    MAP1[tofit[g],][normcounts(SCdat[tofit[g], 
-                colData(SCdat)[[condition]]==ref])!=0] <- c1[[g]]$class 
-    MAP2[tofit[g],][normcounts(SCdat[tofit[g], 
-                colData(SCdat)[[condition]]!=ref])!=0] <- c2[[g]]$class
-    MAP[tofit[g],][normcounts(SCdat[tofit[g], ])!=0] <- oa[[g]]$class
+    for (g in 1:nrow(normcounts(SCdat)[tofit,])){
+      MAP1[tofit[g],][normcounts(SCdat[tofit[g], 
+                  colData(SCdat)[[condition]]==ref])!=0] <- c1[[g]]$class 
+      MAP2[tofit[g],][normcounts(SCdat[tofit[g], 
+                  colData(SCdat)[[condition]]!=ref])!=0] <- c2[[g]]$class
+      MAP[tofit[g],][normcounts(SCdat[tofit[g], ])!=0] <- oa[[g]]$class
+    }
+  }else{
+    MAP1 <- MAP2 <- MAP <- "Categorize set to FALSE; no clustering provided."
   }
   
   comps.all.ALL <- comps.c1.ALL <- comps.c2.ALL <- rep(NA, 

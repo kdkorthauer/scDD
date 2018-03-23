@@ -229,6 +229,11 @@ of the method at the cost of potentially slightly decreased power compared
 to the full scDD framework described in the manuscript (see Section 4 for 
 more details).
 
+Note that if you are only interested in obtaining the results of the test for
+significance, and not in the classification of genes to the patterns mentioned
+above, you can achieve further computational speedup by setting 
+\Rcode{categorize} to \Rcode{FALSE}.
+
 <<main engine>>=
 scDatExSim <- scDD(scDatExSim, prior_param=prior_param, testZeroes=FALSE)
 @
