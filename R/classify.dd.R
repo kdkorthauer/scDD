@@ -264,13 +264,10 @@ testZeroes <- function(dat, cond, these=1:nrow(dat)){
   
   onegene <- function(y, detection){
     if (sum(y==0) > 0){
-      M0 <- suppressWarnings(arm::bayesglm(y>0 ~ detection, 
-                                           family=binomial(link="logit"),
-                                           Warning=FALSE))
       M1 <- suppressWarnings(arm::bayesglm(y>0 ~ detection + factor(cond), 
                                            family=binomial(link="logit"),
                                            Warning=FALSE))
-      return(anova(M1, M0, test="Chisq")[2,5])
+      return(summary(M1)$coefficients[3,4])
     }else{
       return(NA)
     }

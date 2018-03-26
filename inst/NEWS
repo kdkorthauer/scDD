@@ -1,3 +1,10 @@
+Changes in Version 1.3.4 (2018-03-26)
+______________________________________
+
+o The test for differences in proportion of zeroes now uses the Wald test 
+  p-value instead of the likelihood ratio. This will give very similar results,
+  but the Wald test is slightly more conservative.
+
 Changes in Version 1.3.3 (2018-03-23)
 ______________________________________
 
