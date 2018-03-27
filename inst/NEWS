@@ -14,13 +14,6 @@ o An option has been added to skip the categorization step if only intereseted
 o The testing zeroes step and the KS test have been parallelized to speed up
   computation.
 
-Changes in Version 1.3.2 (2018-03-16)
-______________________________________
-
-o The combined p-value column returns NA for genes that have NA for the nonzero 
-  p-value (previously, this column would be filled with the zero p-value for 
-  genes with missing nonzero p-values).
-
 Changes in Version 1.1.7 (2017-10-23)
 _____________________________________
 

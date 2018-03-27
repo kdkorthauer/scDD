@@ -145,8 +145,7 @@
 #'   \item `zero.pvalue`: Benjamini-Hochberg adjusted version of the previous column 
 #'   (only if `testZeroes` is TRUE) 
 #'   \item `combined.pvalue`: Fisher's combined p-value for a difference in nonzero or zero values
-#'   (only if `testZeroes` is TRUE). This is only NA for genes with non-NA nonzero.pvalue 
-#'   and zero.pvalue.
+#'   (only if `testZeroes` is TRUE). 
 #'   \item `combined.pvalue.adj`: Benjamini-Hochberg adjusted version of the previous column 
 #'   (only if `testZeroes` is TRUE) 
 #' }
@@ -571,6 +570,8 @@ scDD <- function(SCdat,
     fishersCombinedPval = function(x){ 
       if(sum(is.na(x)) == 0){
         pchisq(-2 * sum(log(x)), df=2*length(x),lower=FALSE)
+      }else if(sum(is.na(x)) == 1){
+        x[!is.na(x)]
       }else{
         NA
       }
