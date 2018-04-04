@@ -53,9 +53,9 @@
 
 
 testKS <- function(dat, condition, inclZero=TRUE, numDE=NULL, DEIndex){
-  onegene <- function(x){
-    x1 <- x[condition==unique(condition)[1]]
-    x2 <- x[condition==unique(condition)[2]]
+  onegene <- function(x, dat, condition, inclZero){
+    x1 <- dat[x,][condition==unique(condition)[1]]
+    x2 <- dat[x,][condition==unique(condition)[2]]
     
     if (!inclZero){
       x1 <- (x1[x1>0])
@@ -64,8 +64,9 @@ testKS <- function(dat, condition, inclZero=TRUE, numDE=NULL, DEIndex){
     suppressWarnings(ks.test(x1,x2, exact=FALSE))$p.value
   }
   
-  ks.pval.unadj <- unlist(bplapply(seq_len(nrow(dat)), 
-                                   function(x) onegene(dat[x,]) ))
+  ks.pval.unadj <- unlist(bplapply(seq_len(nrow(dat)), onegene, 
+                                   condition=condition, dat=dat,
+                                   inclZero=inclZero))
   ks.pval <- p.adjust(ks.pval.unadj, method="BH")
   sig_genes_ks <- which(ks.pval < 0.05)
   names(sig_genes_ks) <- rownames(dat)[sig_genes_ks]

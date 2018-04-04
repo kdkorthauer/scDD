@@ -262,7 +262,8 @@ classifyDD <- function(pe_mat, condition, sig_genes, oa, c1, c2,
 testZeroes <- function(dat, cond, these=1:nrow(dat)){
   detection <- colSums(dat>0)/nrow(dat)
   
-  onegene <- function(y, detection){
+  onegene <- function(j, dat, detection, cond, these){
+    y=dat[these[j],]
     if (sum(y==0) > 0){
       M1 <- suppressWarnings(arm::bayesglm(y>0 ~ detection + factor(cond), 
                                            family=binomial(link="logit"),
@@ -273,8 +274,9 @@ testZeroes <- function(dat, cond, these=1:nrow(dat)){
     }
   }
   
-  pval <- unlist(bplapply(seq_along(these), 
-                   function(j) onegene(y=dat[these[j],], detection=detection)))
+  pval <- unlist(bplapply(seq_along(these), onegene, dat=dat, 
+                          detection=detection, cond=cond, these=these))
+                      
   return(pval)
 }
 
