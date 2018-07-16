@@ -7,10 +7,10 @@ To install, make sure you have the current version of Bioconductor, and
 use the following commands:
 
 ```R
-## try http:// if https:// URLs are not supported
-source("https://bioconductor.org/biocLite.R")
-biocLite("scDD")
+install.packages("BiocManager")
+BiocManager::install("scDD")
 ```
+
 
 ## Quick Start
 For examples and tips on using the package, please see the vignette PDF 
