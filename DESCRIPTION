@@ -1,5 +1,5 @@
 Package: scDD
-Version: 1.7.0
+Version: 1.7.1
 Title: Mixture modeling of single-cell RNA-seq data to identify genes
         with differential distributions
 Description: This package implements a method to analyze single-cell
@@ -20,7 +20,7 @@ Suggests: BiocStyle, knitr, gridExtra
 License: GPL-2
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr
-biocViews: Bayesian, Clustering, RNASeq, SingleCell,
+biocViews: ImmunoOncology, Bayesian, Clustering, RNASeq, SingleCell,
         MultipleComparison, Visualization, DifferentialExpression
 URL: https://github.com/kdkorthauer/scDD
 BugReports: https://github.com/kdkorthauer/scDD/issues
