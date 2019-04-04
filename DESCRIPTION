@@ -9,8 +9,9 @@ Description: This package implements a method to analyze single-cell
         between two conditions. The package also includes functions for
         simulating data with these patterns from negative binomial
         distributions.
-Author: Keegan Korthauer
-Maintainer: Keegan Korthauer <keegan@jimmy.harvard.edu>
+Authors@R: person("Keegan", "Korthauer", role = c("crea", "aut"), 
+                  email = "keegan@jimmy.harvard.edu", 
+                  comment = c(ORCID = "0000-0002-4565-1654"))
 Depends: R (>= 3.4)
 NeedsCompilation: yes
 Imports: fields, mclust, BiocParallel, outliers, ggplot2, EBSeq, arm,
