@@ -268,9 +268,9 @@ scDD <- function(SCdat,
     min.nonzero <- min.size
   }
   tofit <- which(
-           (rowSums(normcounts(SCdat)[,colData(SCdat)[[condition]]==ref]>0) >= 
+           (rowSums(normcounts(SCdat)[,colData(SCdat)[[condition]]==ref,drop=FALSE]>0) >= 
              max(min.size,2,min.nonzero)) &
-           (rowSums(normcounts(SCdat)[,colData(SCdat)[[condition]]!=ref]>0) >= 
+           (rowSums(normcounts(SCdat)[,colData(SCdat)[[condition]]!=ref,drop=FALSE]>0) >= 
               max(min.size,2,min.nonzero)))
   
   if (length(tofit) < nrow(normcounts(SCdat))){
@@ -291,10 +291,10 @@ scDD <- function(SCdat,
   # one of the conditions. These will cause problems in model fitting
   skipConstant <- which( 
                 apply(normcounts(SCdat)[tofit,
-                                       colData(SCdat)[[condition]]==ref], 1,
+                                       colData(SCdat)[[condition]]==ref, drop=FALSE], 1,
                                 function(x) length(unique(x[x>0])) == 1) |
                 apply(normcounts(SCdat)[tofit,
-                                       colData(SCdat)[[condition]]!=ref], 1,
+                                       colData(SCdat)[[condition]]!=ref, drop=FALSE], 1,
                                 function(x) length(unique(x[x>0])) == 1) )
   if (length(skipConstant) > 0){
     if(testZeroes){
@@ -313,9 +313,9 @@ scDD <- function(SCdat,
                  param$workers, " cores" ))
   BiocParallel::register(BPPARAM = param)
   
-  oa <- c1 <- c2 <- vector("list", nrow(normcounts(SCdat)[tofit,]))
+  oa <- c1 <- c2 <- vector("list", nrow(normcounts(SCdat)[tofit,,drop=FALSE]))
   bf <- den <- comps.all <- 
-    comps.c1 <- comps.c2 <- rep(NA, nrow(normcounts(SCdat)[tofit,]))
+    comps.c1 <- comps.c2 <- rep(NA, nrow(normcounts(SCdat)[tofit,,drop=FALSE]))
   
   # cluster each gene in SCdat
   if (categorize)
@@ -340,7 +340,7 @@ scDD <- function(SCdat,
     }
     
     if (categorize){
-      out <- bplapply(1:nrow(normcounts(SCdat)[tofit,]), function(x) 
+      out <- bplapply(1:nrow(normcounts(SCdat)[tofit,,drop=FALSE]), function(x) 
         genefit(normcounts(SCdat)[tofit[x],]))
       oa <- lapply(out, function(x) x[["oa"]])
       c1 <- lapply(out, function(x) x[["c1"]])
@@ -356,7 +356,7 @@ scDD <- function(SCdat,
             Kolmogorov-Smirnov to test for differences in distributions
             instead of the Bayes Factor permutation test")
     
-    res_ks <- testKS(normcounts(SCdat)[tofit,], 
+    res_ks <- testKS(normcounts(SCdat)[tofit,,drop=FALSE], 
                      colData(SCdat)[[condition]], inclZero=FALSE)
     
     if (testZeroes){
@@ -390,7 +390,7 @@ scDD <- function(SCdat,
       ))
     }
     
-    out <- bplapply(1:nrow(normcounts(SCdat)[tofit,]), function(x) 
+    out <- bplapply(1:nrow(normcounts(SCdat)[tofit,,drop=FALSE]), function(x) 
       genefit(normcounts(SCdat)[tofit[x],]))
     oa <- lapply(out, function(x) x[["oa"]])
     c1 <- lapply(out, function(x) x[["c1"]])
@@ -408,16 +408,16 @@ scDD <- function(SCdat,
       message("Performing permutations to evaluate independence of clustering
               and condition for each gene")
       message(paste0("Parallelizing by ", parallelBy))
-      bf.perm <- vector("list", nrow(normcounts(SCdat)[tofit,]))
-      names(bf.perm) <- rownames(normcounts(SCdat)[tofit,])
+      bf.perm <- vector("list", nrow(normcounts(SCdat)[tofit,,drop=FALSE]))
+      names(bf.perm) <- rownames(normcounts(SCdat)[tofit,,drop=FALSE])
       
       if(parallelBy=="Permutations"){
         if(adjust.perms){
-          C <- apply(normcounts(SCdat)[tofit,], 2, 
+          C <- apply(normcounts(SCdat)[tofit,,drop=FALSE], 2, 
                      function(x) sum(x>0)/length(x))
           
           t1 <- proc.time()
-          for (g in 1:nrow(normcounts(SCdat)[tofit,])){
+          for (g in 1:nrow(normcounts(SCdat)[tofit,,drop=FALSE])){
             bf.perm[[g]] <- permMclustCov(normcounts(SCdat)[tofit[g],], 
                                           permutations, C, 
                                           colData(SCdat)[[condition]], 
@@ -436,7 +436,7 @@ scDD <- function(SCdat,
           
         }else{
           t1 <- proc.time()
-          for (g in 1:nrow(normcounts(SCdat)[tofit,])){
+          for (g in 1:nrow(normcounts(SCdat)[tofit,,drop=FALSE])){
             bf.perm[[g]] <- permMclust(normcounts(SCdat[tofit[g],]), 
                                        permutations,
                                        colData(SCdat)[[condition]], 
@@ -454,8 +454,8 @@ scDD <- function(SCdat,
           }
       }
       }else if(parallelBy=="Genes"){
-        C <- apply(normcounts(SCdat)[tofit,], 2, function(x) sum(x>0)/length(x))
-        bf.perm <- bplapply(1:nrow(normcounts(SCdat)[tofit,]), function(x) 
+        C <- apply(normcounts(SCdat)[tofit,,drop=FALSE], 2, function(x) sum(x>0)/length(x))
+        bf.perm <- bplapply(1:nrow(normcounts(SCdat)[tofit,,drop=FALSE]), function(x) 
               permMclustGene(normcounts(SCdat)[tofit[x],], adjust.perms, 
                              permutations, colData(SCdat)[[condition]], 
                              remove.zeroes=TRUE, log.transf=TRUE, restrict=TRUE,
@@ -465,10 +465,10 @@ scDD <- function(SCdat,
                  parallelize by using the parallelizeBy argument")}
       
       if (adjust.perms){
-        pvals <- sapply(1:nrow(normcounts(SCdat)[tofit,]), function(x) 
+        pvals <- sapply(1:nrow(normcounts(SCdat)[tofit,,drop=FALSE]), function(x) 
           sum( bf.perm[[x]] > bf[x] - den[x] ) )/(permutations)
       }else{
-        pvals <- sapply(1:nrow(normcounts(SCdat)[tofit,]), function(x) 
+        pvals <- sapply(1:nrow(normcounts(SCdat)[tofit,,drop=FALSE]), function(x) 
           sum( bf.perm[[x]] > bf[x]) ) / (permutations)
       }
       
@@ -484,15 +484,15 @@ scDD <- function(SCdat,
   
   if (categorize){
     message("Classifying significant genes into patterns")
-    dd.cats <- classifyDD(normcounts(SCdat)[tofit,], colData(SCdat)[[condition]],
+    dd.cats <- classifyDD(normcounts(SCdat)[tofit,,drop=FALSE], colData(SCdat)[[condition]],
                         sig, oa, c1, c2, alpha=alpha, 
                         m0=m0, s0=s0, a0=a0, b0=b0, 
                         log.nonzero=TRUE, ref=ref, min.size=min.size)
   
-    cats <- rep("NS", nrow(normcounts(SCdat)[tofit,]))
+    cats <- rep("NS", nrow(normcounts(SCdat)[tofit,,drop=FALSE]))
     cats[sig] <- dd.cats
   
-    extraDP <- feDP(normcounts(SCdat)[tofit,], colData(SCdat)[[condition]], 
+    extraDP <- feDP(normcounts(SCdat)[tofit,,drop=FALSE], colData(SCdat)[[condition]], 
                   sig, oa, c1, c2, log.nonzero=TRUE,
                   testZeroes=testZeroes, adjust.perms=adjust.perms, 
                   min.size=min.size)
@@ -505,7 +505,7 @@ scDD <- function(SCdat,
     }else{
       NCs <- which(p.adjust(pvals, method="BH") > level & cats == "NC")
     }
-    NC.cats <- classifyDD(normcounts(SCdat)[tofit,], colData(SCdat)[[condition]],
+    NC.cats <- classifyDD(normcounts(SCdat)[tofit,,drop=FALSE], colData(SCdat)[[condition]],
                         NCs, oa, c1, c2, alpha=alpha, 
                         m0=m0, s0=s0, a0=a0, b0=b0, log.nonzero=TRUE, 
                         ref=ref, min.size=min.size)
@@ -536,11 +536,11 @@ scDD <- function(SCdat,
     colnames(MAP1) <- colnames(SCdat[,colData(SCdat)[[condition]]==ref])
     colnames(MAP2) <- colnames(SCdat[,colData(SCdat)[[condition]]!=ref])
     colnames(MAP) <- colnames(SCdat)
-    MAP1[normcounts(SCdat)[, colData(SCdat)[[condition]]==ref]==0] <- 0
-    MAP2[normcounts(SCdat)[, colData(SCdat)[[condition]]!=ref]==0] <- 0
+    MAP1[normcounts(SCdat[, colData(SCdat)[[condition]]==ref])==0] <- 0
+    MAP2[normcounts(SCdat[, colData(SCdat)[[condition]]!=ref])==0] <- 0
     MAP[normcounts(SCdat)==0] <- 0
   
-    for (g in 1:nrow(normcounts(SCdat)[tofit,])){
+    for (g in 1:nrow(normcounts(SCdat)[tofit,,drop=FALSE])){
       MAP1[tofit[g],][normcounts(SCdat[tofit[g], 
                   colData(SCdat)[[condition]]==ref])!=0] <- c1[[g]]$class 
       MAP2[tofit[g],][normcounts(SCdat[tofit[g], 
