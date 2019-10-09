@@ -10,7 +10,7 @@ Description: This package implements a method to analyze single-cell
         simulating data with these patterns from negative binomial
         distributions.
 Authors@R: person("Keegan", "Korthauer", role = c("cre", "aut"), 
-                  email = "keegan@jimmy.harvard.edu", 
+                  email = "keegan@stat.ubc.ca", 
                   comment = c(ORCID = "0000-0002-4565-1654"))
 Depends: R (>= 3.4)
 NeedsCompilation: yes
