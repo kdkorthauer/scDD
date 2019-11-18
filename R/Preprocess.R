@@ -158,9 +158,9 @@ preprocess <- function(SCdat,
                                           libsize)
   }else if(scran_norm){
     message("Performing scran Normalization")
-    libsize <-  computeSumFactors(assay(SCdat, "counts"))
+    SCdat <-  computeSumFactors(SCdat, assay.type="counts")
     normcounts(SCdat) <- GetNormalizedMat(assay(SCdat, "counts"),
-                                          libsize)
+                                          sizeFactors(SCdat))
   }
   
   return(SCdat)
