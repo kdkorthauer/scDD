@@ -1,5 +1,5 @@
 Package: scDD
-Version: 1.11.1
+Version: 1.12.0
 Title: Mixture modeling of single-cell RNA-seq data to identify genes
         with differential distributions
 Description: This package implements a method to analyze single-cell
