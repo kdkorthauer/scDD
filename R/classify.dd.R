@@ -268,7 +268,12 @@ testZeroes <- function(dat, cond, these=1:nrow(dat)){
       M1 <- suppressWarnings(arm::bayesglm(y>0 ~ detection + factor(cond), 
                                            family=binomial(link="logit"),
                                            Warning=FALSE))
-      return(summary(M1)$coefficients[3,4])
+
+      if (nrow(summary(M1)$coefficients) == 3) {
+        return(summary(M1)$coefficients[3, 4])
+      } else {
+        return(NA)
+      }
     }else{
       return(NA)
     }
