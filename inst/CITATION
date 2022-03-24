@@ -15,8 +15,7 @@ citEntry(entry = "Article",
   volume       = "17",
   number       = "1",
   pages        = "222",
-  url          = "https://genomebiology.biomedcentral.com/
-        articles/10.1186/s13059-016-1077-y.",
+  url          = "https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y",
 
   textVersion  =
   paste("Korthauer KD, Chu LF, Newton MA, Li Y, Thomson J, Stewart R, 
@@ -24,6 +23,5 @@ Kendziorski C. (2016).",
         "A statistical approach for identifying differential 
 distributions in single-cell RNA-seq experiments.",
         "Genome Biology, 17(1), 222.",
-        "URL https://genomebiology.biomedcentral.com/
-        articles/10.1186/s13059-016-1077-y.")
+        "URL https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1077-y")
 )
